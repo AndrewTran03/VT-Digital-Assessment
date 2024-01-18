@@ -5,7 +5,7 @@ import express, { NextFunction } from "express";
 import bodyParser from "body-parser";
 import config from "config";
 import cors from "cors";
-// import log from "./utils/logger";
+import log from "./utils/logger";
 // import router from "./routes";
 import { Server } from "socket.io";
 import http from "http";
@@ -29,5 +29,5 @@ const backendServerPort = 3000;
 const backendServerUrl = "http://localhost:3000/";
 
 app.listen(backendServerPort, async () => {
-    console.log(`App started on ${backendServerUrl}`);
+    log.info(`App started on ${backendServerUrl}`);
 });
