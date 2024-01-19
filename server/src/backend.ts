@@ -7,9 +7,7 @@ import config from "config";
 import cors from "cors";
 import log from "./utils/logger";
 // import router from "./routes";
-import { Server } from "socket.io";
-import http from "http";
-import { Db } from "mongodb";
+import { fetchAndDisplayCanvasCourseData } from "./canvas_interact/canvas.api";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
@@ -25,9 +23,10 @@ app.use((_, res, next: NextFunction) => {
     next();
 });
 
-const backendServerPort = 3000;
-const backendServerUrl = "http://localhost:3000/";
+const backendServerPort = config.get<number>("backendServerPort");
+const backendServerUrl = config.get<string>("backendServerUrl");
 
 app.listen(backendServerPort, async () => {
     log.info(`App started on ${backendServerUrl}`);
+    await fetchAndDisplayCanvasCourseData();
 });
