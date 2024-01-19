@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import config from "config";
 import cors from "cors";
 import log from "./utils/logger";
-// import router from "./routes";
+import router from "./routes";
 import { fetchAndDisplayCanvasCourseData } from "./canvas_interact/canvas.api";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
@@ -14,7 +14,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cors({ credentials: true }));
-// app.use(router);
+app.use(router);
 app.use((_, res, next: NextFunction) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
     res.setHeader("Access-Control-Request-Method", "*");
