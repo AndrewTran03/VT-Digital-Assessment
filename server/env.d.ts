@@ -2,6 +2,8 @@ declare global {
     namespace NodeJS {
         interface ProcessEnv {
             // Secret enviornment variables (allows for TypeScript intellisense)
+            BACKEND_PORT: number;
+            CANVAS_PUBLIC_API_TOKEN: string;
         }
     }
 }

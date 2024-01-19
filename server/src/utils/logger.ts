@@ -2,12 +2,11 @@ import logger, { Logger } from "pino";
 import dayjs from "dayjs";
 import config from "config";
 
-// const level = config.get<string>("logLevel");
-const level = "trace";
+const level = config.get<string>("logLevel");
 
 /*
 From Chat-GPT: 
-For the ogging library for Node.js called Pino, it has different log levels that 
+For the logging library for Node.js called Pino, it has different log levels that 
 represent the severity or importance of log messages. The log levels in Pino, in 
 increasing order of severity, are:
 
