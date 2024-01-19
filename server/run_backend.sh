@@ -10,8 +10,8 @@ log_dir="./logs"
 if [ -d "$log_dir" ]; then
     echo "Directory $log_dir already exists."
 else
-    mkdir "$dir"
-    echo "Directory $dir created."
+    mkdir "$log_dir"
+    echo "Directory $log_dir created."
 fi
 cd "$log_dir"
 file_name="log_$(date +'%m-%d-%y-%T').txt"
