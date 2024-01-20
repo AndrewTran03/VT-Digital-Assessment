@@ -16,17 +16,17 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cors({ credentials: true }));
 app.use(router);
 app.use((_, res, next: NextFunction) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Access-Control-Request-Method", "*");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS");
-    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Request-Method", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
 });
 
 const backendServerPort = config.get<number>("backendServerPort");
 const backendServerUrl = config.get<string>("backendServerUrl");
 
 app.listen(backendServerPort, async () => {
-    log.info(`App started on ${backendServerUrl}`);
-    await fetchAndDisplayCanvasCourseData();
+  log.info(`App started on ${backendServerUrl}`);
+  await fetchAndDisplayCanvasCourseData();
 });

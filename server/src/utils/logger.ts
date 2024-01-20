@@ -18,15 +18,15 @@ increasing order of severity, are:
 - fatal: Represents critical errors that lead to the termination of the application.
 */
 const log: Logger = logger({
-    level: level,
-    transport: {
-        target: "pino-pretty",
-        options: {
-            colorize: true
-        }
-    },
-    base: { pid: false },
-    timestamp: () => `, "time":"${dayjs().format()}"`
+  level: level,
+  transport: {
+    target: "pino-pretty",
+    options: {
+      colorize: true
+    }
+  },
+  base: { pid: false },
+  timestamp: () => `, "time":"${dayjs().format()}"`
 });
 
 export default log;
