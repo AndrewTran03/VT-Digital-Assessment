@@ -5,7 +5,7 @@ type Props = {
 };
 
 function Test(props: Props) {
-  const [num, setNum] = useState(props.num);
+  const [num, setNum] = useState<number>(0);
 
   return (
     <div>
