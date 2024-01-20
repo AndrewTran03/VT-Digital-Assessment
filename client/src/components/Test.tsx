@@ -2,10 +2,11 @@ import { useState } from "react";
 
 type Props = {
   num: number;
+  name: string
 };
 
 function Test(props: Props) {
-  const [num, setNum] = useState<number>(0);
+  const [num, setNum] = useState(props.num);
 
   return (
     <div>
