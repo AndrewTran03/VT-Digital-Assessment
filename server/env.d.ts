@@ -1,12 +1,20 @@
+import log from "./src/utils/logger";
 import { z } from "zod";
+import { fromZodError } from "zod-validation-error";
 
-// Include secret enviornment variables here (allows for TypeScript intellisense)
+// Include secret enviornment variables here
 const processEnvSchema = z.object({
-  BACKEND_PORT: z.number(),
-  CANVAS_PUBLIC_API_TOKEN: z.string()
+  BACKEND_PORT: z.number().gte(3000),
+  CANVAS_PUBLIC_API_TOKEN: z.string().min(1)
 });
-processEnvSchema.parse(process.env);
+const envParseResult = processEnvSchema.safeParse(process.env);
+// Checking if enviornment variables (in ".env" file) were setup properly
+if (!envParseResult.success) {
+  log.error(fromZodError(envParseResult.error));
+  process.exit(1);
+}
 
+// Allows for global TypeScript intellisense of process.env variables in the backend
 declare global {
   namespace NodeJS {
     interface ProcessEnv extends z.infer<typeof processEnvSchema> {}
