@@ -7,7 +7,7 @@ import config from "config";
 import cors from "cors";
 import log from "./utils/logger";
 import router from "./routes";
-import { fetchAndDisplayCanvasCourseData } from "./canvas_interact/canvas.api";
+import { fetchAndDisplayCanvasData } from "./canvas_interact/canvas.api";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
@@ -28,5 +28,5 @@ const backendServerUrl = config.get<string>("backendServerUrl");
 
 app.listen(backendServerPort, async () => {
   log.info(`App started on ${backendServerUrl}`);
-  await fetchAndDisplayCanvasCourseData();
+  await fetchAndDisplayCanvasData();
 });
