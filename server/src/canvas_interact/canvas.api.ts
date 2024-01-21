@@ -6,13 +6,15 @@ import { CanvasCourse, CanvasQuiz, CanvasQuizQuestion } from "../../assets/types
 const canvasUrl = "https://canvas.vt.edu:443/api";
 const canvasPublicApiToken = config.get<string>("canvasPublicApiToken");
 
+const axiosHeaders = {
+  Authorization: `Bearer ${canvasPublicApiToken}`
+};
+
 // End Result: A data structure as folows - Map { K: CourseId, V: Map { K: QuizId, V: QuizQuestionsObj }}
 async function fetchCanvasQuizData() {
   // Gets your own Canvas User-Id (If Needed)
   // const userData = await axios.get(`${canvasUrl}/v1/users/self`, {
-  //   headers: {
-  //     Authorization: `Bearer ${canvasPublicApiToken}`
-  //   }
+  //   headers: axiosHeaders
   // });
   // const canvasUserId = userData.data.id;
   // log.info(canvasUserId);
@@ -20,9 +22,6 @@ async function fetchCanvasQuizData() {
   console.clear();
   let canvasCoursesArr: CanvasCourse[] = [];
   const enrollmentTypeRoles = ["teacher", "ta"];
-  const axiosHeaders = {
-    Authorization: `Bearer ${canvasPublicApiToken}`
-  };
   // Get every available COURSE where the user is a TA or Course Instructor of the Canvas course
   for (let i = 0; i < enrollmentTypeRoles.length; i++) {
     const role = enrollmentTypeRoles[i];
@@ -37,6 +36,8 @@ async function fetchCanvasQuizData() {
       headers: axiosHeaders
     });
 
+    // Assigns each CanvasCourse object to proper array index, then drops it (keeps object)
+    // PREV: JSON - 0: { ...object... } => TS: arr[0] = ...object...
     const canvasCoursesTemp: Record<number, CanvasCourse> = {};
     courseRes.data.forEach((course: CanvasCourse, idx: number) => {
       // Handle Date parsing properly
@@ -58,13 +59,13 @@ async function fetchCanvasQuizData() {
 
       canvasCoursesTemp[idx] = course;
     });
-
     const currArr = Object.values(canvasCoursesTemp);
     canvasCoursesArr = canvasCoursesArr.concat(currArr);
     log.info(`Length of ${role.toUpperCase()} array is ${currArr.length}`);
   }
   log.info(`Total length is ${canvasCoursesArr.length}`);
 
+  // Extracts only the relevant information from Course data: CourseIds
   const courseIdsArr: number[] = canvasCoursesArr.map((item) => item.id!);
   log.info(`Course IDs- ${courseIdsArr}. Length: ${courseIdsArr.length}`);
 
@@ -80,6 +81,8 @@ async function fetchCanvasQuizData() {
     });
 
     let canvasQuizzesArr: CanvasQuiz[] = [];
+    // Assigns each CanvasQuiz object to proper array index, then drops it (keeps object)
+    // PREV: JSON - 0: { ...object... } => TS: arr[0] = ...object...
     const canvasQuizzesTemp: Record<number, CanvasCourse> = {};
     quizRes.data.forEach((quiz: CanvasQuiz, idx: number) => {
       // Handle Date parsing properly
@@ -101,9 +104,9 @@ async function fetchCanvasQuizData() {
 
       canvasQuizzesTemp[idx] = quiz;
     });
-
     canvasQuizzesArr = Object.values(canvasQuizzesTemp);
 
+    // Extracts only the relevant information from Quiz data: QuizIds
     const quizIdsArr = canvasQuizzesArr.map((item) => item.id!);
     log.info(`Course ID# ${courseId}: Quiz IDs- ${quizIdsArr}. Length: ${quizIdsArr.length}`);
 
@@ -115,11 +118,12 @@ async function fetchCanvasQuizData() {
         headers: axiosHeaders
       });
 
+      // Assigns each CanvasQuizQuestion object to proper array index, then drops it (keeps object)
+      // PREV: JSON - 0: { ...object... } => TS: arr[0] = ...object...
       const canvasQuizQuestionTemp: Record<number, CanvasQuizQuestion> = {};
       quizQuestionsRes.data.forEach((quizQues: CanvasQuizQuestion, idx: number) => {
         canvasQuizQuestionTemp[idx] = quizQues;
       });
-
       const canvasCurrQuizQuestionsArr = Object.values(canvasQuizQuestionTemp);
       log.info(`Course ID# ${courseId}: Quiz ID# ${quizId}: Quiz Length- ${canvasCurrQuizQuestionsArr.length}`);
       const quizMapEntry: Map<number, CanvasQuizQuestion[]> = new Map([[quizId, canvasCurrQuizQuestionsArr]]);
