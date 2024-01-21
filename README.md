@@ -1,6 +1,52 @@
 # VT-Digital-Assessment
 
+## >> Getting Started << DO THIS FIRST!
 
+```shell
+# HTTPS
+git clone https://code.vt.edu/andrewt03/vt-digital-assessment.git
+
+# SSH (recommended)
+git clone git@code.vt.edu:andrewt03/vt-digital-assessment.git
+```
+
+```shell
+# Create a frontend terminal
+cd client/
+npm install
+sh run_frontend.sh
+```
+
+```shell
+# Create a backend terminal
+cd server/
+npm install
+sh run_backend.sh
+```
+
+`NOTE`: Please create a `.env` file (and structure it similarly to the `.env.sample` provided) and then populate it your Canvas API key first before running this application locally. If you do not have a `Canvas API Token`, please follow the steps outlined in the `Addendum: Creating a Canvas API Token` section (as shown below).
+
+# Addendum: Creating a Canvas API Token
+
+- Go to your Canvas site (VT: [Canvas](https://canvas.vt.edu/)).
+- Go to the top-left to your icon and click `Account`.
+- Navigate to `Settings`.
+- Scroll down until you see the `Approved Integrations` section. Click `+ New Access Token`.
+- Fill in the `Purpose` section with your reason for generating a Canvas API token and set your desired expiration date in the `Expires` row. Then, click `Generate Token`.
+- You will then see your `API Token`. Save this someplace safe as it will be generated only this once, and you cannot see it again. If you lose the token, you need to regenerate it again using the steps above.
+- In your cloned repository:
+```shell
+cd server/
+touch .env
+cp .env.sample .env
+# Please add your API token on the `CANVAS_PUBLIC_API_TOKEN` line in quotations for safe-keeping as well as to make the backend work!
+```
+
+# Resources:
+
+- [Canvas Live API](https://canvas.vt.edu/doc/api/live#!/assignments.json/list_assignments_assignments_get_1) 
+
+# Extra GitLab README Generated Instructions
 
 ## Getting started
 
