@@ -16,20 +16,34 @@ async function fetchAndDisplayCanvasCourseData() {
   log.info(canvasUserId);
 
   console.clear();
-  const response = await axios.get(`${canvasUrl}/v1/users/${canvasUserId}/courses`, {
-    headers: {
-      Authorization: `Bearer ${canvasPublicApiToken}`
-    }
-  });
+  let canvasCoursesArr: CanvasCourse[] = [];
+  const enrollmentTypeRoles = ["ta", "teacher"];
+  for (let i = 0; i < enrollmentTypeRoles.length; i++) {
+    const role = enrollmentTypeRoles[i];
 
-  const canvasCourses: Record<number, CanvasCourse> = {};
-  response.data.forEach((course: CanvasCourse, idx: number) => {
-    canvasCourses[idx] = course;
-  });
+    const courseParams = {
+      enrollment_type: role,
+      enrollment_state: "active",
+      state: ["available"]
+    };
+    const response = await axios.get(`${canvasUrl}/v1/courses`, {
+      params: courseParams,
+      headers: {
+        Authorization: `Bearer ${canvasPublicApiToken}`
+      }
+    });
 
-  const canvasCoursesArr = Object.values(canvasCourses);
-  log.info(canvasCoursesArr);
-  log.info("LENGTH IS: " + canvasCoursesArr.length);
+    const canvasCourses: Record<number, CanvasCourse> = {};
+    response.data.forEach((course: CanvasCourse, idx: number) => {
+      canvasCourses[idx] = course;
+    });
+
+    const currArr = Object.values(canvasCourses);
+    canvasCoursesArr = canvasCoursesArr.concat(currArr);
+    log.info(currArr);
+    log.info(`Length of ${role} array is ${currArr.length}`);
+  }
+  log.info(`Total length is ${canvasCoursesArr.length}`);
 }
 
 export { fetchAndDisplayCanvasCourseData };
