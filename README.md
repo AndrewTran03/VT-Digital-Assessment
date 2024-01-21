@@ -24,7 +24,7 @@ npm install
 sh run_backend.sh
 ```
 
-`NOTE`: Please create a `.env` file (and structure it similarly to the `.env.sample` provided) and then populate it your Canvas API key first before running this application locally. If you do not have a `Canvas API Token`, please follow the steps outlined in the `Addendum: Creating a Canvas API Token` section (as shown below).
+`NOTE`: Please create a `.env` file (and structure it similarly to the `.env.sample` provided) and then populate it your Canvas API key first before running this application locally. If you do not have a `Canvas API Token`, please follow the steps outlined in the `Addendum: Creating a Canvas API Token` section (as shown below). Additionally, if you would like to see the `.drawio` files in the `system-design` directory, please install the [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) Extension on Visual Studio Code.
 
 # Addendum: Creating a Canvas API Token
 
