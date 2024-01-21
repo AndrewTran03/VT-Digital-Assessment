@@ -7,8 +7,8 @@ const canvasUrl = "https://canvas.vt.edu:443/api";
 const canvasPublicApiToken = config.get<string>("canvasPublicApiToken");
 
 // End Result: A data structure as folows - Map { K: CourseId, V: Map { K: QuizId, V: QuizQuestionsObj }}
-async function fetchAndDisplayCanvasData() {
-  // Gets your own Canvas User-Id
+async function fetchCanvasQuizData() {
+  // Gets your own Canvas User-Id (If Needed)
   // const userData = await axios.get(`${canvasUrl}/v1/users/self`, {
   //   headers: {
   //     Authorization: `Bearer ${canvasPublicApiToken}`
@@ -151,4 +151,4 @@ function checkFinalSizeHelper(map: Map<number, Array<Map<number, CanvasQuizQuest
   });
 }
 
-export { fetchAndDisplayCanvasData };
+export { fetchCanvasQuizData };
