@@ -2,7 +2,7 @@ import { useState } from "react";
 
 type Props = {
   num: number;
-  name: string
+  name: string;
 };
 
 function Test(props: Props) {
