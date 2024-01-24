@@ -53,6 +53,9 @@ async function fetchCanvasQuizData() {
       if (typeof course.course_progress?.completed_at === "string") {
         course.course_progress.completed_at = new Date(course.course_progress.completed_at);
       }
+      if (typeof course.term?.start_at === "string") {
+        course.term.start_at = new Date(course.term.start_at);
+      }
       if (typeof course.term?.end_at === "string") {
         course.term.end_at = new Date(course.term.end_at);
       }
