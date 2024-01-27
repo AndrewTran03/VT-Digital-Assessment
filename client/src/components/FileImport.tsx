@@ -67,13 +67,14 @@ const FileImport: React.FC = () => {
     e.preventDefault();
     console.log("Hit submitted!");
 
-    axios.post(`${backendUrlBase}/api/objective`, learningObjArr)
+    axios
+      .post(`${backendUrlBase}/api/objective`, learningObjArr)
       .then((res) => console.log(res))
       .catch((err: AxiosError) => {
         const errorConfig = err.response?.data as APIErrorResponse;
         const error = new APIRequestError("Failed to INSERT course objectives to backend", errorConfig);
         console.error(error.toString());
-    });
+      });
   }
 
   function handleBackButtonClick(e: FormEvent<HTMLButtonElement>) {
