@@ -5,6 +5,11 @@ type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+type APIErrorResponse = {
+  errorLoc: string;
+  errorMsg: string;
+};
+
 // Reference: https://canvas.vt.edu/doc/api/live#!/assignments.json/
 type CanvasCourse = {
   id?: number;
@@ -185,4 +190,4 @@ type CanvasQuizAnswer = {
   blank_id?: number;
 };
 
-export { CanvasCourse, CanvasQuiz, CanvasQuizQuestion };
+export { APIErrorResponse, CanvasCourse, CanvasQuiz, CanvasQuizQuestion };
