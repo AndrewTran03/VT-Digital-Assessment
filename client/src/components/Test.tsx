@@ -1,19 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Props = {
   num: number;
   name: string;
 };
 
-function Test(props: Props) {
+const Test: React.FC<Props> = (props) => {
   const [num, setNum] = useState(props.num);
 
+  useEffect(() => {
+    console.log(num);
+  }, [num]);
+
   return (
-    <div>
+    <>
       Num is {num}
       <p>Hi, this is a test!</p>
-    </div>
+      <button onClick={() => setNum((prevNum) => prevNum + 1)}>Click Me!</button>
+    </>
   );
-}
+};
 
 export default Test;
