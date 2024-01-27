@@ -5,6 +5,8 @@ type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+const backendUrlBase = "http://localhost:3000";
+
 // REMOVE THESE LATER
 type Test1 = {
   name: string;
@@ -17,4 +19,17 @@ type Test2 = Prettify<
   }
 >;
 
-export { Test2 };
+type APIErrorResponse = {
+  errorLoc: string;
+  errorMsg: string;
+};
+
+type CourseObjective = {
+  deptAbbrev: string;
+  courseNum: number;
+  semester: "Fall" | "Spring" | "Summer" | "Winter";
+  year: number;
+  canvasObjective: string;
+};
+
+export { Test2, backendUrlBase, APIErrorResponse, CourseObjective };
