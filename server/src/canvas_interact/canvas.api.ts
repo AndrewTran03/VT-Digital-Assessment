@@ -142,6 +142,7 @@ async function fetchCanvasQuizData() {
   }
 
   checkFinalSizeHelper(canvasQuizAssociations);
+  return canvasQuizAssociations;
 }
 
 // Helper function to validate mapping process is correct
