@@ -190,4 +190,9 @@ type CanvasQuizAnswer = {
   blank_id?: number;
 };
 
-export { APIErrorResponse, CanvasCourse, CanvasQuiz, CanvasQuizQuestion };
+type CanvasQuizQuestionGroup = {
+  quizId: number;
+  questions: CanvasQuizQuestion[];
+};
+
+export { APIErrorResponse, CanvasCourse, CanvasQuiz, CanvasQuizQuestion, CanvasQuizQuestionGroup };
