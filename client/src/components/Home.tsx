@@ -9,10 +9,18 @@ const Home: React.FC = () => {
     navigate("/file_import");
   }
 
+  function handldClickToDashboard(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    navigate("/dashboard");
+  }
+
   return (
     <>
       <button type="button" onClick={handleClickToObjectives}>
         + Add Learning Objectives for Your Course
+      </button>
+      <button type="button" onClick={handldClickToDashboard}>
+        Click Here to Go to Dashboard
       </button>
     </>
   );
