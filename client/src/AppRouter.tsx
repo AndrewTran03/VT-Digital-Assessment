@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "./components/Home";
 import FileImport from "./components/FileImport";
+import UserDashboard from "./components/UserDashboard";
 
 function AppRouter() {
   return (
@@ -10,6 +11,7 @@ function AppRouter() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/file_import" element={<FileImport />} />
+            <Route path="/dashboard" element={<UserDashboard />} />
           </Routes>
         </Router>
       </>
