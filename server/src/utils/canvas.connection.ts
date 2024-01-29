@@ -5,7 +5,7 @@ async function ensureConnectionToCanvasApi() {
   try {
     const canvasUserId = await fetchCanvasUserInfo();
     if (canvasUserId == -1) {
-      throw new Error("Failed to connect to Canvas API . Exiting now...");
+      throw new Error("Failed to connect to Canvas API. Exiting now...");
     }
     log.info("Sucessfully initiated connection to the Canvas API");
   } catch (err: any) {
