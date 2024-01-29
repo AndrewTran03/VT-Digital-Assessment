@@ -5,7 +5,11 @@ import { fromZodError } from "zod-validation-error";
 // Include secret enviornment variables here
 const processEnvSchema = z.object({
   BACKEND_PORT: z.number().gte(3000),
-  CANVAS_PUBLIC_API_TOKEN: z.string().min(1)
+  CANVAS_PUBLIC_API_TOKEN: z.string().min(1),
+  USERNAME: z.string().min(1),
+  PASSWORD: z.string().min(1),
+  DEPLOYMENT_NAME: z.string().min(1),
+  MONGO_DB_NAME: z.string().min(1)
 });
 const envParseResult = processEnvSchema.safeParse(process.env);
 // Checking if enviornment variables (in ".env" file) were setup properly
