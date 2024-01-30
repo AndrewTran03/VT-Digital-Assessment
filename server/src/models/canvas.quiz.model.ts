@@ -37,7 +37,16 @@ const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuest
   questionType: {
     type: String,
     required: true,
-    enum: ["multiple_choice_question", "essay_question"] as const
+    enum: [
+      "multiple_choice_question",
+      "essay_question",
+      "true_false_question",
+      "multiple_dropdrowns_question",
+      "fill_in_multiple_blanks_question",
+      "multiple_answers_question",
+      "short_answer_question",
+      "numerical_question"
+    ] as const
   },
   questionText: {
     type: String,
