@@ -86,7 +86,7 @@ async function fetchCanvasUserCourseData() {
   return courseIdsArr;
 }
 
-// Returns a number[] of the Canvas user's available Quiz IDs
+// Returns a Map (described below) of the Canvas user's available Quiz IDs
 async function fetchCanvasUserQuizData(courseIdsArr: readonly number[]) {
   console.clear();
   const canvasQuizAssociations = new Map<number, Array<CanvasQuizQuestionGroup>>();
