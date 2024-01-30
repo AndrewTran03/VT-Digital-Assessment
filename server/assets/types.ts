@@ -209,13 +209,29 @@ type CanvasCourseSingleCourseObjective = Prettify<
   }
 >;
 
-type CanvasCourseObjectiveGroup = {
-  deptAbbrev: string;
-  courseNum: number;
-  semester: "Fall" | "Spring" | "Summer" | "Winter";
-  year: number;
-  canvasCourseInternalCode: number;
-  canvasObjectives: string[];
+type CanvasCourseObjectiveGroup = Prettify<
+  CourseObjectiveBase & {
+    canvasObjectives: string[];
+  }
+>;
+
+type CanvasCourseQuizMongoDBEntry = {
+  courseId: number;
+  quizId: number;
+  canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
+};
+
+type CanvasCourseQuizQuestionMongoDBEntry = {
+  questionType: "multiple_choice_question" | "essay_question";
+  questionText: string;
+  answers?: CanvasCourseMCQAnswerMongoDBEntry[];
+};
+
+type CanvasCourseMCQAnswerMongoDBEntry = {
+  weight: number;
+  migration_id: string;
+  id: number;
+  text: string;
 };
 
 export {
@@ -225,5 +241,8 @@ export {
   CanvasQuizQuestion,
   CanvasQuizQuestionGroup,
   CanvasCourseSingleCourseObjective,
-  CanvasCourseObjectiveGroup
+  CanvasCourseObjectiveGroup,
+  CanvasCourseQuizMongoDBEntry,
+  CanvasCourseQuizQuestionMongoDBEntry,
+  CanvasCourseMCQAnswerMongoDBEntry
 };

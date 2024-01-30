@@ -25,4 +25,6 @@ router.get("/api/canvas/external_canvas_api", async (_, res) => {
   }
 });
 
+router.post("/api/canvas", async (req, res) => {});
+
 export { router as canvasDataRouter };
