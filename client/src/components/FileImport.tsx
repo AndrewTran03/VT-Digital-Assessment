@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { backendUrlBase, CourseObjective, APIErrorResponse } from "../assets/types";
+import { backendUrlBase, CourseObjectiveBase, APIErrorResponse } from "../assets/types";
 import { APIRequestError } from "../assets/APIRequestError";
 
 enum Season {
@@ -20,11 +20,12 @@ const learningObjSchema = z.object({
   courseNum: z.number().min(1000).max(9999),
   semester: z.enum(seasonValues),
   year: z.number().gte(0).lte(9999),
+  canvasCourseInternalCode: z.number().gte(100000),
   canvasObjective: z.string().min(1)
 });
 
 const FileImport: React.FC = () => {
-  const [learningObjArr, setLearningObjArr] = useState<CourseObjective[]>([]);
+  const [learningObjArr, setLearningObjArr] = useState<CourseObjectiveBase[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,14 +45,23 @@ const FileImport: React.FC = () => {
           return;
         }
         const entries = line.split(","); // Since this is a CSV file
-        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasObjectiveUnparsed] = entries;
+        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasCourseInternalCodeStr, canvasObjectiveUnparsed] =
+          entries;
 
         const courseNum = parseInt(courseNumStr);
         const semester = semesterStr as ValidSeason;
         const year = parseInt(yearStr);
-        const canvasObjective = canvasObjectiveUnparsed.replace('"', "").replace(".", "");
+        const canvasCourseInternalCode = parseInt(canvasCourseInternalCodeStr);
+        const canvasObjective = canvasObjectiveUnparsed.replace('".\r\n', "");
 
-        const newLearningObjective: CourseObjective = { deptAbbrev, courseNum, semester, year, canvasObjective };
+        const newLearningObjective: CourseObjectiveBase = {
+          deptAbbrev,
+          courseNum,
+          semester,
+          year,
+          canvasCourseInternalCode,
+          canvasObjective
+        };
         const validResult = learningObjSchema.safeParse(newLearningObjective);
         if (validResult.success) {
           setLearningObjArr((prevArr) => prevArr.concat(newLearningObjective));
@@ -83,6 +93,15 @@ const FileImport: React.FC = () => {
     navigate("/");
   }
 
+  function handleForwardButtonClick(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    console.log("Next button pressed!");
+    console.log("FILE IMPORT: " + learningObjArr[0].canvasCourseInternalCode);
+    navigate("/learning_obj_match", {
+      state: { canvasCourseInternalCode: learningObjArr[0].canvasCourseInternalCode! }
+    });
+  }
+
   return (
     <div>
       <button type="reset" onClick={handleBackButtonClick}>
@@ -91,6 +110,9 @@ const FileImport: React.FC = () => {
       <input type="file" accept=".csv" onChange={handleFileChange} />
       <button type="submit" onClick={handleButtonSubmit}>
         Submit
+      </button>
+      <button type="submit" onClick={handleForwardButtonClick}>
+        Go to Course Objective Matching Component
       </button>
     </div>
   );

@@ -19,18 +19,31 @@ type Test2 = Prettify<
   }
 >;
 
+// Required with All MongoDB Entries:
+type MongoDBEntry = {
+  readonly _id: string; // Primary Key (IDentifier)
+  readonly __v: number; // Version Number (Auto-Increments - Avoiding Duplicate Entry-Modification)
+  readonly createdDate: string;
+  readonly updatedDate: string;
+};
+
+type MongoDBCombined<T> = Prettify<MongoDBEntry & T>;
+
 type APIErrorResponse = {
   errorLoc: string;
   errorMsg: string;
 };
 
-type CourseObjective = {
+type CourseObjectiveBase = {
   deptAbbrev: string;
   courseNum: number;
   semester: "Fall" | "Spring" | "Summer" | "Winter";
   year: number;
+  canvasCourseInternalCode: number;
   canvasObjective: string;
 };
+
+type CourseObjective = MongoDBCombined<CourseObjectiveBase>;
 
 type CanvasQuizQuestion = {
   id: number;
@@ -76,6 +89,7 @@ export {
   Test2,
   backendUrlBase,
   APIErrorResponse,
+  CourseObjectiveBase,
   CourseObjective,
   CanvasQuizQuestion,
   CanvasQuizQuestionGroup,
