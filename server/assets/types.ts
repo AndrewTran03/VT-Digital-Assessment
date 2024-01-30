@@ -195,4 +195,35 @@ type CanvasQuizQuestionGroup = {
   questions: CanvasQuizQuestion[];
 };
 
-export { APIErrorResponse, CanvasCourse, CanvasQuiz, CanvasQuizQuestion, CanvasQuizQuestionGroup };
+type CourseObjectiveBase = {
+  deptAbbrev: string;
+  courseNum: number;
+  semester: "Fall" | "Spring" | "Summer" | "Winter";
+  year: number;
+  canvasCourseInternalCode: number;
+};
+
+type CanvasCourseSingleCourseObjective = Prettify<
+  CourseObjectiveBase & {
+    canvasObjective: string;
+  }
+>;
+
+type CanvasCourseObjectiveGroup = {
+  deptAbbrev: string;
+  courseNum: number;
+  semester: "Fall" | "Spring" | "Summer" | "Winter";
+  year: number;
+  canvasCourseInternalCode: number;
+  canvasObjectives: string[];
+};
+
+export {
+  APIErrorResponse,
+  CanvasCourse,
+  CanvasQuiz,
+  CanvasQuizQuestion,
+  CanvasQuizQuestionGroup,
+  CanvasCourseSingleCourseObjective,
+  CanvasCourseObjectiveGroup
+};
