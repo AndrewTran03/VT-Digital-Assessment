@@ -7,7 +7,7 @@ import { mapReplacer } from "../utils/json.helper";
 const router = express.Router();
 
 let index = 0;
-router.get("/api/canvas", async (_, res) => {
+router.get("/api/canvas/external_canvas_api", async (_, res) => {
   try {
     const canvasUserCourseIds = await fetchCanvasUserCourseData();
     const canvasQuizMap = await fetchCanvasUserQuizData(canvasUserCourseIds);

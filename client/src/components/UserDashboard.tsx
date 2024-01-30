@@ -9,7 +9,7 @@ const UserDashboard: React.FC<Props> = (props) => {
   const [data, setData] = useState<CanvasQuizMap | null>(null);
 
   async function fetchCanvasQuizData() {
-    await axios.get(`${backendUrlBase}/api/canvas`).then((res) => {
+    await axios.get(`${backendUrlBase}/api/canvas/external_canvas_api`).then((res) => {
       const jsonStr = JSON.stringify(res.data, mapReplacer);
       const parsedData: CanvasQuizMap = JSON.parse(jsonStr, mapReviver);
       setData(parsedData);
