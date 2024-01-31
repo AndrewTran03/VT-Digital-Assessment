@@ -9,6 +9,10 @@ import {
 const mongoDBName = config.get<string>("mongoDatabaseName");
 const canvasQuizzesMongoCollectionName = config.get<string>("canvasQuizzesMongoCollectionName");
 
+// Reference: https://mongoosejs.com/docs/api/schemastring.html
+// Allow empty strings to pass "required" check (needed for initial empty string of "canvasMatchedLearningObjective" property)
+mongoose.Schema.Types.String.checkRequired((v) => v !== null && v !== undefined);
+
 const CanvasCourseMCQAnswerSchema = new mongoose.Schema<CanvasCourseMCQAnswerMongoDBEntry>({
   weight: {
     type: Number,
@@ -28,10 +32,10 @@ const CanvasCourseMCQAnswerSchema = new mongoose.Schema<CanvasCourseMCQAnswerMon
   }
 });
 
-const CanvasCourseMCQAnswerModel = mongoose.model<CanvasCourseMCQAnswerMongoDBEntry>(
-  `${mongoDBName}_CanvasCourseMCQAnswer`,
-  CanvasCourseMCQAnswerSchema
-);
+// const CanvasCourseMCQAnswerModel = mongoose.model<CanvasCourseMCQAnswerMongoDBEntry>(
+//   `${mongoDBName}_CanvasCourseMCQAnswer`,
+//   CanvasCourseMCQAnswerSchema
+// );
 
 const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuestionMongoDBEntry>({
   questionType: {
@@ -53,19 +57,22 @@ const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuest
     required: true
   },
   answers: {
-    type: [CanvasCourseMCQAnswerModel.schema],
-    required: false,
-    default: []
+    type: [CanvasCourseMCQAnswerSchema],
+    required: true
   }
 });
 
-const CanvasCourseQuizQuestionModel = mongoose.model<CanvasCourseQuizQuestionMongoDBEntry>(
-  `${mongoDBName}_CanvasCourseQuizQuestion`,
-  CanvasCourseQuizQuestionSchema
-);
+// const CanvasCourseQuizQuestionModel = mongoose.model<CanvasCourseQuizQuestionMongoDBEntry>(
+//   `${mongoDBName}_CanvasCourseQuizQuestion`,
+//   CanvasCourseQuizQuestionSchema
+// );
 
 const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>(
   {
+    canvasUserId: {
+      type: Number,
+      required: true
+    },
     courseId: {
       type: Number,
       required: true
@@ -74,8 +81,13 @@ const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>
       type: Number,
       required: true
     },
+    canvasMatchedLearningObjective: {
+      type: String,
+      required: true,
+      default: ""
+    },
     canvasQuizEntries: {
-      type: [CanvasCourseQuizQuestionModel.schema],
+      type: [CanvasCourseQuizQuestionSchema],
       required: true
     }
   },

@@ -226,8 +226,10 @@ type CanvasCourseObjectiveGroup = Prettify<
 >;
 
 type CanvasCourseQuizMongoDBEntry = {
+  canvasUserId: number;
   courseId: number;
   quizId: number;
+  canvasMatchedLearningObjective: string;
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 };
 

@@ -7,16 +7,17 @@ import {
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasQuizQuestionGroup
 } from "../../assets/types";
-import { fetchCanvasUserCourseData, fetchCanvasUserQuizData } from "../canvas_interact/canvas.api";
+import { fetchCanvasUserInfo, fetchCanvasUserCourseData, fetchCanvasUserQuizData } from "../canvas_interact/canvas.api";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 // import { mapReplacer } from "../utils/json.helper";
 
 const router = express.Router();
 
 async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
+  const canvasUserId = await fetchCanvasUserInfo();
   const canvasUserCourseIds = await fetchCanvasUserCourseData();
   const canvasQuizMap = await fetchCanvasUserQuizData(canvasUserCourseIds);
-  const canvasQuizMapTransformedToArray = convertCanvasQuizMapToArray(canvasQuizMap);
+  const canvasQuizMapTransformedToArray = convertCanvasQuizMapToArray(canvasUserId, canvasQuizMap);
 
   // Insert into DB here
   log.info("LENGTH: " + canvasQuizMapTransformedToArray.length);
@@ -37,7 +38,7 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
   return true;
 }
 
-function convertCanvasQuizMapToArray(inputMap: Map<number, Array<CanvasQuizQuestionGroup>>) {
+function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array<CanvasQuizQuestionGroup>>) {
   const resultArray: CanvasCourseQuizMongoDBEntry[] = [];
 
   // Map: { courseId, Array <{ quizId, [questions, [answers (optional)]] } }
@@ -58,8 +59,8 @@ function convertCanvasQuizMapToArray(inputMap: Map<number, Array<CanvasQuizQuest
             | "numerical_question",
           questionText: question.question_text!
         };
+        const answers: CanvasCourseMCQAnswerMongoDBEntry[] = [];
         if (question.answers) {
-          const answers: CanvasCourseMCQAnswerMongoDBEntry[] = [];
           question.answers.forEach((answer) => {
             const newAnswer: CanvasCourseMCQAnswerMongoDBEntry = {
               weight: answer.weight,
@@ -69,13 +70,15 @@ function convertCanvasQuizMapToArray(inputMap: Map<number, Array<CanvasQuizQuest
             };
             answers.push(newAnswer);
           });
-          newQuizQuestionEntry.answers = answers;
         }
+        newQuizQuestionEntry.answers = answers;
         quizEntries.push(newQuizQuestionEntry);
       });
       const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
+        canvasUserId: userId,
         courseId: courseId,
         quizId: quizId,
+        canvasMatchedLearningObjective: "", // Empty for now: Will be resolved later in front-end React Matching Component
         canvasQuizEntries: quizEntries
       };
       resultArray.push(newQuizEntry);
@@ -84,13 +87,6 @@ function convertCanvasQuizMapToArray(inputMap: Map<number, Array<CanvasQuizQuest
 
   return resultArray;
 }
-
-router.get("/api/canvas/external_canvas_api", async (_, res) => {
-  const canvasUserCourseIds = await fetchCanvasUserCourseData();
-  const canvasQuizMap = await fetchCanvasUserQuizData(canvasUserCourseIds);
-  const canvasQuizMapTransformedToArray = convertCanvasQuizMapToArray(canvasQuizMap);
-  return res.status(200).send(JSON.stringify(canvasQuizMapTransformedToArray, null, 2));
-});
 
 let index = 0;
 router.get("/api/canvas", async (_, res) => {
