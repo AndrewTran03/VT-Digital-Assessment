@@ -9,7 +9,7 @@ const UserDashboard: React.FC<Props> = (props) => {
   const [data, setData] = useState<CanvasQuizMap | null>(null);
 
   async function fetchCanvasQuizData() {
-    await axios.get(`${backendUrlBase}/api/canvas`).then((res) => {      
+    await axios.get(`${backendUrlBase}/api/canvas`).then((res) => {
       console.log(res);
     });
   }
