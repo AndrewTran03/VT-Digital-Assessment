@@ -75,13 +75,13 @@ async function fetchCanvasUserCourseData() {
     });
     const currArr = Object.values(canvasCoursesTemp);
     canvasCoursesArr = canvasCoursesArr.concat(currArr);
-    log.info(`Length of ${role.toUpperCase()} array is ${currArr.length}`);
+    // log.info(`Length of ${role.toUpperCase()} array is ${currArr.length}`);
   }
-  log.info(`Total length is ${canvasCoursesArr.length}`);
+  // log.info(`Total length is ${canvasCoursesArr.length}`);
 
   // Extracts only the relevant information from Course data: CourseIds
   const courseIdsArr = canvasCoursesArr.map((item) => item.id!);
-  log.info(`Course IDs- ${courseIdsArr}. Length: ${courseIdsArr.length}`);
+  // log.info(`Course IDs- ${courseIdsArr}. Length: ${courseIdsArr.length}`);
 
   return courseIdsArr;
 }
@@ -126,7 +126,7 @@ async function fetchCanvasUserQuizData(courseIdsArr: readonly number[]) {
 
     // Extracts only the relevant information from Quiz data: QuizIds
     const quizIdsArr = canvasQuizzesArr.map((item) => item.id!);
-    log.info(`Course ID# ${courseId}: Quiz IDs- ${quizIdsArr}. Length: ${quizIdsArr.length}`);
+    // log.info(`Course ID# ${courseId}: Quiz IDs- ${quizIdsArr}. Length: ${quizIdsArr.length}`);
 
     // Quiz Question Code Went Here
     await fetchCanvasUserQuizQuestionData(courseId, quizIdsArr, canvasQuizAssociations);
@@ -157,7 +157,7 @@ async function fetchCanvasUserQuizQuestionData(
       canvasQuizQuestionTemp[idx] = quizQues;
     });
     const canvasCurrQuizQuestionsArr = Object.values(canvasQuizQuestionTemp);
-    log.info(`Course ID# ${courseId}: Quiz ID# ${quizId}: Quiz Length- ${canvasCurrQuizQuestionsArr.length}`);
+    // log.info(`Course ID# ${courseId}: Quiz ID# ${quizId}: Quiz Length- ${canvasCurrQuizQuestionsArr.length}`);
     const quizMapEntry: CanvasQuizQuestionGroup = { quizId: quizId, questions: canvasCurrQuizQuestionsArr };
 
     // Map courseId existence check (and updating)
