@@ -45,14 +45,20 @@ const FileImport: React.FC = () => {
           return;
         }
         const entries = line.split(","); // Since this is a CSV file
-        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasCourseInternalCodeStr, canvasObjectiveUnparsed] =
-          entries;
+        const [
+          deptAbbrev,
+          courseNumStr,
+          semesterStr,
+          yearStr,
+          canvasCourseInternalCodeStr,
+          ...canvasObjectiveUnparsed
+        ] = entries;
 
         const courseNum = parseInt(courseNumStr);
         const semester = semesterStr as ValidSeason;
         const year = parseInt(yearStr);
         const canvasCourseInternalCode = parseInt(canvasCourseInternalCodeStr);
-        const canvasObjective = canvasObjectiveUnparsed.replace('".\r\n', "");
+        const canvasObjective = canvasObjectiveUnparsed.join(",").replace('".\r\n', "");
 
         const newLearningObjective: CourseObjectiveBase = {
           deptAbbrev,
