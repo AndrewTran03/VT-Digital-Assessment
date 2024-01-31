@@ -12,19 +12,19 @@ const canvasQuizzesMongoCollectionName = config.get<string>("canvasQuizzesMongoC
 const CanvasCourseMCQAnswerSchema = new mongoose.Schema<CanvasCourseMCQAnswerMongoDBEntry>({
   weight: {
     type: Number,
-    required: true
+    required: false
   },
   migration_id: {
     type: String,
-    required: true
+    required: false
   },
   id: {
     type: Number,
-    required: true
+    required: false
   },
   text: {
     type: String,
-    required: true
+    required: false
   }
 });
 
@@ -41,7 +41,7 @@ const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuest
       "multiple_choice_question",
       "essay_question",
       "true_false_question",
-      "multiple_dropdrowns_question",
+      "multiple_dropdowns_question",
       "fill_in_multiple_blanks_question",
       "multiple_answers_question",
       "short_answer_question",
