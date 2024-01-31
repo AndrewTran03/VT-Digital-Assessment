@@ -60,7 +60,7 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
 
       // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
       const canvasQuizItemToInsert = new CanvasCourseQuizModel(currEntry);
-      const canvasQuizItemInsertResult = canvasQuizItemToInsert.save();
+      const canvasQuizItemInsertResult = await canvasQuizItemToInsert.save();
       log.info("Inserted the specified course objectives successfully! Congratulations!");
     } catch (err) {
       log.error("Error with interacting the Canvas API! Please try again!");
@@ -126,9 +126,11 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array
 let index = 0;
 router.get("/api/canvas", async (_, res) => {
   try {
+    const currItems = await CanvasCourseQuizModel.find();
+    log.info(currItems);
     index++;
     log.info(`END OF GET REQUEST #${index} ------------------------`);
-    return res.status(200);
+    return res.status(200).json(currItems);
   } catch (err) {
     log.error("Did not find any Canvas quiz question for any course! Please try again!");
     const resErrBody: APIErrorResponse = {

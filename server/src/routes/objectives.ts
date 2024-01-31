@@ -83,7 +83,7 @@ router.post("/api/objective", async (req, res) => {
 
   try {
     // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
-    const courseObjectivesInsertResult = courseObjectivesToInsert.save();
+    const courseObjectivesInsertResult = await courseObjectivesToInsert.save();
     log.info("Inserted the specified course objectives successfully! Congratulations!");
     return res.status(201).json(courseObjectivesInsertResult); // 201 = Successful Resource Creation
   } catch (err) {
