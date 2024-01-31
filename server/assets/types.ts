@@ -225,6 +225,8 @@ type CanvasCourseObjectiveGroup = Prettify<
   }
 >;
 
+const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
+
 type CanvasCourseQuizMongoDBEntry = {
   canvasUserId: number;
   canvasCourseInternalId: number;
@@ -254,7 +256,7 @@ type CanvasCourseMCQAnswerMongoDBEntry = {
   text: string;
 };
 
-const questionTypes = [
+const questionTypeValues = [
   "multiple_choice_question",
   "essay_question",
   "true_false_question",
@@ -273,8 +275,9 @@ export {
   CanvasQuizQuestionGroup,
   CanvasCourseSingleCourseObjective,
   CanvasCourseObjectiveGroup,
+  seasonValues,
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,
-  questionTypes
+  questionTypeValues
 };

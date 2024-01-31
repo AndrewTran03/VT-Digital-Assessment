@@ -3,7 +3,7 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import log from "../utils/logger";
 import {
-  questionTypes,
+  questionTypeValues,
   APIErrorResponse,
   CanvasCourseMCQAnswerMongoDBEntry,
   CanvasCourseQuizMongoDBEntry,
@@ -22,7 +22,7 @@ const canvasQuizQuestionSchema = z.object({
   canvasMatchedLearningObjective: z.string().min(0),
   canvasQuizEntries: z.array(
     z.object({
-      questionType: z.enum(questionTypes),
+      questionType: z.enum(questionTypeValues),
       questionText: z.string().min(0),
       answers: z.array(
         z.object({
@@ -68,6 +68,7 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
     }
     log.info(`INDEX ${i} COMPLETED ------------------------------------- \n`);
   }
+  log.info("Inserted ALL of the specified course objectives successfully! Congratulations!");
 
   return true;
 }
