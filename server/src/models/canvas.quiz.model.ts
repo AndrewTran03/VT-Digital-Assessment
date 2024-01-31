@@ -73,7 +73,7 @@ const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>
       type: Number,
       required: true
     },
-    courseId: {
+    canvasCourseInternalId: {
       type: Number,
       required: true
     },

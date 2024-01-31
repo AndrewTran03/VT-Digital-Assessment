@@ -24,7 +24,7 @@ const CanvasObjectivesSchema = new mongoose.Schema<CanvasCourseObjectiveGroup>(
       type: Number,
       required: true
     },
-    canvasCourseInternalCode: {
+    canvasCourseInternalId: {
       type: Number,
       required: true
     },

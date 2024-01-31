@@ -17,7 +17,7 @@ router.get("/api/objective/", async (_, res) => {
         courseNum: item.courseNum,
         semester: item.semester,
         year: item.year,
-        canvasCourseInternalCode: item.canvasCourseInternalCode,
+        canvasCourseInternalId: item.canvasCourseInternalId,
         canvasObjective: item.canvasObjectives[idx]
       };
       newCourseObjectives.push(newCourseObjectiveParsed);
@@ -47,7 +47,7 @@ router.get("/api/objective/:canvasIdCode", async (req, res) => {
         courseNum: item.courseNum,
         semester: item.semester,
         year: item.year,
-        canvasCourseInternalCode: item.canvasCourseInternalCode,
+        canvasCourseInternalId: item.canvasCourseInternalId,
         canvasObjective: item.canvasObjectives[idx]
       };
       newCourseObjectives.push(newCourseObjectiveParsed);
@@ -66,7 +66,7 @@ router.get("/api/objective/:canvasIdCode", async (req, res) => {
 
 router.post("/api/objective", async (req, res) => {
   const newCourseObjectives: CanvasCourseSingleCourseObjective[] = req.body;
-  const { deptAbbrev, courseNum, semester, year, canvasCourseInternalCode } = newCourseObjectives[0];
+  const { deptAbbrev, courseNum, semester, year, canvasCourseInternalId } = newCourseObjectives[0];
 
   const newCourseObjectivesArr: string[] = [];
   newCourseObjectives.forEach((entry) => {
@@ -77,7 +77,7 @@ router.post("/api/objective", async (req, res) => {
     courseNum: courseNum,
     semester: semester,
     year: year,
-    canvasCourseInternalCode: canvasCourseInternalCode,
+    canvasCourseInternalId: canvasCourseInternalId,
     canvasObjectives: newCourseObjectivesArr
   });
 
