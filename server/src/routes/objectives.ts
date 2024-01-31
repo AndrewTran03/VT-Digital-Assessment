@@ -67,12 +67,11 @@ router.get("/api/objective/:canvasIdCode", async (req, res) => {
 router.post("/api/objective", async (req, res) => {
   const newCourseObjectives: CanvasCourseSingleCourseObjective[] = req.body;
   const { deptAbbrev, courseNum, semester, year, canvasCourseInternalCode } = newCourseObjectives[0];
-  log.warn(newCourseObjectives.length);
+  
   const newCourseObjectivesArr: string[] = [];
   newCourseObjectives.forEach((entry) => {
     newCourseObjectivesArr.push(entry.canvasObjective.replace(/\"|\r/g, ""));
   });
-  log.info(newCourseObjectivesArr.length);
   const courseObjectivesToInsert = new CourseObjectivesModel({
     deptAbbrev: deptAbbrev,
     courseNum: courseNum,
