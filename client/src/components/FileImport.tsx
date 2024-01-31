@@ -20,7 +20,7 @@ const learningObjSchema = z.object({
   courseNum: z.number().min(1000).max(9999),
   semester: z.enum(seasonValues),
   year: z.number().gte(0).lte(9999),
-  canvasCourseInternalCode: z.number().gte(100000),
+  canvasCourseInternalId: z.number().gte(100000),
   canvasObjective: z.string().min(1)
 });
 
