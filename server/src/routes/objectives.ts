@@ -67,7 +67,7 @@ router.get("/api/objective/:canvasIdCode", async (req, res) => {
 router.post("/api/objective", async (req, res) => {
   const newCourseObjectives: CanvasCourseSingleCourseObjective[] = req.body;
   const { deptAbbrev, courseNum, semester, year, canvasCourseInternalCode } = newCourseObjectives[0];
-  
+
   const newCourseObjectivesArr: string[] = [];
   newCourseObjectives.forEach((entry) => {
     newCourseObjectivesArr.push(entry.canvasObjective.replace(/\"|\r/g, ""));
@@ -82,6 +82,7 @@ router.post("/api/objective", async (req, res) => {
   });
 
   try {
+    // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
     const courseObjectivesInsertResult = courseObjectivesToInsert.save();
     log.info("Inserted the specified course objectives successfully! Congratulations!");
     return res.status(201).json(courseObjectivesInsertResult); // 201 = Successful Resource Creation

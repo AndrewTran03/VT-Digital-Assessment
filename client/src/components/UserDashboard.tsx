@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { CanvasQuizMap, backendUrlBase } from "../assets/types";
 import axios from "axios";
-import { mapReplacer, mapReviver } from "../assets/JSONHelper";
+// import { mapReplacer, mapReviver } from "../assets/JSONHelper";
 
 type Props = {};
 
@@ -10,9 +10,11 @@ const UserDashboard: React.FC<Props> = (props) => {
 
   async function fetchCanvasQuizData() {
     await axios.get(`${backendUrlBase}/api/canvas/external_canvas_api`).then((res) => {
-      const jsonStr = JSON.stringify(res.data, mapReplacer);
-      const parsedData: CanvasQuizMap = JSON.parse(jsonStr, mapReviver);
-      setData(parsedData);
+      // const jsonStr = JSON.stringify(res.data, mapReplacer);
+      // const parsedData: CanvasQuizMap = JSON.parse(jsonStr, mapReviver);
+
+      // setData(parsedData);
+      console.log(res);
     });
   }
 

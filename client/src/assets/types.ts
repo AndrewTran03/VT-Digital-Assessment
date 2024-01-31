@@ -39,7 +39,7 @@ type CourseObjectiveBase = {
   courseNum: number;
   semester: "Fall" | "Spring" | "Summer" | "Winter";
   year: number;
-  canvasCourseInternalCode: number;
+  canvasCourseInternalId: number;
   canvasObjective: string;
 };
 

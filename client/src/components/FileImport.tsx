@@ -45,19 +45,13 @@ const FileImport: React.FC = () => {
           return;
         }
         const entries = line.split(","); // Since this is a CSV file
-        const [
-          deptAbbrev,
-          courseNumStr,
-          semesterStr,
-          yearStr,
-          canvasCourseInternalCodeStr,
-          ...canvasObjectiveUnparsed
-        ] = entries;
+        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasCourseInternalIdStr, ...canvasObjectiveUnparsed] =
+          entries;
 
         const courseNum = parseInt(courseNumStr);
         const semester = semesterStr as ValidSeason;
         const year = parseInt(yearStr);
-        const canvasCourseInternalCode = parseInt(canvasCourseInternalCodeStr);
+        const canvasCourseInternalId = parseInt(canvasCourseInternalIdStr);
         const canvasObjective = canvasObjectiveUnparsed.join(",").replace('".\r\n', "");
 
         const newLearningObjective: CourseObjectiveBase = {
@@ -65,7 +59,7 @@ const FileImport: React.FC = () => {
           courseNum,
           semester,
           year,
-          canvasCourseInternalCode,
+          canvasCourseInternalId,
           canvasObjective
         };
         const validResult = learningObjSchema.safeParse(newLearningObjective);
@@ -102,9 +96,9 @@ const FileImport: React.FC = () => {
   function handleForwardButtonClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.log("Next button pressed!");
-    console.log("FILE IMPORT: " + learningObjArr[0].canvasCourseInternalCode);
+    console.log("FILE IMPORT: " + learningObjArr[0].canvasCourseInternalId);
     navigate("/learning_obj_match", {
-      state: { canvasCourseInternalCode: learningObjArr[0].canvasCourseInternalCode! }
+      state: { canvasCourseInternalCode: learningObjArr[0].canvasCourseInternalId! }
     });
   }
 

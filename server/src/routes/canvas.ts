@@ -25,6 +25,7 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
     try {
       const currEntry = canvasQuizMapTransformedToArray[i];
 
+      // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
       const canvasQuizItemToInsert = new CanvasCourseQuizModel(currEntry);
       const canvasQuizItemInsertResult = canvasQuizItemToInsert.save();
       log.info("Inserted the specified course objectives successfully! Congratulations!");
@@ -76,7 +77,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array
       });
       const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
         canvasUserId: userId,
-        courseId: courseId,
+        canvasCourseInternalId: courseId,
         quizId: quizId,
         canvasMatchedLearningObjective: "", // Empty for now: Will be resolved later in front-end React Matching Component
         canvasQuizEntries: quizEntries
@@ -106,6 +107,8 @@ router.get("/api/canvas", async (_, res) => {
 
 router.post("/api/canvas", async (req, res) => {
   try {
+    // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
+    log.info("Inserted the specified alien successfully! Congratulations!");
     return res.status(201); // 201 = Successful Resource Creation
   } catch (err) {
     log.error("Could not insert the specified Canvas quiz questions! Please try again!");
