@@ -254,6 +254,17 @@ type CanvasCourseMCQAnswerMongoDBEntry = {
   text: string;
 };
 
+const questionTypes = [
+  "multiple_choice_question",
+  "essay_question",
+  "true_false_question",
+  "multiple_dropdowns_question",
+  "fill_in_multiple_blanks_question",
+  "multiple_answers_question",
+  "short_answer_question",
+  "numerical_question"
+] as const;
+
 export {
   APIErrorResponse,
   CanvasCourse,
@@ -264,5 +275,6 @@ export {
   CanvasCourseObjectiveGroup,
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
-  CanvasCourseMCQAnswerMongoDBEntry
+  CanvasCourseMCQAnswerMongoDBEntry,
+  questionTypes
 };

@@ -1,6 +1,9 @@
 import express from "express";
+import { z } from "zod";
+import { fromZodError } from "zod-validation-error";
 import log from "../utils/logger";
 import {
+  questionTypes,
   APIErrorResponse,
   CanvasCourseMCQAnswerMongoDBEntry,
   CanvasCourseQuizMongoDBEntry,
@@ -9,9 +12,29 @@ import {
 } from "../../assets/types";
 import { fetchCanvasUserInfo, fetchCanvasUserCourseData, fetchCanvasUserQuizData } from "../canvas_interact/canvas.api";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
-// import { mapReplacer } from "../utils/json.helper";
 
 const router = express.Router();
+
+const canvasQuizQuestionSchema = z.object({
+  canvasUserId: z.number().gte(0),
+  canvasCourseInternalId: z.number().gte(0),
+  quizId: z.number().gte(0),
+  canvasMatchedLearningObjective: z.string().min(0),
+  canvasQuizEntries: z.array(
+    z.object({
+      questionType: z.enum(questionTypes),
+      questionText: z.string().min(0),
+      answers: z.array(
+        z.object({
+          weight: z.number().gte(0).optional(),
+          migration_id: z.string().min(0).optional(),
+          id: z.number().gte(0).optional(),
+          text: z.string().min(0).optional()
+        })
+      )
+    })
+  )
+});
 
 async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
   const canvasUserId = await fetchCanvasUserInfo();
@@ -21,6 +44,16 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
 
   // Insert into DB here
   log.info("LENGTH: " + canvasQuizMapTransformedToArray.length);
+  canvasQuizMapTransformedToArray.forEach((currEntry) => {
+    const validResult = canvasQuizQuestionSchema.safeParse(currEntry);
+    if (validResult.success) {
+      log.info("The following course objectives index is of the proper schema");
+    } else {
+      log.error(fromZodError(validResult.error));
+      process.exit(1);
+    }
+  });
+
   for (let i = 0; i < canvasQuizMapTransformedToArray.length; i++) {
     try {
       const currEntry = canvasQuizMapTransformedToArray[i];
