@@ -5,7 +5,7 @@ import { CanvasCourseSingleCourseObjective, APIErrorResponse } from "../../asset
 
 const router = express.Router();
 
-router.get("/api/objective/", async (_, res) => {
+router.get("/api/objective", async (_, res) => {
   try {
     const currItems = await CourseObjectivesModel.find();
 
