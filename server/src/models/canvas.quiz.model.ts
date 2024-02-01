@@ -3,7 +3,8 @@ import config from "config";
 import {
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
-  CanvasCourseMCQAnswerMongoDBEntry
+  CanvasCourseMCQAnswerMongoDBEntry,
+  QuestionTypeValues
 } from "../../assets/types";
 
 const mongoDBName = config.get<string>("mongoDatabaseName");
@@ -41,16 +42,7 @@ const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuest
   questionType: {
     type: String,
     required: true,
-    enum: [
-      "multiple_choice_question",
-      "essay_question",
-      "true_false_question",
-      "multiple_dropdowns_question",
-      "fill_in_multiple_blanks_question",
-      "multiple_answers_question",
-      "short_answer_question",
-      "numerical_question"
-    ] as const
+    enum: QuestionTypeValues
   },
   questionText: {
     type: String,

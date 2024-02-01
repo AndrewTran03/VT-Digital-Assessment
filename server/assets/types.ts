@@ -162,15 +162,7 @@ type CanvasQuizQuestion = {
   quiz_id: number;
   position?: number;
   question_name?: string;
-  question_type?:
-    | "multiple_choice_question"
-    | "essay_question"
-    | "true_false_question"
-    | "multiple_dropdowns_question"
-    | "fill_in_multiple_blanks_question"
-    | "multiple_answers_question"
-    | "short_answer_question"
-    | "numerical_question";
+  question_type?: QuestionTypeEnumValues;
   question_text?: string;
   points_possible?: number;
   correct_comments?: string;
@@ -225,7 +217,17 @@ type CanvasCourseObjectiveGroup = Prettify<
   }
 >;
 
-const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
+const SeasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
+enum QuestionType {
+  multiple_choice_question = "multiple_choice_question",
+  essay_question = "essay_question",
+  multiple_dropdown_question = "multiple_dropdown_question",
+  fill_in_multiple_blanks_question = "fill_in_multiple_blanks_question",
+  multiple_answers_question = "multiple_answers_question",
+  short_answer_question = "short_answer_question",
+  numerical_question = "numerical_question"
+}
+type QuestionTypeEnumValues = keyof typeof QuestionType;
 
 type CanvasCourseQuizMongoDBEntry = {
   canvasUserId: number;
@@ -236,15 +238,7 @@ type CanvasCourseQuizMongoDBEntry = {
 };
 
 type CanvasCourseQuizQuestionMongoDBEntry = {
-  questionType:
-    | "multiple_choice_question"
-    | "essay_question"
-    | "true_false_question"
-    | "multiple_dropdowns_question"
-    | "fill_in_multiple_blanks_question"
-    | "multiple_answers_question"
-    | "short_answer_question"
-    | "numerical_question";
+  questionType: QuestionTypeEnumValues;
   questionText: string;
   answers?: CanvasCourseMCQAnswerMongoDBEntry[];
 };
@@ -256,7 +250,7 @@ type CanvasCourseMCQAnswerMongoDBEntry = {
   text: string;
 };
 
-const questionTypeValues = [
+const QuestionTypeValues = [
   "multiple_choice_question",
   "essay_question",
   "true_false_question",
@@ -275,9 +269,10 @@ export {
   CanvasQuizQuestionGroup,
   CanvasCourseSingleCourseObjective,
   CanvasCourseObjectiveGroup,
-  seasonValues,
+  SeasonValues,
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,
-  questionTypeValues
+  QuestionTypeEnumValues,
+  QuestionTypeValues
 };

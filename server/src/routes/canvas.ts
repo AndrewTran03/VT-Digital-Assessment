@@ -3,12 +3,13 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import log from "../utils/logger";
 import {
-  questionTypeValues,
+  QuestionTypeValues,
   APIErrorResponse,
   CanvasCourseMCQAnswerMongoDBEntry,
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
-  CanvasQuizQuestionGroup
+  CanvasQuizQuestionGroup,
+  QuestionTypeEnumValues
 } from "../../assets/types";
 import { fetchCanvasUserInfo, fetchCanvasUserCourseData, fetchCanvasUserQuizData } from "../canvas_interact/canvas.api";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
@@ -22,7 +23,7 @@ const canvasQuizQuestionSchema = z.object({
   canvasMatchedLearningObjective: z.string().min(0),
   canvasQuizEntries: z.array(
     z.object({
-      questionType: z.enum(questionTypeValues),
+      questionType: z.enum(QuestionTypeValues),
       questionText: z.string().min(0),
       answers: z.array(
         z.object({
@@ -83,15 +84,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array
       const { quizId } = questionGroup;
       questionGroup.questions.forEach((question) => {
         const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
-          questionType: question.question_type! as
-            | "multiple_choice_question"
-            | "essay_question"
-            | "true_false_question"
-            | "multiple_dropdowns_question"
-            | "fill_in_multiple_blanks_question"
-            | "multiple_answers_question"
-            | "short_answer_question"
-            | "numerical_question",
+          questionType: question.question_type! as QuestionTypeEnumValues,
           questionText: question.question_text!
         };
         const answers: CanvasCourseMCQAnswerMongoDBEntry[] = [];
