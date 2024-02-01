@@ -1,10 +1,14 @@
 import React from "react";
+import { CanvasCourseQuizMongoDBEntry } from "../assets/types";
 
-type LearningObjectiveType = {
-  data: string;
-  setData: React.Dispatch<React.SetStateAction<string>>;
+type CanvasQuizQuestionType = {
+  canvasQuizDataArr: CanvasCourseQuizMongoDBEntry[];
+  setCanvasQuizDataArr: React.Dispatch<React.SetStateAction<CanvasCourseQuizMongoDBEntry[]>>;
 };
 
-const CanvasQuizQuestionContext = React.createContext<LearningObjectiveType>({ data: "", setData: () => {} });
+const CanvasQuizQuestionContext = React.createContext<CanvasQuizQuestionType>({
+  canvasQuizDataArr: [],
+  setCanvasQuizDataArr: () => {}
+});
 
 export default CanvasQuizQuestionContext;

@@ -7,6 +7,28 @@ type Prettify<T> = {
 
 const backendUrlBase = "http://localhost:3000";
 
+// Required with All MongoDB Entries:
+type MongoDBId = {
+  readonly _id: string; // Primary Key (IDentifier)
+};
+
+type MongoDBEntry = Prettify<
+  MongoDBId & {
+    readonly __v: number; // Version Number (Auto-Increments - Avoiding Duplicate Entry-Modification)
+    readonly createdDate: string;
+    readonly updatedDate: string;
+  }
+>;
+
+type MongoDBCombined<T> = Prettify<MongoDBEntry & T>;
+
+type MongoDBWithId<T> = Prettify<MongoDBId & T>;
+
+type APIErrorResponse = {
+  errorLoc: string;
+  errorMsg: string;
+};
+
 enum Season {
   Fall = "Fall",
   Spring = "Spring",
@@ -15,22 +37,7 @@ enum Season {
 }
 type SeasonEnumValues = keyof typeof Season;
 
-// Required with All MongoDB Entries:
-type MongoDBEntry = {
-  readonly _id: string; // Primary Key (IDentifier)
-  readonly __v: number; // Version Number (Auto-Increments - Avoiding Duplicate Entry-Modification)
-  readonly createdDate: string;
-  readonly updatedDate: string;
-};
-
-type MongoDBCombined<T> = Prettify<MongoDBEntry & T>;
-
-type APIErrorResponse = {
-  errorLoc: string;
-  errorMsg: string;
-};
-
-type CourseObjectiveBase = {
+type SingleCourseObjective = {
   deptAbbrev: string;
   courseNum: number;
   semester: SeasonEnumValues;
@@ -39,7 +46,16 @@ type CourseObjectiveBase = {
   canvasObjective: string;
 };
 
-type CourseObjective = MongoDBCombined<CourseObjectiveBase>;
+type MultipleCourseObjectivesBase = {
+  deptAbbrev: string;
+  courseNum: number;
+  semester: SeasonEnumValues;
+  year: number;
+  canvasCourseInternalId: number;
+  canvasObjectives: string[];
+};
+
+type CourseObjectives = MongoDBCombined<MultipleCourseObjectivesBase>;
 
 enum QuestionType {
   multiple_choice_question = "multiple_choice_question",
@@ -85,26 +101,60 @@ type CanvasQuizQuestion = {
 //   blank_id?: number;
 // };
 
-type CanvasQuizAnswer = {
+type CanvasQuizAnswer = CanvasCourseMCQAnswerMongoDBEntryBase;
+
+type CanvasCourseQuizMongoDBEntryBase = {
+  canvasUserId: number;
+  canvasCourseInternalId: number;
+  quizId: number;
+  canvasMatchedLearningObjectivesArr: string[];
+  canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntryBase[];
+};
+
+type CanvasCourseQuizQuestionMongoDBEntryBase = {
+  questionType: QuestionTypeEnumValues;
+  questionText: string;
+  answers?: CanvasCourseMCQAnswerMongoDBEntryBase[];
+};
+
+type CanvasCourseMCQAnswerMongoDBEntryBase = {
   weight: number;
   migration_id: string;
   id: number;
   text: string;
 };
 
-type CanvasQuizQuestionGroup = {
+type CanvasCourseQuizMongoDBEntry = MongoDBCombined<{
+  canvasUserId: number;
+  canvasCourseInternalId: number;
   quizId: number;
-  questions: CanvasQuizQuestion[];
-};
+  canvasMatchedLearningObjectivesArr: string[];
+  canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
+}>;
 
-type CanvasQuizMap = Map<number, CanvasQuizQuestionGroup[]>;
+type CanvasCourseQuizQuestionMongoDBEntry = MongoDBWithId<{
+  questionType: QuestionTypeEnumValues;
+  questionText: string;
+  answers?: CanvasCourseMCQAnswerMongoDBEntry[];
+}>;
+
+type CanvasCourseMCQAnswerMongoDBEntry = MongoDBWithId<{
+  weight: number;
+  migration_id: string;
+  id: number;
+  text: string;
+}>;
 
 export {
   backendUrlBase,
+  MongoDBWithId,
+  MongoDBCombined,
   SeasonEnumValues,
   APIErrorResponse,
-  CourseObjectiveBase,
-  CourseObjective,
+  SingleCourseObjective,
+  MultipleCourseObjectivesBase,
+  CourseObjectives,
   CanvasQuizQuestion,
-  CanvasQuizMap
+  CanvasCourseQuizMongoDBEntryBase,
+  CanvasCourseQuizMongoDBEntry
 };

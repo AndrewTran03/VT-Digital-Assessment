@@ -1,12 +1,16 @@
 import { useState, useEffect } from "react";
-import { CanvasQuizMap, backendUrlBase } from "../assets/types";
+import { backendUrlBase } from "../assets/types";
 import axios from "axios";
 
 const UserDashboard: React.FC = () => {
-  const [data, setData] = useState<CanvasQuizMap | null>(null);
+  // const [data, setData] = useState<CanvasQuizMap | null>(null);
 
   async function fetchCanvasQuizData() {
-    await axios.get(`${backendUrlBase}/api/canvas`).then((res) => {
+    // await axios.get(`${backendUrlBase}/api/canvas`).then((res) => {
+    //   console.log(res);
+    // });
+
+    await axios.get(`${backendUrlBase}/api/objective`).then((res) => {
       console.log(res);
     });
   }
@@ -20,9 +24,9 @@ const UserDashboard: React.FC = () => {
     fetchCanvasQuizData();
   }, []);
 
-  useEffect(() => {
-    console.log(data);
-  }, [data]);
+  // useEffect(() => {
+  //   console.log(data);
+  // }, [data]);
 
   return (
     <>

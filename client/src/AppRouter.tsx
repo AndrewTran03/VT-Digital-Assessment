@@ -4,7 +4,7 @@ import FileImport from "./components/FileImport";
 import UserDashboard from "./components/UserDashboard";
 import LearningObjectiveMatch from "./components/LearningObjectiveMatch";
 
-function AppRouter() {
+const AppRouter: React.FC = () => {
   return (
     <>
       <>
@@ -19,6 +19,6 @@ function AppRouter() {
       </>
     </>
   );
-}
+};
 
 export default AppRouter;
