@@ -126,7 +126,7 @@ router.get("/api/canvas", async (_, res) => {
     const currItems = await CanvasCourseQuizModel.find();
     log.info(currItems);
     index++;
-    log.info(`END OF GET REQUEST #${index} ------------------------`);
+    log.info(`END OF GET REQUEST #${index} ---------------------`);
     return res.status(200).json(currItems);
   } catch (err) {
     log.error("Did not find any Canvas quiz question for any course! Please try again!");
