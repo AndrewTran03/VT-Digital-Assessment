@@ -2,8 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import AppRouter from "./AppRouter";
 import { CourseObjectives, CanvasCourseQuizMongoDBEntry } from "./assets/types";
-import CanvasQuizQuestionContext from "./shared/CanvasQuizQuestionContext";
-import LearningObjectiveContext from "./shared/LearningObjectiveContext";
+import { CanvasQuizQuestionContext, LearningObjectiveContext } from "./shared";
 
 const App: React.FC = () => {
   // Initial States of Each React-Context's Shared Data
