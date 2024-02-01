@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { backendUrlBase, APIErrorResponse, SeasonEnumValues, SingleCourseObjective } from "../assets/types";
+import { backendUrlBase, APIErrorResponse, SeasonEnumValues, SingleCanvasLearningObjective } from "../assets/types";
 import { APIRequestError } from "../shared/APIRequestError";
 
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
@@ -17,7 +17,7 @@ const learningObjSchema = z.object({
 });
 
 const FileImport: React.FC = () => {
-  const [learningObjArr, setLearningObjArr] = useState<SingleCourseObjective[]>([]);
+  const [learningObjArr, setLearningObjArr] = useState<SingleCanvasLearningObjective[]>([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -46,7 +46,7 @@ const FileImport: React.FC = () => {
         const canvasCourseInternalId = parseInt(canvasCourseInternalIdStr);
         const canvasObjective = canvasObjectiveUnparsed.join(",").replace('".\r\n', "");
 
-        const newLearningObjective: SingleCourseObjective = {
+        const newLearningObjective: SingleCanvasLearningObjective = {
           deptAbbrev,
           courseNum,
           semester,
