@@ -1,7 +1,7 @@
-import { useState, useEffect, ChangeEvent } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { backendUrlBase } from "../assets/types";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 type Props = {
   canvasCourseInternalCode?: number;
