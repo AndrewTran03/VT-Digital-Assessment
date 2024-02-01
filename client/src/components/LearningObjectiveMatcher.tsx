@@ -146,8 +146,8 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
                       </AccordionSummary>
                       <FormControl>
                         <FormLabel id="demo-radio-buttons-group-label">
-                          Current Selected Answer:{" "}
-                          {!selectedAnswers[idx] ? "No answer selected for this question yet" : selectedAnswers[idx]}
+                          Current Selected Learning-Objective:{" "}
+                          {!selectedAnswers[idx] ? "No answer selected yet" : selectedAnswers[idx]}
                         </FormLabel>
                         <RadioGroup
                           aria-labelledby="demo-radio-buttons-group-label"
