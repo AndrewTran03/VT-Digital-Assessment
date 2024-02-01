@@ -1,13 +1,13 @@
 import { useState } from "react";
 import "./App.css";
 import AppRouter from "./AppRouter";
-import { CourseObjectives, CanvasCourseQuizMongoDBEntry } from "./assets/types";
+import { CanvasLearningObjectives, CanvasCourseQuizMongoDBEntry } from "./assets/types";
 import { CanvasQuizQuestionContext, LearningObjectiveContext } from "./shared";
 
 const App: React.FC = () => {
   // Initial States of Each React-Context's Shared Data
   const [canvasQuizDataArr, setCanvasQuizDataArr] = useState<CanvasCourseQuizMongoDBEntry[]>([]);
-  const [courseLearningObjectiveData, setLearningCourseObjectiveData] = useState<CourseObjectives>({
+  const [courseLearningObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
     _id: "",
     __v: 0,
     createdDate: "",
