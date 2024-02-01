@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { CanvasQuizMap, backendUrlBase } from "../assets/types";
 import axios from "axios";
-// import { mapReplacer, mapReviver } from "../assets/JSONHelper";
 
-type Props = {};
-
-const UserDashboard: React.FC<Props> = (props) => {
+const UserDashboard: React.FC = () => {
   const [data, setData] = useState<CanvasQuizMap | null>(null);
 
   async function fetchCanvasQuizData() {
