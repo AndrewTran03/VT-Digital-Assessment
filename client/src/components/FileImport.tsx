@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { backendUrlBase, APIErrorResponse, SeasonEnumValues, SingleCanvasLearningObjective } from "../assets/types";
+import { backendUrlBase, APIErrorResponse, SeasonEnumValues, SingleCanvasLearningObjective } from "../shared/types";
 import { APIRequestError } from "../shared/APIRequestError";
 
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;

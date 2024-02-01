@@ -5,7 +5,7 @@ import {
   CanvasLearningObjectives,
   QuestionTypeEnumValues,
   SeasonEnumValues
-} from "../assets/types";
+} from "./types";
 
 function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]) {
   const canvasEntriesArr: CanvasCourseQuizMongoDBEntry[] = [];

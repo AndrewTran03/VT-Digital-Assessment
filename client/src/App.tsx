@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "./App.css";
 import AppRouter from "./AppRouter";
-import { CanvasLearningObjectives, CanvasCourseQuizMongoDBEntry } from "./assets/types";
+import { CanvasLearningObjectives, CanvasCourseQuizMongoDBEntry } from "./shared/types";
 import { CanvasQuizQuestionContext, LearningObjectiveContext } from "./shared";
 
 const App: React.FC = () => {

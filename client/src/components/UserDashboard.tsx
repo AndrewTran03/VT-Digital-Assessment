@@ -1,7 +1,7 @@
 import { useEffect, useContext, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { backendUrlBase } from "../assets/types";
+import { backendUrlBase } from "../shared/types";
 import { CanvasQuizQuestionContext } from "../shared";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
 

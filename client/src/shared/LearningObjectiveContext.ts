@@ -1,5 +1,5 @@
 import React from "react";
-import { CanvasLearningObjectives } from "../assets/types";
+import { CanvasLearningObjectives } from "./types";
 
 type LearningObjectiveType = {
   courseLearningObjectiveData: CanvasLearningObjectives;

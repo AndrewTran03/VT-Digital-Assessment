@@ -8,7 +8,7 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { backendUrlBase, multipleChoiceQuestionLetters } from "../assets/types";
+import { backendUrlBase, multipleChoiceQuestionLetters } from "../shared/types";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared";
 

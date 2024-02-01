@@ -1,5 +1,5 @@
 import React from "react";
-import { CanvasCourseQuizMongoDBEntry } from "../assets/types";
+import { CanvasCourseQuizMongoDBEntry } from "./types";
 
 type CanvasQuizQuestionType = {
   canvasQuizDataArr: CanvasCourseQuizMongoDBEntry[];
