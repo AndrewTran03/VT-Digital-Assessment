@@ -37,7 +37,7 @@ enum Season {
 }
 type SeasonEnumValues = keyof typeof Season;
 
-type SingleCourseObjective = {
+type SingleCanvasLearningObjective = {
   deptAbbrev: string;
   courseNum: number;
   semester: SeasonEnumValues;
@@ -46,7 +46,7 @@ type SingleCourseObjective = {
   canvasObjective: string;
 };
 
-type MultipleCourseObjectivesBase = {
+type MultipleCanvasLearningObjectivesBase = {
   deptAbbrev: string;
   courseNum: number;
   semester: SeasonEnumValues;
@@ -55,7 +55,7 @@ type MultipleCourseObjectivesBase = {
   canvasObjectives: string[];
 };
 
-type CourseObjectives = MongoDBCombined<MultipleCourseObjectivesBase>;
+type CanvasLearningObjectives = MongoDBCombined<MultipleCanvasLearningObjectivesBase>;
 
 enum QuestionType {
   multiple_choice_question = "multiple_choice_question",
@@ -150,11 +150,14 @@ export {
   MongoDBWithId,
   MongoDBCombined,
   SeasonEnumValues,
+  QuestionTypeEnumValues,
   APIErrorResponse,
-  SingleCourseObjective,
-  MultipleCourseObjectivesBase,
-  CourseObjectives,
+  SingleCanvasLearningObjective,
+  MultipleCanvasLearningObjectivesBase,
+  CanvasLearningObjectives,
   CanvasQuizQuestion,
   CanvasCourseQuizMongoDBEntryBase,
-  CanvasCourseQuizMongoDBEntry
+  CanvasCourseQuizMongoDBEntry,
+  CanvasCourseQuizQuestionMongoDBEntry,
+  CanvasCourseMCQAnswerMongoDBEntry
 };
