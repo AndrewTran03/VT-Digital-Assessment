@@ -3,18 +3,10 @@ import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import { backendUrlBase, CourseObjectiveBase, APIErrorResponse } from "../assets/types";
+import { backendUrlBase, CourseObjectiveBase, APIErrorResponse, SeasonEnumValues } from "../assets/types";
 import { APIRequestError } from "../assets/APIRequestError";
 
-enum Season {
-  Fall = "Fall",
-  Spring = "Spring",
-  Summer = "Summer",
-  Winter = "Winter"
-}
-type ValidSeason = keyof typeof Season;
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
-
 const learningObjSchema = z.object({
   deptAbbrev: z.string().min(2).max(4),
   courseNum: z.number().min(1000).max(9999),
@@ -49,7 +41,7 @@ const FileImport: React.FC = () => {
           entries;
 
         const courseNum = parseInt(courseNumStr);
-        const semester = semesterStr as ValidSeason;
+        const semester = semesterStr as SeasonEnumValues;
         const year = parseInt(yearStr);
         const canvasCourseInternalId = parseInt(canvasCourseInternalIdStr);
         const canvasObjective = canvasObjectiveUnparsed.join(",").replace('".\r\n', "");

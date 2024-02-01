@@ -19,6 +19,14 @@ type Test2 = Prettify<
   }
 >;
 
+enum Season {
+  Fall = "Fall",
+  Spring = "Spring",
+  Summer = "Summer",
+  Winter = "Winter"
+}
+type SeasonEnumValues = keyof typeof Season;
+
 // Required with All MongoDB Entries:
 type MongoDBEntry = {
   readonly _id: string; // Primary Key (IDentifier)
@@ -37,7 +45,7 @@ type APIErrorResponse = {
 type CourseObjectiveBase = {
   deptAbbrev: string;
   courseNum: number;
-  semester: "Fall" | "Spring" | "Summer" | "Winter";
+  semester: SeasonEnumValues;
   year: number;
   canvasCourseInternalId: number;
   canvasObjective: string;
@@ -45,20 +53,23 @@ type CourseObjectiveBase = {
 
 type CourseObjective = MongoDBCombined<CourseObjectiveBase>;
 
+enum QuestionType {
+  multiple_choice_question = "multiple_choice_question",
+  essay_question = "essay_question",
+  multiple_dropdown_question = "multiple_dropdown_question",
+  fill_in_multiple_blanks_question = "fill_in_multiple_blanks_question",
+  multiple_answers_question = "multiple_answers_question",
+  short_answer_question = "short_answer_question",
+  numerical_question = "numerical_question"
+}
+type QuestionTypeEnumValues = keyof typeof QuestionType;
+
 type CanvasQuizQuestion = {
   id: number;
   quiz_id: number;
   position?: number;
   question_name?: string;
-  question_type?:
-    | "multiple_choice_question"
-    | "essay_question"
-    | "true_false_question"
-    | "multiple_dropdowns_question"
-    | "fill_in_multiple_blanks_question"
-    | "multiple_answers_question"
-    | "short_answer_question"
-    | "numerical_question";
+  question_type?: QuestionTypeEnumValues;
   question_text?: string;
   points_possible?: number;
   correct_comments?: string;
@@ -103,6 +114,7 @@ type CanvasQuizMap = Map<number, CanvasQuizQuestionGroup[]>;
 export {
   Test2,
   backendUrlBase,
+  SeasonEnumValues,
   APIErrorResponse,
   CourseObjectiveBase,
   CourseObjective,
