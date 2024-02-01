@@ -103,7 +103,14 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Canvas Quiz Question</TableCell>
+              <TableCell
+                style={{
+                  borderRight: "1px solid lightgray",
+                  paddingRight: "8px"
+                }}
+              >
+                Canvas Quiz Question
+              </TableCell>
               <TableCell>Learning Objective</TableCell>
             </TableRow>
           </TableHead>
@@ -117,7 +124,9 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
                       maxWidth: "40%",
                       overflow: "wrap",
                       textOverflow: "ellipsis",
-                      overflowWrap: "break-word"
+                      overflowWrap: "break-word",
+                      borderRight: "1px solid lightgray",
+                      paddingRight: "8px"
                     }}
                   >
                     <Typography>
