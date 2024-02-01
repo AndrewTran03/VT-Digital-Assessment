@@ -87,10 +87,15 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
     await fetchCanvasLearningObjectiveData();
   }
 
+  function handleSubmit(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    console.clear();
+    console.log("Pressed submit button successfully!");
+  }
+
   return (
     <>
       Got to the Learning-Objective-Match component
-      <p>Hi</p>
       <button type="submit" onClick={handleAPIButtonClick}>
         Get Course Objective Data
       </button>
@@ -137,7 +142,6 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
                         </FormLabel>
                         <RadioGroup
                           aria-labelledby="demo-radio-buttons-group-label"
-                          defaultValue={courseLearningObjectiveData?.canvasObjectives[0]?.toString()}
                           name="radio-buttons-group"
                           onChange={(e) => {
                             const updatedAnswers = [...selectedAnswers];
@@ -166,6 +170,9 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
           </TableBody>
         </Table>
       </Paper>
+      <button type="submit" onClick={handleSubmit}>
+        Submit Results
+      </button>
     </>
   );
 };
