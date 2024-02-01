@@ -73,10 +73,9 @@ const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>
       type: Number,
       required: true
     },
-    canvasMatchedLearningObjective: {
-      type: String,
-      required: true,
-      default: ""
+    canvasMatchedLearningObjectivesArr: {
+      type: [String],
+      required: true
     },
     canvasQuizEntries: {
       type: [CanvasCourseQuizQuestionSchema],

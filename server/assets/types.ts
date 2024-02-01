@@ -233,7 +233,7 @@ type CanvasCourseQuizMongoDBEntry = {
   canvasUserId: number;
   canvasCourseInternalId: number;
   quizId: number;
-  canvasMatchedLearningObjective: string;
+  canvasMatchedLearningObjectivesArr: string[];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 };
 

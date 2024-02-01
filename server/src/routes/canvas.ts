@@ -20,21 +20,23 @@ const canvasQuizQuestionSchema = z.object({
   canvasUserId: z.number().gte(0),
   canvasCourseInternalId: z.number().gte(0),
   quizId: z.number().gte(0),
-  canvasMatchedLearningObjective: z.string().min(0),
-  canvasQuizEntries: z.array(
-    z.object({
-      questionType: z.enum(QuestionTypeValues),
-      questionText: z.string().min(0),
-      answers: z.array(
-        z.object({
-          weight: z.number().gte(0).optional(),
-          migration_id: z.string().min(0).optional(),
-          id: z.number().gte(0).optional(),
-          text: z.string().min(0).optional()
-        })
-      )
-    })
-  )
+  canvasMatchedLearningObjectiveArr: z.array(z.string()).default([]),
+  canvasQuizEntries: z
+    .array(
+      z.object({
+        questionType: z.enum(QuestionTypeValues),
+        questionText: z.string().min(0),
+        answers: z.array(
+          z.object({
+            weight: z.number().gte(0).optional(),
+            migration_id: z.string().min(0).optional(),
+            id: z.number().gte(0).optional(),
+            text: z.string().min(0).optional()
+          })
+        )
+      })
+    )
+    .default([])
 });
 
 async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
@@ -82,6 +84,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array
     questionGroups.forEach((questionGroup) => {
       const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
       const { quizId } = questionGroup;
+      const canvasMatchedLearningObjectivesArr: string[] = [];
       questionGroup.questions.forEach((question) => {
         const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
           questionType: question.question_type! as QuestionTypeEnumValues,
@@ -101,12 +104,13 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array
         }
         newQuizQuestionEntry.answers = answers;
         quizEntries.push(newQuizQuestionEntry);
+        canvasMatchedLearningObjectivesArr.push("");
       });
       const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
         canvasUserId: userId,
         canvasCourseInternalId: courseId,
         quizId: quizId,
-        canvasMatchedLearningObjective: "", // Empty for now: Will be resolved later in front-end React Matching Component
+        canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr, // Empty for now: Will be resolved later in front-end React Matching Component
         canvasQuizEntries: quizEntries
       };
       resultArray.push(newQuizEntry);
