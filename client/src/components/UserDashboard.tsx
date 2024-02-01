@@ -31,7 +31,7 @@ const UserDashboard: React.FC = () => {
     e.preventDefault();
     console.clear();
     // Hard-coded for now (will change later)
-    navigate("/learning_obj_match", { state: { canvasCourseInternalId: 185413, quizId: 171111 } });
+    navigate("/learning_obj_match", { state: { canvasCourseInternalId: 185413, quizId: 490583 } });
   }
 
   return (

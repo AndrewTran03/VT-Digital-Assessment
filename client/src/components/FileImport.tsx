@@ -90,7 +90,7 @@ const FileImport: React.FC = () => {
     console.log("Next button pressed!");
     console.log("FILE IMPORT: " + learningObjArr[0].canvasCourseInternalId);
     navigate("/learning_obj_match", {
-      state: { canvasCourseInternalCode: learningObjArr[0].canvasCourseInternalId! }
+      state: { canvasCourseInternalId: 185413, quizId: 490583 }
     });
   }
 
