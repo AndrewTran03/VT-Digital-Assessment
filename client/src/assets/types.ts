@@ -7,18 +7,6 @@ type Prettify<T> = {
 
 const backendUrlBase = "http://localhost:3000";
 
-// REMOVE THESE LATER
-type Test1 = {
-  name: string;
-  num: number;
-};
-
-type Test2 = Prettify<
-  Test1 & {
-    isTrue: boolean;
-  }
->;
-
 enum Season {
   Fall = "Fall",
   Spring = "Spring",
@@ -112,7 +100,6 @@ type CanvasQuizQuestionGroup = {
 type CanvasQuizMap = Map<number, CanvasQuizQuestionGroup[]>;
 
 export {
-  Test2,
   backendUrlBase,
   SeasonEnumValues,
   APIErrorResponse,
