@@ -4,7 +4,7 @@ import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { backendUrlBase, CourseObjectiveBase, APIErrorResponse, SeasonEnumValues } from "../assets/types";
-import { APIRequestError } from "../assets/APIRequestError";
+import { APIRequestError } from "../shared/APIRequestError";
 
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
 const learningObjSchema = z.object({
