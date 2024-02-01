@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import config from "config";
-import { CanvasCourseObjectiveGroup, seasonValues } from "../../assets/types";
+import { CanvasCourseObjectiveGroup, SeasonValues } from "../../assets/types";
 
 const mongoDBName = config.get<string>("mongoDatabaseName");
 const canvasObjectivesMongoCollectionName = config.get<string>("canvasObjectivesMongoCollectionName");
@@ -18,7 +18,7 @@ const CanvasObjectivesSchema = new mongoose.Schema<CanvasCourseObjectiveGroup>(
     semester: {
       type: String,
       required: true,
-      enum: seasonValues
+      enum: SeasonValues
     },
     year: {
       type: Number,
