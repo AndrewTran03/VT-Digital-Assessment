@@ -1,9 +1,9 @@
 import React from "react";
-import { CourseObjectives } from "../assets/types";
+import { CanvasLearningObjectives } from "../assets/types";
 
 type LearningObjectiveType = {
-  courseLearningObjectiveData: CourseObjectives;
-  setLearningCourseObjectiveData: React.Dispatch<React.SetStateAction<CourseObjectives>>;
+  courseLearningObjectiveData: CanvasLearningObjectives;
+  setLearningCourseObjectiveData: React.Dispatch<React.SetStateAction<CanvasLearningObjectives>>;
 };
 
 const LearningObjectiveContext = React.createContext<LearningObjectiveType>({
