@@ -128,7 +128,6 @@ async function fetchCanvasUserQuizData(courseIdsArr: readonly number[]) {
     const quizIdsArr = canvasQuizzesArr.map((item) => item.id!);
     // log.info(`Course ID# ${courseId}: Quiz IDs- ${quizIdsArr}. Length: ${quizIdsArr.length}`);
 
-    // Quiz Question Code Went Here
     await fetchCanvasUserQuizQuestionData(courseId, quizIdsArr, canvasQuizAssociations);
   }
 
