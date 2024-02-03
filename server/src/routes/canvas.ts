@@ -94,7 +94,7 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
 function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>) {
   const resultArray: CanvasCourseQuizMongoDBEntry[] = [];
 
-  // Map: { courseId, Array <{ quizId, questions, [questions, [answers (optional)]] } }
+  // Map: { { courseId, courseName }, Array <{ quizId, questioNames, [questions, [answers (optional)]] } }
   inputMap.forEach((questionGroups, { courseId, courseName }) => {
     questionGroups.forEach((questionGroup) => {
       const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
