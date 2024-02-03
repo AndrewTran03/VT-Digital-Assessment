@@ -176,7 +176,7 @@ const multipleChoiceQuestionLetters = [
   "X",
   "Y",
   "Z"
-];
+] as const;
 
 export {
   backendUrlBase,
