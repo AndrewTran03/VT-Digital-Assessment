@@ -16,7 +16,9 @@ function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]) {
     const updatedDate = data.updated_date;
     const canvasUserId = data.canvasUserId as number;
     const canvasCourseInternalId = data.canvasCourseInternalId as number;
+    const canvasCourseName = data.canvasCourseName;
     const quizId = data.quizId as number;
+    const quizName = data.quizName;
     const canvasMatchedLearningObjectivesArr: string[] = [];
     data.canvasMatchedLearningObjectivesArr.forEach((learningObjective: any) => {
       const currLearningObjective = learningObjective as string;
@@ -63,7 +65,9 @@ function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]) {
       updatedDate: updatedDate,
       canvasUserId: canvasUserId,
       canvasCourseInternalId: canvasCourseInternalId,
+      canvasCourseName: canvasCourseName,
       quizId: quizId,
+      quizName: quizName,
       canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr,
       canvasQuizEntries: canvasQuizEntries
     };

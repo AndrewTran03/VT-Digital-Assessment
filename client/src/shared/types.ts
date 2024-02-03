@@ -106,7 +106,9 @@ type CanvasQuizAnswer = CanvasCourseMCQAnswerMongoDBEntryBase;
 type CanvasCourseQuizMongoDBEntryBase = {
   canvasUserId: number;
   canvasCourseInternalId: number;
+  canvasCourseName: string;
   quizId: number;
+  quizName: string;
   canvasMatchedLearningObjectivesArr: string[];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntryBase[];
 };
@@ -127,7 +129,9 @@ type CanvasCourseMCQAnswerMongoDBEntryBase = {
 type CanvasCourseQuizMongoDBEntry = MongoDBCombined<{
   canvasUserId: number;
   canvasCourseInternalId: number;
+  canvasCourseName: string;
   quizId: number;
+  quizName: string;
   canvasMatchedLearningObjectivesArr: string[];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 }>;
