@@ -5,35 +5,6 @@ import { CanvasCourseSingleCourseObjective, APIErrorResponse } from "../../asset
 
 const router = express.Router();
 
-// router.get("/api/objective", async (_, res) => {
-//   try {
-//     const currItems = await CourseObjectivesModel.find();
-
-//     const newCourseObjectives: CanvasCourseSingleCourseObjective[] = [];
-
-//     currItems.forEach((item, idx) => {
-//       const newCourseObjectiveParsed: CanvasCourseSingleCourseObjective = {
-//         deptAbbrev: item.deptAbbrev,
-//         courseNum: item.courseNum,
-//         semester: item.semester,
-//         year: item.year,
-//         canvasCourseInternalId: item.canvasCourseInternalId,
-//         canvasObjective: item.canvasObjectives[idx]
-//       };
-//       newCourseObjectives.push(newCourseObjectiveParsed);
-//     });
-
-//     return res.status(200).json(currItems);
-//   } catch (err) {
-//     log.error("Did not find any Canvas course objectives for any course! Please try again!");
-//     const resErrBody: APIErrorResponse = {
-//       errorLoc: "GET",
-//       errorMsg: "No items found in MongoDB database"
-//     };
-//     return res.status(400).send(JSON.stringify(resErrBody));
-//   }
-// });
-
 router.get("/api/objective/:canvasIdCode", async (req, res) => {
   const canvasIdCode = req.params.canvasIdCode;
   try {
@@ -82,7 +53,6 @@ router.post("/api/objective", async (req, res) => {
   });
 
   try {
-    // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
     const courseObjectivesInsertResult = await courseObjectivesToInsert.save();
     log.info("Inserted the specified course objectives successfully! Congratulations!");
     return res.status(201).json(courseObjectivesInsertResult); // 201 = Successful Resource Creation

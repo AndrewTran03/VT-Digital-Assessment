@@ -33,11 +33,6 @@ const CanvasCourseMCQAnswerSchema = new mongoose.Schema<CanvasCourseMCQAnswerMon
   }
 });
 
-// const CanvasCourseMCQAnswerModel = mongoose.model<CanvasCourseMCQAnswerMongoDBEntry>(
-//   `${mongoDBName}_CanvasCourseMCQAnswer`,
-//   CanvasCourseMCQAnswerSchema
-// );
-
 const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuestionMongoDBEntry>({
   questionType: {
     type: String,
@@ -53,11 +48,6 @@ const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuest
     required: true
   }
 });
-
-// const CanvasCourseQuizQuestionModel = mongoose.model<CanvasCourseQuizQuestionMongoDBEntry>(
-//   `${mongoDBName}_CanvasCourseQuizQuestion`,
-//   CanvasCourseQuizQuestionSchema
-// );
 
 const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>(
   {
