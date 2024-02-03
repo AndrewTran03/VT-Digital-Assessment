@@ -1,3 +1,5 @@
+import { Document, Types } from "mongoose";
+
 // Shared Typescript Types/Interfaces/Other Global-Variables Used Throughout the Project:
 
 // Reference: https://www.totaltypescript.com/concepts/the-prettify-helper
@@ -5,9 +7,21 @@ type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+type MongoDBItem<T> = Document<unknown, {}, T> & T & { _id: Types.ObjectId };
+
 type APIErrorResponse = {
   errorLoc: string;
   errorMsg: string;
+};
+
+type CanvasCourseInfo = {
+  courseId: number;
+  courseName: string;
+};
+
+type CanvasQuizInfo = {
+  quizId: number;
+  quizName: string;
 };
 
 // Reference: https://canvas.vt.edu/doc/api/live#!/assignments.json/
@@ -194,6 +208,7 @@ type CanvasQuizAnswer = CanvasCourseMCQAnswerMongoDBEntry;
 
 type CanvasQuizQuestionGroup = {
   quizId: number;
+  quizName: string;
   questions: CanvasQuizQuestion[];
 };
 
@@ -232,7 +247,9 @@ type QuestionTypeEnumValues = keyof typeof QuestionType;
 type CanvasCourseQuizMongoDBEntry = {
   canvasUserId: number;
   canvasCourseInternalId: number;
+  canvasCourseName: string;
   quizId: number;
+  quizName: string;
   canvasMatchedLearningObjectivesArr: string[];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 };
@@ -263,6 +280,9 @@ const QuestionTypeValues = [
 
 export {
   APIErrorResponse,
+  CanvasCourseInfo,
+  CanvasQuizInfo,
+  MongoDBItem,
   CanvasCourse,
   CanvasQuiz,
   CanvasQuizQuestion,

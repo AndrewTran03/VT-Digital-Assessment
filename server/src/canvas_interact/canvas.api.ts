@@ -1,7 +1,14 @@
 import axios, { AxiosError } from "axios";
 import config from "config";
 import log from "../utils/logger";
-import { CanvasCourse, CanvasQuiz, CanvasQuizQuestion, CanvasQuizQuestionGroup } from "../../assets/types";
+import {
+  CanvasCourse,
+  CanvasQuiz,
+  CanvasQuizQuestion,
+  CanvasQuizQuestionGroup,
+  CanvasCourseInfo,
+  CanvasQuizInfo
+} from "../../assets/types";
 
 const canvasUrl = "https://canvas.vt.edu:443/api";
 const canvasPublicApiToken = config.get<string>("canvasPublicApiToken");
@@ -79,20 +86,23 @@ async function fetchCanvasUserCourseData() {
   }
   // log.info(`Total length is ${canvasCoursesArr.length}`);
 
-  // Extracts only the relevant information from Course data: CourseIds
-  const courseIdsArr = canvasCoursesArr.map((item) => item.id!);
-  // log.info(`Course IDs- ${courseIdsArr}. Length: ${courseIdsArr.length}`);
+  // Extracts only the relevant information from Course data: CourseIds and CourseNames
+  const courseArr: CanvasCourseInfo[] = canvasCoursesArr.map((item) => ({
+    courseId: item.id!,
+    courseName: item.name!
+  }));
+  // log.info(`Course Info- ${courseArr}. Length: ${courseIdsArr.length}`);
 
-  return courseIdsArr;
+  return courseArr;
 }
 
 // Returns a Map (described below) of the Canvas user's available Quiz IDs
-async function fetchCanvasUserQuizData(courseIdsArr: readonly number[]) {
+async function fetchCanvasUserQuizData(courseArr: readonly CanvasCourseInfo[]) {
   console.clear();
-  const canvasQuizAssociations = new Map<number, Array<CanvasQuizQuestionGroup>>();
+  const canvasQuizAssociations = new Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>();
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
-  for (let j = 0; j < courseIdsArr.length; j++) {
-    const courseId = courseIdsArr[j];
+  for (let j = 0; j < courseArr.length; j++) {
+    const { courseId, courseName } = courseArr[j];
 
     const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes`, {
       headers: axiosHeaders
@@ -124,26 +134,27 @@ async function fetchCanvasUserQuizData(courseIdsArr: readonly number[]) {
     });
     canvasQuizzesArr = Object.values(canvasQuizzesTemp);
 
-    // Extracts only the relevant information from Quiz data: QuizIds
-    const quizIdsArr = canvasQuizzesArr.map((item) => item.id!);
-    // log.info(`Course ID# ${courseId}: Quiz IDs- ${quizIdsArr}. Length: ${quizIdsArr.length}`);
+    // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
+    const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
+    // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz IDs- ${quizArr}. Length: ${quizArr.length}`);
 
-    await fetchCanvasUserQuizQuestionData(courseId, quizIdsArr, canvasQuizAssociations);
+    await fetchCanvasUserQuizQuestionData(courseId, courseName, quizArr, canvasQuizAssociations);
   }
 
   return canvasQuizAssociations;
 }
 
-// End Result: A data structure as folows - Map { K: CourseId, V: Array<{ QuizId, QuizQuestionsObj }> }
+// End Result: A data structure as folows - Map { K: { CourseId, CourseName }, V: Array<{ QuizId, QuizQuestionsObj }> }
 async function fetchCanvasUserQuizQuestionData(
   courseId: number,
-  quizIdsArr: number[],
-  canvasQuizAssociations: Map<number, Array<CanvasQuizQuestionGroup>>
+  courseName: string,
+  quizArr: CanvasQuizInfo[],
+  canvasQuizAssociations: Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>
 ) {
   console.clear();
   // Get every QUESTION for every available quiz of every Canvas course where the user is a TA or Course Instructor
-  for (let k = 0; k < quizIdsArr.length; k++) {
-    const quizId = quizIdsArr[k];
+  for (let k = 0; k < quizArr.length; k++) {
+    const { quizId, quizName } = quizArr[k];
 
     const quizQuestionsRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/questions`, {
       headers: axiosHeaders
@@ -156,13 +167,18 @@ async function fetchCanvasUserQuizQuestionData(
       canvasQuizQuestionTemp[idx] = quizQues;
     });
     const canvasCurrQuizQuestionsArr = Object.values(canvasQuizQuestionTemp);
-    // log.info(`Course ID# ${courseId}: Quiz ID# ${quizId}: Quiz Length- ${canvasCurrQuizQuestionsArr.length}`);
-    const quizMapEntry: CanvasQuizQuestionGroup = { quizId: quizId, questions: canvasCurrQuizQuestionsArr };
+    // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz ID# ${quizId}:, Quiz Name: ${quizName}, Quiz Length- ${canvasCurrQuizQuestionsArr.length}`);
+    const quizMapEntry: CanvasQuizQuestionGroup = {
+      quizId: quizId,
+      quizName: quizName,
+      questions: canvasCurrQuizQuestionsArr
+    };
 
     // Map courseId existence check (and updating)
-    const mapAccess = canvasQuizAssociations.get(courseId);
+    const courseInfo: CanvasCourseInfo = { courseId: courseId, courseName: courseName };
+    const mapAccess = canvasQuizAssociations.get(courseInfo);
     if (mapAccess === undefined) {
-      canvasQuizAssociations.set(courseId, [quizMapEntry]);
+      canvasQuizAssociations.set(courseInfo, [quizMapEntry]);
     } else {
       mapAccess.push(quizMapEntry);
     }

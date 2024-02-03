@@ -3,13 +3,15 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import log from "../utils/logger";
 import {
+  MongoDBItem,
   QuestionTypeValues,
   APIErrorResponse,
   CanvasCourseMCQAnswerMongoDBEntry,
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasQuizQuestionGroup,
-  QuestionTypeEnumValues
+  QuestionTypeEnumValues,
+  CanvasCourseInfo
 } from "../../assets/types";
 import { fetchCanvasUserInfo, fetchCanvasUserCourseData, fetchCanvasUserQuizData } from "../canvas_interact/canvas.api";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
@@ -45,24 +47,37 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
   const canvasQuizMap = await fetchCanvasUserQuizData(canvasUserCourseIds);
   const canvasQuizMapTransformedToArray = convertCanvasQuizMapToArray(canvasUserId, canvasQuizMap);
 
-  // Insert into DB here
+  // Checks for valid schema creation
   log.info("LENGTH: " + canvasQuizMapTransformedToArray.length);
-  canvasQuizMapTransformedToArray.forEach((currEntry) => {
+  canvasQuizMapTransformedToArray.forEach((currEntry, idx) => {
     const validResult = canvasQuizQuestionSchema.safeParse(currEntry);
     if (validResult.success) {
-      log.info("The following course objectives index is of the proper schema");
+      log.info(`The following quiz question object array (at index ${idx}) is of the proper schema`);
     } else {
       log.error(fromZodError(validResult.error));
       process.exit(1);
     }
   });
 
+  log.info(canvasQuizMapTransformedToArray.length);
   for (let i = 0; i < canvasQuizMapTransformedToArray.length; i++) {
+    log.info(`INDEX ${i} STARTED ------------------------------------- \n`);
     try {
       const currEntry = canvasQuizMapTransformedToArray[i];
 
-      // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
+      // Avoid adding quiz entries that have no questions to the frontend
+      if (currEntry.canvasQuizEntries.length === 0) {
+        log.warn("Did NOT insert...entry does not have any questions in it");
+        continue;
+      }
+
       const canvasQuizItemToInsert = new CanvasCourseQuizModel(currEntry);
+      // Check for existence of entry check (to avoid potential duplicates to be added)
+      const newEntryFound = await checkCanvasQuizQuestionExistence(canvasQuizItemToInsert);
+      if (!newEntryFound) {
+        log.error("Did NOT insert...something already matches this");
+        continue;
+      }
       const canvasQuizItemInsertResult = await canvasQuizItemToInsert.save();
       log.info("Inserted the specified course objectives successfully! Congratulations!");
     } catch (err) {
@@ -76,14 +91,14 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
   return true;
 }
 
-function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array<CanvasQuizQuestionGroup>>) {
+function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>) {
   const resultArray: CanvasCourseQuizMongoDBEntry[] = [];
 
-  // Map: { courseId, Array <{ quizId, [questions, [answers (optional)]] } }
-  inputMap.forEach((questionGroups, courseId) => {
+  // Map: { courseId, Array <{ quizId, questions, [questions, [answers (optional)]] } }
+  inputMap.forEach((questionGroups, { courseId, courseName }) => {
     questionGroups.forEach((questionGroup) => {
       const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
-      const { quizId } = questionGroup;
+      const { quizId, quizName } = questionGroup;
       const canvasMatchedLearningObjectivesArr: string[] = [];
       questionGroup.questions.forEach((question) => {
         const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
@@ -109,7 +124,9 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array
       const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
         canvasUserId: userId,
         canvasCourseInternalId: courseId,
+        canvasCourseName: courseName,
         quizId: quizId,
+        quizName: quizName,
         canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr, // Empty for now: Will be resolved later in front-end React Matching Component
         canvasQuizEntries: quizEntries
       };
@@ -118,6 +135,65 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<number, Array
   });
 
   return resultArray;
+}
+
+async function checkCanvasQuizQuestionExistence(currEntry: MongoDBItem<CanvasCourseQuizMongoDBEntry>) {
+  let newEntryFound = false;
+
+  for (let i = 0; i < currEntry.canvasQuizEntries.length; i++) {
+    if (currEntry.canvasQuizEntries[i].answers !== undefined && currEntry.canvasQuizEntries[i].answers!.length > 0) {
+      for (let j = 0; j < currEntry.canvasQuizEntries[i].answers!.length; j++) {
+        const findObjWithAnswers = {
+          canvasUserId: currEntry.canvasUserId,
+          canvasCourseInternalId: currEntry.canvasCourseInternalId,
+          canvasCourseName: currEntry.canvasCourseName,
+          quizId: currEntry.quizId,
+          quizName: currEntry.quizName,
+          canvasQuizEntries: {
+            $elemMatch: {
+              questionType: currEntry.canvasQuizEntries[i].questionType,
+              questionText: currEntry.canvasQuizEntries[i].questionText,
+              answers: {
+                $elemMatch: {
+                  weight: currEntry.canvasQuizEntries[i].answers![j].weight,
+                  migration_id: currEntry.canvasQuizEntries[i].answers![j].migration_id,
+                  id: currEntry.canvasQuizEntries[i].answers![j].id,
+                  text: currEntry.canvasQuizEntries[i].answers![j].text
+                }
+              }
+            }
+          }
+        };
+        const findResult = await CanvasCourseQuizModel.find<CanvasCourseQuizMongoDBEntry>(findObjWithAnswers);
+        // A new (unique) entry (or an update to an existing entry) exists (no need to further check this object to insert/update)
+        if (findResult.length === 0) {
+          log.info("[WITHOUT ANSWERS] Did not find this entry in the MongoDB database...considered new!");
+          return true;
+        }
+      }
+    } else {
+      const findObjWithoutAnswers = {
+        canvasUserId: currEntry.canvasUserId,
+        canvasCourseInternalId: currEntry.canvasCourseInternalId,
+        canvasCourseName: currEntry.canvasCourseName,
+        quizId: currEntry.quizId,
+        quizName: currEntry.quizName,
+        canvasQuizEntries: {
+          $elemMatch: {
+            questionType: currEntry.canvasQuizEntries[i].questionType,
+            questionText: currEntry.canvasQuizEntries[i].questionText
+          }
+        }
+      };
+      const findResult = await CanvasCourseQuizModel.find<CanvasCourseQuizMongoDBEntry>(findObjWithoutAnswers);
+      // A new (unique) entry (or an update to an existing entry) exists (no need to further check this object to insert/update)
+      if (findResult.length === 0) {
+        log.warn("[WITH ANSWERS] Did not find this entry in the MongoDB database...considered new!");
+        return true;
+      }
+    }
+  }
+  return newEntryFound;
 }
 
 let index = 0;
