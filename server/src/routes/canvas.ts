@@ -214,16 +214,15 @@ router.get("/api/canvas", async (_, res) => {
   }
 });
 
-router.post("/api/canvas", async (req, res) => {
+router.put("/api/canvas", async (req, res) => {
   try {
-    // TODO: Check for existence of entry check (to avoid potential duplicates to be added)
-    log.info("Inserted the specified alien successfully! Congratulations!");
-    return res.status(201); // 201 = Successful Resource Creation
+    log.info("Updated the specified Canvas quiz question successfully! Congratulations!");
+    return res.status(200);
   } catch (err) {
-    log.error("Could not insert the specified Canvas quiz questions! Please try again!");
+    log.error("Could not update the specified Canvas quiz question! Please try again!");
     const resErrBody: APIErrorResponse = {
-      errorLoc: "POST",
-      errorMsg: "Failed to insert into the MongoDB database"
+      errorLoc: "PUT",
+      errorMsg: "Failed to update the MongoDB database"
     };
     return res.status(400).send(JSON.stringify(resErrBody));
   }
