@@ -29,6 +29,9 @@ const FileImport: React.FC = () => {
     const file = e.target.files![0];
     console.log(file.name);
     const reader = new FileReader();
+    // Reset the array back to avoid learning-objective upload mismatch
+    // with consecutive submissions
+    setLearningObjArr([]);
     reader.onload = (e: ProgressEvent<FileReader>) => {
       const fileContents = e.target?.result as string;
       const lines = fileContents.split("\n"); // Line Delimited
