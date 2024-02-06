@@ -1,0 +1,9 @@
+﻿Department,Course Number,Semester,Year,Internal Canvas Code (Go to Canvas Course Home Page and Located the End of the URL),Learning Objective
+CS,3714,Spring,2024,185413,Working knowledge of the Kotlin programming language
+CS,3714,Spring,2024,185413,Design an interactive graphical user interface for a mobile application
+CS,3714,Spring,2024,185413,"Explain fundamental distinctions and similarities between mobile apps, web applications, and standard applications"
+CS,3714,Spring,2024,185413,"Implement a mobile application such as a game or a web client that uses the mobile device's sensors, networking, location, camera and/or audio"
+CS,3714,Spring,2024,185413,"Effectively employ object-oriented, procedural, and functional programming paradigms for software engineering"
+CS,3714,Spring,2024,185413,Apply asynchronous programming techniques in the implementation of a mobile application
+CS,3714,Spring,2024,185413,"Discuss mobile application security issues such as confidentiality, integrity, and authentication"
+CS,3714,Spring,2024,185413,Discuss performance considerations in mobile application development

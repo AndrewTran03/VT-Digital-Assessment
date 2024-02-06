@@ -1,0 +1,7 @@
+﻿Department,Course Number,Semester,Year,Internal Canvas Code (Go to Canvas Course Home Page and Located the End of the URL),Learning Objective
+CS,2505,Fall,2023,176154,Understand the representation of information at the hardware level
+CS,2505,Fall,2023,176154,"Understand the different layers of abstraction in a computing system, i.e., logic design, computer architecture, machine language, assembly language, high level language"
+CS,2505,Fall,2023,176154,Write simple to moderately complex programs in C
+CS,2505,Fall,2023,176154,Read and understand simple programs in x86 assembly language
+CS,2505,Fall,2023,176154,"Be able to apply common UNIX tools, such as gdb and objdump, to analyze, debug and correct C programs"
+CS,2505,Fall,2023,176154,Be able to operate efficiently in a UNIX command-line environment
