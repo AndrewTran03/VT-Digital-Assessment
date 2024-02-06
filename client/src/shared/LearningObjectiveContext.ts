@@ -1,25 +1,18 @@
 import React from "react";
-import { CanvasLearningObjectives } from "./types";
+import { LearningObjectiveQuizData } from "./types";
 
 type LearningObjectiveType = {
-  courseLearningObjectiveData: CanvasLearningObjectives;
-  setLearningCourseObjectiveData: React.Dispatch<React.SetStateAction<CanvasLearningObjectives>>;
+  canvasLearningObjectiveData: LearningObjectiveQuizData;
+  setCanvasLearningObjectiveData: React.Dispatch<React.SetStateAction<LearningObjectiveQuizData>>;
 };
 
 const LearningObjectiveContext = React.createContext<LearningObjectiveType>({
-  courseLearningObjectiveData: {
-    _id: "",
-    __v: 0,
-    createdDate: "",
-    updatedDate: "",
-    deptAbbrev: "",
-    courseNum: 0,
-    semester: "Summer",
-    year: 0,
+  canvasLearningObjectiveData: {
     canvasCourseInternalId: 0,
-    canvasObjectives: []
+    quizId: 0,
+    formMode: "Insert"
   },
-  setLearningCourseObjectiveData: () => {}
+  setCanvasLearningObjectiveData: () => {}
 });
 
 export default LearningObjectiveContext;
