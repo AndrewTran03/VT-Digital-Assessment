@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext, FormEvent } from "react";
-import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Paper, Table, TableHead, TableRow, TableCell, TableBody, Accordion, AccordionSummary } from "@mui/material";
 import Typography from "@mui/material/Typography";
@@ -8,52 +8,42 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { backendUrlBase, multipleChoiceQuestionLetters } from "../shared/types";
+import { backendUrlBase, multipleChoiceQuestionLetters, CanvasLearningObjectives } from "../shared/types";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared";
+import "../styles/TableCellStyles.css";
 
-type Props = {
-  canvasCourseInternalId?: number;
-  quizId?: number;
-};
-
-const LearningObjectiveMatcher: React.FC<Props> = (props) => {
+const LearningObjectiveMatcher: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
-  const { courseLearningObjectiveData, setLearningCourseObjectiveData } = useContext(LearningObjectiveContext);
-  const [canvasCourseInternalId, setCanvasCourseInternalId] = useState(props.canvasCourseInternalId || 0);
-  const [quizId, setQuizId] = useState(props.quizId || 0);
+  const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
+  const [canvasCourseInternalId] = useState(canvasLearningObjectiveData.canvasCourseInternalId);
+  const [quizId] = useState(canvasLearningObjectiveData.quizId);
+  const [formMode] = useState(canvasLearningObjectiveData.formMode);
+  const [learningCourseObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
+    _id: "",
+    __v: 0,
+    createdDate: "",
+    updatedDate: "",
+    deptAbbrev: "",
+    courseNum: 0,
+    semester: "Summer",
+    year: 0,
+    canvasCourseInternalId: 0,
+    canvasObjectives: []
+  });
   const matchingEntry = canvasQuizDataArr.filter(
     (data) => data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === quizId
   );
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
-  const location = useLocation();
-
-  // Link Props: useState() Change and Management
-  useEffect(() => {
-    if (location.state && !Object.values(location.state).includes(undefined)) {
-      const newCanvasCourseInternalId = location.state.canvasCourseInternalId;
-      setCanvasCourseInternalId(newCanvasCourseInternalId);
-      const quizId = location.state.quizId;
-      setQuizId(quizId);
-    }
-  }, [location.state]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
       await fetchCanvasLearningObjectiveData();
-      console.log(canvasQuizDataArr);
+      console.clear();
     }
     fetchData();
   }, []);
-
-  useEffect(() => {
-    console.log(courseLearningObjectiveData);
-  }, [courseLearningObjectiveData]);
-
-  useEffect(() => {
-    console.log("NEW INTERNAL: " + canvasCourseInternalId);
-    console.log("NEW QUIZ: " + quizId);
-  }, [canvasCourseInternalId, quizId]);
 
   useEffect(() => {
     console.assert(matchingEntry.length === 1);
@@ -66,10 +56,7 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
 
   async function fetchCanvasLearningObjectiveData() {
     await axios.get(`${backendUrlBase}/api/objective/${canvasCourseInternalId}`).then((res) => {
-      console.log("Before");
-      console.log(res.data);
       const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
-      console.log(parsedResult);
       setLearningCourseObjectiveData(parsedResult);
     });
     console.log(canvasQuizDataArr);
@@ -91,6 +78,7 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
     e.preventDefault();
     console.clear();
     console.log("Pressed submit button successfully!");
+    navigate(-1);
   }
 
   return (
@@ -117,17 +105,9 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
           <TableBody>
             {matchingEntry[0] &&
               matchingEntry[0].canvasQuizEntries.map((quizQuestion, idx) => (
-                <TableRow key={matchingEntry[0]._id}>
+                <TableRow key={`${matchingEntry[0]._id}_${idx}`}>
                   <TableCell
-                    style={{
-                      width: "40%",
-                      maxWidth: "40%",
-                      overflow: "wrap",
-                      textOverflow: "ellipsis",
-                      overflowWrap: "break-word",
-                      borderRight: "1px solid lightgray",
-                      paddingRight: "8px"
-                    }}
+                    className="table-cell"
                   >
                     <Typography>
                       <b>Question {idx + 1}:</b> {extractTextFromHTML(quizQuestion.questionText)}
@@ -146,7 +126,7 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
                       </AccordionSummary>
                       <FormControl>
                         <FormLabel id="demo-radio-buttons-group-label">
-                          Current Selected Learning-Objective:{" "}
+                          Current Selected Learning-Objective:
                           {!selectedAnswers[idx] ? "No answer selected yet" : selectedAnswers[idx]}
                         </FormLabel>
                         <RadioGroup
@@ -158,8 +138,8 @@ const LearningObjectiveMatcher: React.FC<Props> = (props) => {
                             setSelectedAnswers(updatedAnswers);
                           }}
                         >
-                          {courseLearningObjectiveData && courseLearningObjectiveData.canvasObjectives.length > 0 ? (
-                            courseLearningObjectiveData.canvasObjectives.map((canvasObj) => (
+                          {learningCourseObjectiveData && learningCourseObjectiveData.canvasObjectives.length > 0 ? (
+                            learningCourseObjectiveData.canvasObjectives.map((canvasObj) => (
                               <FormControlLabel
                                 key={canvasObj.toString()}
                                 value={canvasObj.toString()}

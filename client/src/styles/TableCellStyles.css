@@ -1,0 +1,9 @@
+.table-cell {
+  width: 40%;
+  max-width: 40%;
+  overflow: wrap;
+  text-overflow: ellipsis;
+  overflow-wrap: break-word;
+  border-right: 1px solid lightgray;
+  padding-right: 8px;
+}
