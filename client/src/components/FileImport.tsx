@@ -18,6 +18,7 @@ const learningObjSchema = z.object({
 
 const FileImport: React.FC = () => {
   const [learningObjArr, setLearningObjArr] = useState<SingleCanvasLearningObjective[]>([]);
+  const [allowedToSubmit, setAllowedToSubmit] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,19 +58,21 @@ const FileImport: React.FC = () => {
         const validResult = learningObjSchema.safeParse(newLearningObjective);
         if (validResult.success) {
           setLearningObjArr((prevArr) => prevArr.concat(newLearningObjective));
+          setAllowedToSubmit(true);
         } else {
           console.error(fromZodError(validResult.error));
+          setAllowedToSubmit(false);
         }
       });
     };
     reader.readAsText(file);
   }
 
-  function handleButtonSubmit(e: FormEvent<HTMLButtonElement>) {
+  async function handleButtonSubmit(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.log("Hit submitted!");
 
-    axios
+    await axios
       .post(`${backendUrlBase}/api/objective`, learningObjArr)
       .then((res) => console.log(res))
       .catch((err: AxiosError) => {
@@ -85,26 +88,14 @@ const FileImport: React.FC = () => {
     navigate("/");
   }
 
-  function handleForwardButtonClick(e: FormEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    console.log("Next button pressed!");
-    console.log("FILE IMPORT: " + learningObjArr[0].canvasCourseInternalId);
-    navigate("/learning_obj_match", {
-      state: { canvasCourseInternalId: 185413, quizId: 490583 }
-    });
-  }
-
   return (
     <div>
       <button type="reset" onClick={handleBackButtonClick}>
         Back
       </button>
       <input type="file" accept=".csv" onChange={handleFileChange} />
-      <button type="submit" onClick={handleButtonSubmit}>
+      <button type="submit" disabled={!allowedToSubmit} onClick={handleButtonSubmit}>
         Submit
-      </button>
-      <button type="submit" onClick={handleForwardButtonClick}>
-        Go to Course Objective Matching Component
       </button>
     </div>
   );
