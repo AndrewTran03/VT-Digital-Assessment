@@ -57,6 +57,12 @@ type MultipleCanvasLearningObjectivesBase = {
 
 type CanvasLearningObjectives = MongoDBCombined<MultipleCanvasLearningObjectivesBase>;
 
+type LearningObjectiveQuizData = {
+  canvasCourseInternalId: number;
+  quizId: number;
+  formMode: "Insert" | "Update";
+};
+
 enum QuestionType {
   multiple_choice_question = "multiple_choice_question",
   essay_question = "essay_question",
@@ -193,5 +199,6 @@ export {
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,
+  LearningObjectiveQuizData,
   multipleChoiceQuestionLetters
 };
