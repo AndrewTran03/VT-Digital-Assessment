@@ -66,7 +66,8 @@ type LearningObjectiveQuizData = {
 enum QuestionType {
   multiple_choice_question = "multiple_choice_question",
   essay_question = "essay_question",
-  multiple_dropdown_question = "multiple_dropdown_question",
+  true_false_question = "true_false_question",
+  multiple_dropdowns_question = "multiple_dropdowns_question",
   fill_in_multiple_blanks_question = "fill_in_multiple_blanks_question",
   multiple_answers_question = "multiple_answers_question",
   short_answer_question = "short_answer_question",
