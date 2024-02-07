@@ -214,10 +214,21 @@ router.get("/api/canvas", async (_, res) => {
   }
 });
 
-router.put("/api/canvas", async (req, res) => {
+router.put("/api/canvas/update_objectives/:canvasQuizEntryId", async (req, res) => {
+  const canvasQuizEntryToUpdateId = req.params.canvasQuizEntryId;
+
+  const learningObjectiveArrToUpdate = req.body as string[];
+
   try {
+    const canvasQuizEntryToUpdate = await CanvasCourseQuizModel.findById(canvasQuizEntryToUpdateId);
+    // Error check to avoid working with an invalid MongoDB "_id" passed to the database query
+    if (!canvasQuizEntryToUpdate) {
+      throw new Error("The specified Canvas quiz question does not exist in the MongoDB database");
+    }
+    canvasQuizEntryToUpdate.canvasMatchedLearningObjectivesArr = learningObjectiveArrToUpdate;
+    const canvasQuizEntryUpdateResult = canvasQuizEntryToUpdate.save();
     log.info("Updated the specified Canvas quiz question successfully! Congratulations!");
-    return res.status(200);
+    return res.status(200).json(canvasQuizEntryUpdateResult);
   } catch (err) {
     log.error("Could not update the specified Canvas quiz question! Please try again!");
     const resErrBody: APIErrorResponse = {
