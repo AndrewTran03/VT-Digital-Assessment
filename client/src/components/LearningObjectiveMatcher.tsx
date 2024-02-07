@@ -106,14 +106,21 @@ const LearningObjectiveMatcher: React.FC = () => {
             {matchingEntry[0] &&
               matchingEntry[0].canvasQuizEntries.map((quizQuestion, idx) => (
                 <TableRow key={`${matchingEntry[0]._id}_${idx}`}>
-                  <TableCell className="table-cell">
+                  <TableCell className="table-cell"
+                    style={{
+                      maxWidth: 50
+                    }}>
                     <Typography>
                       <b>Question {idx + 1}:</b> {extractTextFromHTML(quizQuestion.questionText)}
                     </Typography>
                     {quizQuestion.questionType.includes("multiple") &&
                       quizQuestion.answers!.map((answer, idx) => (
                         <Typography>
-                          ({multipleChoiceQuestionLetters[idx]}) {answer.text}
+                          {answer.weight > 0 ? (
+                            <b>{`(${multipleChoiceQuestionLetters[idx]}) ${answer.text}`}</b>
+                          ) : (
+                            `(${multipleChoiceQuestionLetters[idx]}) ${answer.text}`
+                          )}
                         </Typography>
                       ))}
                   </TableCell>
