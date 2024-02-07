@@ -7,16 +7,14 @@ import LearningObjectiveMatcher from "./components/LearningObjectiveMatcher";
 const AppRouter: React.FC = () => {
   return (
     <>
-      <>
-        <Router>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/file_import" element={<FileImport />} />
-            <Route path="/dashboard" element={<UserDashboard />} />
-            <Route path="/learning_obj_match" element={<LearningObjectiveMatcher />} />
-          </Routes>
-        </Router>
-      </>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/file_import" element={<FileImport />} />
+          <Route path="/dashboard" element={<UserDashboard />} />
+          <Route path="/learning_obj_match" element={<LearningObjectiveMatcher />} />
+        </Routes>
+      </Router>
     </>
   );
 };
