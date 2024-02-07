@@ -16,14 +16,12 @@ import {
 } from "@mui/material";
 import { OverridableStringUnion } from "@mui/types";
 import { Variant } from "@mui/material/styles/createTypography";
+import "../styles/TableCellStyles.css";
 
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { setCanvasLearningObjectiveData } = useContext(LearningObjectiveContext);
-  const canvasQuizDataArrGroupBy = Object.groupBy(
-    canvasQuizDataArr,
-    ({ canvasCourseInternalId }) => canvasCourseInternalId
-  );
+  const canvasQuizDataArrGroupBy = Object.groupBy(canvasQuizDataArr, (entry) => entry.canvasCourseInternalId);
   const sortedCanvasQuizDataArrGroupBy = Object.fromEntries(
     Object.entries(canvasQuizDataArrGroupBy).sort(([keyA], [keyB]) => {
       const canvasCourseInternalIdA = Number(keyA);
@@ -77,9 +75,6 @@ const UserDashboard: React.FC = () => {
         <button type="submit" onClick={handleAPIButtonClick}>
           Refresh
         </button>
-        {/* <button type="submit" onClick={handleClickToMatcher}>
-          Click here to go Learning Objective Matcher
-        </button> */}
       </Typography>
       {sortedCanvasQuizDataArrGroupBy &&
         Object.entries(sortedCanvasQuizDataArrGroupBy).length > 0 &&
@@ -100,126 +95,20 @@ const UserDashboard: React.FC = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell
-                        style={{
-                          width: "40%",
-                          maxWidth: "40%",
-                          overflow: "wrap",
-                          textOverflow: "ellipsis",
-                          overflowWrap: "break-word",
-                          borderRight: "1px solid lightgray",
-                          paddingRight: "8px"
-                        }}
-                      >
-                        Canvas Quiz Id
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          width: "40%",
-                          maxWidth: "40%",
-                          overflow: "wrap",
-                          textOverflow: "ellipsis",
-                          overflowWrap: "break-word",
-                          borderRight: "1px solid lightgray",
-                          paddingRight: "8px"
-                        }}
-                      >
-                        Quiz Name
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          width: "40%",
-                          maxWidth: "40%",
-                          overflow: "wrap",
-                          textOverflow: "ellipsis",
-                          overflowWrap: "break-word",
-                          borderRight: "1px solid lightgray",
-                          paddingRight: "8px"
-                        }}
-                      >
-                        Number of Quiz Questions
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          width: "40%",
-                          maxWidth: "40%",
-                          overflow: "wrap",
-                          textOverflow: "ellipsis",
-                          overflowWrap: "break-word",
-                          borderRight: "1px solid lightgray",
-                          paddingRight: "8px"
-                        }}
-                      >
-                        Assign Learning Objectives
-                      </TableCell>
-                      <TableCell
-                        style={{
-                          width: "40%",
-                          maxWidth: "40%",
-                          overflow: "wrap",
-                          textOverflow: "ellipsis",
-                          overflowWrap: "break-word",
-                          borderRight: "1px solid lightgray",
-                          paddingRight: "8px"
-                        }}
-                      >
-                        View Statistics
-                      </TableCell>
+                      <TableCell className="table-cell">Canvas Quiz Id</TableCell>
+                      <TableCell className="table-cell">Quiz Name</TableCell>
+                      <TableCell className="table-cell">Number of Quiz Questions</TableCell>
+                      <TableCell className="table-cell">Assign Learning Objectives</TableCell>
+                      <TableCell className="table-cell">View Statistics</TableCell>
                     </TableRow>
                   </TableHead>
                   {value[1].map((entry) => (
                     <TableBody>
                       <TableRow>
-                        <TableCell
-                          style={{
-                            width: "40%",
-                            maxWidth: "40%",
-                            overflow: "wrap",
-                            textOverflow: "ellipsis",
-                            overflowWrap: "break-word",
-                            borderRight: "1px solid lightgray",
-                            paddingRight: "8px"
-                          }}
-                        >
-                          {entry.quizId}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            width: "40%",
-                            maxWidth: "40%",
-                            overflow: "wrap",
-                            textOverflow: "ellipsis",
-                            overflowWrap: "break-word",
-                            borderRight: "1px solid lightgray",
-                            paddingRight: "8px"
-                          }}
-                        >
-                          {entry.quizName}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            width: "40%",
-                            maxWidth: "40%",
-                            overflow: "wrap",
-                            textOverflow: "ellipsis",
-                            overflowWrap: "break-word",
-                            borderRight: "1px solid lightgray",
-                            paddingRight: "8px"
-                          }}
-                        >
-                          {entry.canvasQuizEntries.length}
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            width: "40%",
-                            maxWidth: "40%",
-                            overflow: "wrap",
-                            textOverflow: "ellipsis",
-                            overflowWrap: "break-word",
-                            borderRight: "1px solid lightgray",
-                            paddingRight: "8px"
-                          }}
-                        >
+                        <TableCell className="table-cell">{entry.quizId}</TableCell>
+                        <TableCell className="table-cell">{entry.quizName}</TableCell>
+                        <TableCell className="table-cell">{entry.canvasQuizEntries.length}</TableCell>
+                        <TableCell className="table-cell">
                           <Typography>
                             <button
                               type="submit"
