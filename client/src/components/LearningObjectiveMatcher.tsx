@@ -102,7 +102,7 @@ const LearningObjectiveMatcher: React.FC = () => {
               <TableCell
                 style={{
                   border: "1px solid lightgray",
-                  width: "40%"
+                  width: "50%"
                 }}
               >
                 Canvas Quiz Question
@@ -114,7 +114,7 @@ const LearningObjectiveMatcher: React.FC = () => {
             {matchingEntry[0] &&
               matchingEntry[0].canvasQuizEntries.map((quizQuestion, idx) => (
                 <TableRow key={`${matchingEntry[0]._id}_${idx}`}>
-                  <TableCell className="table-cell" style={{ maxWidth: "40%", border: "1px solid lightgray" }}>
+                  <TableCell className="table-cell" style={{ maxWidth: "50%", border: "1px solid lightgray" }}>
                     <Typography style={{ maxWidth: "100%" }}>
                       <b>Question {idx + 1}:</b>
                     </Typography>
