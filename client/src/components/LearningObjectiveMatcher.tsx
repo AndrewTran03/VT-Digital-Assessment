@@ -102,7 +102,7 @@ const LearningObjectiveMatcher: React.FC = () => {
               <TableCell
                 style={{
                   borderRight: "1px solid lightgray",
-                  paddingRight: "8px"
+                  width: "40%"
                 }}
               >
                 Canvas Quiz Question
@@ -114,14 +114,28 @@ const LearningObjectiveMatcher: React.FC = () => {
             {matchingEntry[0] &&
               matchingEntry[0].canvasQuizEntries.map((quizQuestion, idx) => (
                 <TableRow key={`${matchingEntry[0]._id}_${idx}`}>
-                  <TableCell className="table-cell">
-                    <Typography>
+                  <TableCell className="table-cell" style={{ maxWidth: "40%" }}>
+                    <Typography style={{ maxWidth: "100%" }}>
                       <b>Question {idx + 1}:</b>
                     </Typography>
-                    <div
-                      style={{ fontFamily: "inherit", fontSize: "inherit", marginBottom: "5px" }}
-                      dangerouslySetInnerHTML={{ __html: quizQuestion.questionText }}
-                    />
+                    <Typography>
+                      <div
+                        style={{
+                          fontFamily: "inherit",
+                          fontSize: "inherit",
+                          overflow: "wrap",
+                          maxWidth: "100%",
+                          textOverflow: "ellipsis",
+                          overflowWrap: "break-word",
+                          borderRight: "1px solid lightgray",
+                          marginBottom: "5px"
+                        }}
+                        dangerouslySetInnerHTML={{ __html: quizQuestion.questionText }}
+                      />
+                    </Typography>
+                    <Typography>
+                      <b>Answer(s):</b>
+                    </Typography>
                     {(quizQuestion.questionType === "multiple_choice_question" ||
                       quizQuestion.questionType === "multiple_answers_question" ||
                       quizQuestion.questionType === "multiple_dropdowns_question" ||

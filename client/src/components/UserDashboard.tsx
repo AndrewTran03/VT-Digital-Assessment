@@ -95,20 +95,46 @@ const UserDashboard: React.FC = () => {
                 <Table>
                   <TableHead>
                     <TableRow>
-                      <TableCell className="table-cell">Canvas Quiz Id</TableCell>
-                      <TableCell className="table-cell">Quiz Name</TableCell>
-                      <TableCell className="table-cell">Number of Quiz Questions</TableCell>
-                      <TableCell className="table-cell">Assign Learning Objectives</TableCell>
-                      <TableCell className="table-cell">View Statistics</TableCell>
+                      <TableCell className="table-cell" style={{ width: "15%" }}>
+                        <Typography>
+                          <b>Canvas Quiz Id</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "30%" }}>
+                        <Typography>
+                          <b>Quiz Name</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "15%" }}>
+                        <Typography>
+                          <b>Number of Quiz Questions</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                        <Typography>
+                          <b>Assign Learning Objectives</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                        <Typography>
+                          <b>View Statistics</b>
+                        </Typography>
+                      </TableCell>
                     </TableRow>
                   </TableHead>
                   {value[1].map((entry) => (
                     <TableBody>
                       <TableRow>
-                        <TableCell className="table-cell">{entry.quizId}</TableCell>
-                        <TableCell className="table-cell">{entry.quizName}</TableCell>
-                        <TableCell className="table-cell">{entry.canvasQuizEntries.length}</TableCell>
-                        <TableCell className="table-cell">
+                        <TableCell className="table-cell" style={{ width: "15%" }}>
+                          <Typography>{entry.quizId}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "30%" }}>
+                          <Typography>{entry.quizName}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "15%" }}>
+                          <Typography>{entry.canvasQuizEntries.length}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "20%" }}>
                           <Typography>
                             <button
                               type="submit"
@@ -118,10 +144,8 @@ const UserDashboard: React.FC = () => {
                             </button>
                           </Typography>
                         </TableCell>
-                        <TableCell>
-                          <Typography>
-                            <b>Click to View Statistics</b>
-                          </Typography>
+                        <TableCell style={{ width: "20%" }}>
+                          <Typography>Click to View Statistics</Typography>
                         </TableCell>
                       </TableRow>
                     </TableBody>
