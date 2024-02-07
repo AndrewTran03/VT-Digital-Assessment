@@ -16,8 +16,6 @@ import "../styles/TableCellStyles.css";
 const LearningObjectiveMatcher: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
-  const [canvasCourseInternalId] = useState(canvasLearningObjectiveData.canvasCourseInternalId);
-  const [quizId] = useState(canvasLearningObjectiveData.quizId);
   const [formMode] = useState(canvasLearningObjectiveData.formMode);
   const [learningCourseObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
     _id: "",
@@ -32,9 +30,13 @@ const LearningObjectiveMatcher: React.FC = () => {
     canvasObjectives: []
   });
   const matchingEntry = canvasQuizDataArr.filter(
-    (data) => data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === quizId
+    (data) =>
+      data.canvasCourseInternalId === canvasLearningObjectiveData.canvasCourseInternalId &&
+      data.quizId === canvasLearningObjectiveData.quizId
   );
-  const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+  const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
+    matchingEntry.length === 0 ? matchingEntry[0].canvasMatchedLearningObjectivesArr : []
+  );
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
 
@@ -56,11 +58,12 @@ const LearningObjectiveMatcher: React.FC = () => {
   }, [matchingEntry]);
 
   async function fetchCanvasLearningObjectiveData() {
-    await axios.get(`${backendUrlBase}/api/objective/${canvasCourseInternalId}`).then((res) => {
-      const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
-      setLearningCourseObjectiveData(parsedResult);
-    });
-    console.log(canvasQuizDataArr);
+    await axios
+      .get(`${backendUrlBase}/api/objective/${canvasLearningObjectiveData.canvasCourseInternalId}`)
+      .then((res) => {
+        const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
+        setLearningCourseObjectiveData(parsedResult);
+      });
   }
 
   function extractTextFromHTML(htmlStr: string) {
@@ -82,10 +85,15 @@ const LearningObjectiveMatcher: React.FC = () => {
     await fetchCanvasLearningObjectiveData();
   }
 
-  function handleSubmit(e: FormEvent<HTMLButtonElement>) {
+  async function handleSubmit(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
     console.log("Pressed submit button successfully!");
+    console.assert(matchingEntry.length === 1);
+    console.log(`${matchingEntry[0]._id}`);
+    await axios
+      .put(`${backendUrlBase}/api/canvas/update_objectives/${matchingEntry[0]._id}`, selectedAnswers)
+      .then((res) => console.log(res));
     navigate(-1);
   }
 
@@ -177,9 +185,11 @@ const LearningObjectiveMatcher: React.FC = () => {
                         style={{
                           width: "100%",
                           backgroundColor: "white",
+                          fontFamily: "inherit",
+                          fontSize: "inherit",
                           color: "black",
-                          resize: "none", // Prevent resizing by the user
-                          overflowY: "hidden" // Hide vertical scrollbar
+                          resize: "none",
+                          overflowY: "hidden"
                         }}
                         placeholder={
                           quizQuestion.answers &&
@@ -206,6 +216,7 @@ const LearningObjectiveMatcher: React.FC = () => {
                         <RadioGroup
                           aria-labelledby="demo-radio-buttons-group-label"
                           name="radio-buttons-group"
+                          defaultValue={selectedAnswers[idx] ? selectedAnswers[idx] : ""}
                           onChange={(e) => {
                             const updatedAnswers = [...selectedAnswers];
                             updatedAnswers[idx] = e.target.value;
@@ -233,7 +244,7 @@ const LearningObjectiveMatcher: React.FC = () => {
           </TableBody>
         </Table>
       </Paper>
-      <button type="submit" onClick={handleSubmit}>
+      <button type="submit" disabled={matchingEntry.length !== 1} onClick={handleSubmit}>
         Submit Results
       </button>
     </>
