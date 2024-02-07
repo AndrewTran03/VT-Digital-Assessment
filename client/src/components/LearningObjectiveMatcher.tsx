@@ -106,9 +106,7 @@ const LearningObjectiveMatcher: React.FC = () => {
             {matchingEntry[0] &&
               matchingEntry[0].canvasQuizEntries.map((quizQuestion, idx) => (
                 <TableRow key={`${matchingEntry[0]._id}_${idx}`}>
-                  <TableCell
-                    className="table-cell"
-                  >
+                  <TableCell className="table-cell">
                     <Typography>
                       <b>Question {idx + 1}:</b> {extractTextFromHTML(quizQuestion.questionText)}
                     </Typography>
