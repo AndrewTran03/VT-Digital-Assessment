@@ -60,7 +60,6 @@ type CanvasLearningObjectives = MongoDBCombined<MultipleCanvasLearningObjectives
 type LearningObjectiveQuizData = {
   canvasCourseInternalId: number;
   quizId: number;
-  formMode: "Insert" | "Update";
 };
 
 enum QuestionType {

@@ -9,8 +9,7 @@ type LearningObjectiveType = {
 const LearningObjectiveContext = React.createContext<LearningObjectiveType>({
   canvasLearningObjectiveData: {
     canvasCourseInternalId: 0,
-    quizId: 0,
-    formMode: "Insert"
+    quizId: 0
   },
   setCanvasLearningObjectiveData: () => {}
 });

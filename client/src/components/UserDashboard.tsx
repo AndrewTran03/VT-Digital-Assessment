@@ -62,8 +62,7 @@ const UserDashboard: React.FC = () => {
     console.clear();
     setCanvasLearningObjectiveData({
       canvasCourseInternalId: courseInternalId,
-      quizId: specifiedQuizId,
-      formMode: "Insert"
+      quizId: specifiedQuizId
     });
     navigate("/learning_obj_match");
   }

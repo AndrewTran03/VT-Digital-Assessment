@@ -16,7 +16,8 @@ import "../styles/TableCellStyles.css";
 const LearningObjectiveMatcher: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
-  const [formMode] = useState(canvasLearningObjectiveData.formMode);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const navigate = useNavigate();
   const [learningCourseObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
     _id: "",
     __v: 0,
@@ -29,16 +30,14 @@ const LearningObjectiveMatcher: React.FC = () => {
     canvasCourseInternalId: 0,
     canvasObjectives: []
   });
-  const matchingEntry = canvasQuizDataArr.filter(
+  const matchingEntries = canvasQuizDataArr.filter(
     (data) =>
       data.canvasCourseInternalId === canvasLearningObjectiveData.canvasCourseInternalId &&
       data.quizId === canvasLearningObjectiveData.quizId
   );
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
-    matchingEntry.length === 0 ? matchingEntry[0].canvasMatchedLearningObjectivesArr : []
+    matchingEntries.length === 1 ? matchingEntries[0].canvasMatchedLearningObjectivesArr : []
   );
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -49,13 +48,13 @@ const LearningObjectiveMatcher: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.assert(matchingEntry.length === 1);
-    console.log(matchingEntry.length);
-    if (matchingEntry.length === 1) {
+    console.assert(matchingEntries.length === 1);
+    console.log(matchingEntries.length);
+    if (matchingEntries.length === 1) {
       console.log("LENGTH IS 1: FILTERING IS A SUCCESS!");
-      console.log(matchingEntry[0]);
+      console.log(matchingEntries[0]);
     }
-  }, [matchingEntry]);
+  }, [matchingEntries]);
 
   async function fetchCanvasLearningObjectiveData() {
     await axios
@@ -89,10 +88,10 @@ const LearningObjectiveMatcher: React.FC = () => {
     e.preventDefault();
     console.clear();
     console.log("Pressed submit button successfully!");
-    console.assert(matchingEntry.length === 1);
-    console.log(`${matchingEntry[0]._id}`);
+    console.assert(matchingEntries.length === 1);
+    console.log(`${matchingEntries[0]._id}`);
     await axios
-      .put(`${backendUrlBase}/api/canvas/update_objectives/${matchingEntry[0]._id}`, selectedAnswers)
+      .put(`${backendUrlBase}/api/canvas/update_objectives/${matchingEntries[0]._id}`, selectedAnswers)
       .then((res) => console.log(res));
     navigate(-1);
   }
@@ -119,9 +118,9 @@ const LearningObjectiveMatcher: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {matchingEntry[0] &&
-              matchingEntry[0].canvasQuizEntries.map((quizQuestion, idx) => (
-                <TableRow key={`${matchingEntry[0]._id}_${idx}`}>
+            {matchingEntries[0] &&
+              matchingEntries[0].canvasQuizEntries.map((quizQuestion, idx) => (
+                <TableRow key={`${matchingEntries[0]._id}_${idx}`}>
                   <TableCell className="table-cell" style={{ maxWidth: "50%", border: "1px solid lightgray" }}>
                     <Typography style={{ maxWidth: "100%" }}>
                       <b>Question {idx + 1}:</b>
@@ -244,7 +243,7 @@ const LearningObjectiveMatcher: React.FC = () => {
           </TableBody>
         </Table>
       </Paper>
-      <button type="submit" disabled={matchingEntry.length !== 1} onClick={handleSubmit}>
+      <button type="submit" disabled={matchingEntries.length !== 1} onClick={handleSubmit}>
         Submit Results
       </button>
     </>
