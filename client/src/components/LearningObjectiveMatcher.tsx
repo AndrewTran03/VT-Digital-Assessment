@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext, FormEvent } from "react";
+import { useState, useEffect, useContext, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { Paper, Table, TableHead, TableRow, TableCell, TableBody, Accordion, AccordionSummary } from "@mui/material";
@@ -35,6 +35,7 @@ const LearningObjectiveMatcher: React.FC = () => {
     (data) => data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === quizId
   );
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>([]);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,6 +67,13 @@ const LearningObjectiveMatcher: React.FC = () => {
     const htmlParser = new DOMParser();
     const document = htmlParser.parseFromString(htmlStr, "text/html");
     return document.body.textContent || "";
+  }
+
+  function handleAdjustmentTextareaHeight() {
+    if (textareaRef.current) {
+      textareaRef.current.rows = 1;
+      textareaRef.current.rows = Math.ceil(textareaRef.current.scrollHeight / 10);
+    }
   }
 
   async function handleAPIButtonClick(e: FormEvent<HTMLButtonElement>) {
@@ -106,14 +114,18 @@ const LearningObjectiveMatcher: React.FC = () => {
             {matchingEntry[0] &&
               matchingEntry[0].canvasQuizEntries.map((quizQuestion, idx) => (
                 <TableRow key={`${matchingEntry[0]._id}_${idx}`}>
-                  <TableCell className="table-cell"
-                    style={{
-                      maxWidth: 50
-                    }}>
+                  <TableCell className="table-cell">
                     <Typography>
-                      <b>Question {idx + 1}:</b> {extractTextFromHTML(quizQuestion.questionText)}
+                      <b>Question {idx + 1}:</b>
                     </Typography>
-                    {quizQuestion.questionType.includes("multiple") &&
+                    <div
+                      style={{ fontFamily: "inherit", fontSize: "inherit", marginBottom: "5px" }}
+                      dangerouslySetInnerHTML={{ __html: quizQuestion.questionText }}
+                    />
+                    {(quizQuestion.questionType === "multiple_choice_question" ||
+                      quizQuestion.questionType === "multiple_answers_question" ||
+                      quizQuestion.questionType === "multiple_dropdowns_question" ||
+                      quizQuestion.questionType === "true_false_question") &&
                       quizQuestion.answers!.map((answer, idx) => (
                         <Typography>
                           {answer.weight > 0 ? (
@@ -123,6 +135,40 @@ const LearningObjectiveMatcher: React.FC = () => {
                           )}
                         </Typography>
                       ))}
+                    {quizQuestion.questionType === "fill_in_multiple_blanks_question" &&
+                      quizQuestion.answers!.map((answer) => (
+                        <Typography>
+                          {answer.weight > 0 ? (
+                            <b>
+                              <li>{`${answer.text}`}</li>
+                            </b>
+                          ) : (
+                            <li>{`${answer.text}`}</li>
+                          )}
+                        </Typography>
+                      ))}
+                    {(quizQuestion.questionType === "numerical_question" ||
+                      quizQuestion.questionType === "short_answer_question" ||
+                      quizQuestion.questionType === "essay_question") && (
+                      <textarea
+                        style={{
+                          width: "100%",
+                          backgroundColor: "white",
+                          color: "black",
+                          resize: "none", // Prevent resizing by the user
+                          overflowY: "hidden" // Hide vertical scrollbar
+                        }}
+                        placeholder={
+                          quizQuestion.answers &&
+                          quizQuestion.answers[0] &&
+                          quizQuestion.answers[0] &&
+                          quizQuestion.answers[0].text
+                            ? `Default Answer Provided: "${quizQuestion.answers[0].text}"`
+                            : "No Default Answer Provided: This is a default placeholder answer text"
+                        }
+                        onChange={handleAdjustmentTextareaHeight}
+                      ></textarea>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Accordion>
@@ -130,7 +176,7 @@ const LearningObjectiveMatcher: React.FC = () => {
                         <Typography>Click Here to Select the Learning Objective</Typography>
                       </AccordionSummary>
                       <FormControl>
-                        <FormLabel id="demo-radio-buttons-group-label">
+                        <FormLabel id="demo-radio-buttons-group-label" style={{ marginBottom: "10px" }}>
                           Current Selected Learning-Objective:
                           {!selectedAnswers[idx] ? " No answer selected yet" : ` ${selectedAnswers[idx]}`}
                         </FormLabel>
