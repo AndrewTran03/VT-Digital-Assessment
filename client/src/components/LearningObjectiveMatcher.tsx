@@ -98,11 +98,11 @@ const LearningObjectiveMatcher: React.FC = () => {
 
   return (
     <>
-      <Typography>
+      <Typography fontSize={24}>
         <b>
           Learning-Objective-Match for{" "}
           <i>
-            "{matchingEntries[0].quizName}" (ID: {matchingEntries[0].quizId})
+             "{matchingEntries[0].quizName}" (ID: {matchingEntries[0].quizId})
           </i>
         </b>
       </Typography>
