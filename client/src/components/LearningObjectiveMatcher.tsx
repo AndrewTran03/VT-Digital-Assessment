@@ -98,11 +98,18 @@ const LearningObjectiveMatcher: React.FC = () => {
 
   return (
     <>
-      Got to the Learning-Objective-Match component
+      <Typography>
+        <b>
+          Learning-Objective-Match for{" "}
+          <i>
+            "{matchingEntries[0].quizName}" (ID: {matchingEntries[0].quizId})
+          </i>
+        </b>
+      </Typography>
       <button type="submit" onClick={handleAPIButtonClick}>
         Get Course Objective Data
       </button>
-      <Paper>
+      <Paper style={{ borderRadius: 20, overflow: "hidden" }}>
         <Table>
           <TableHead>
             <TableRow>
@@ -112,9 +119,15 @@ const LearningObjectiveMatcher: React.FC = () => {
                   width: "50%"
                 }}
               >
-                Canvas Quiz Question
+                <Typography>
+                  <b>Canvas Quiz Question</b>
+                </Typography>
               </TableCell>
-              <TableCell style={{ border: "1px solid lightgray" }}>Learning Objective</TableCell>
+              <TableCell style={{ border: "1px solid lightgray" }}>
+                <Typography>
+                  <b>Learning Objective</b>
+                </Typography>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

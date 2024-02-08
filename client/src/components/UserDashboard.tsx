@@ -71,14 +71,16 @@ const UserDashboard: React.FC = () => {
     <>
       <Typography fontSize={24}>
         <b>Canvas Course Dashboard</b>
-        <button type="submit" onClick={handleAPIButtonClick}>
-          Refresh
-        </button>
       </Typography>
+      <button type="submit" onClick={handleAPIButtonClick}>
+        <Typography>
+          <b>Refresh</b>
+        </Typography>
+      </button>
       {sortedCanvasQuizDataArrGroupBy &&
         Object.entries(sortedCanvasQuizDataArrGroupBy).length > 0 &&
         Object.entries(sortedCanvasQuizDataArrGroupBy).map((value, key) => (
-          <Paper key={key} style={{ margin: "20px 0" }}>
+          <Paper key={key} style={{ margin: "20px 0", borderRadius: 20, overflow: "hidden" }}>
             {value[1] && value[1].length > 0 && (
               <div key={value[1][0].canvasCourseName}>
                 <div
