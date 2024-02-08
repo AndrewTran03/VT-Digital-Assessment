@@ -181,6 +181,7 @@ const LearningObjectiveMatcher: React.FC = () => {
                       quizQuestion.questionType === "short_answer_question" ||
                       quizQuestion.questionType === "essay_question") && (
                       <textarea
+                        readOnly={true}
                         style={{
                           width: "100%",
                           backgroundColor: "white",
