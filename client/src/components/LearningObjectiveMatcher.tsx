@@ -115,7 +115,7 @@ const LearningObjectiveMatcher: React.FC = () => {
     <>
       <Typography fontSize={24}>
         <b>
-          Learning-Objective-Match for{" "}
+          Match Learning-Objectives for{" "}
           <i>
             "{matchingEntries[0].quizName}" (ID: {matchingEntries[0].quizId})
           </i>
