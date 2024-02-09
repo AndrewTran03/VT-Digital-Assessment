@@ -9,8 +9,7 @@ const App: React.FC = () => {
   const [canvasQuizDataArr, setCanvasQuizDataArr] = useState<CanvasCourseQuizMongoDBEntry[]>([]);
   const [canvasLearningObjectiveData, setCanvasLearningObjectiveData] = useState<LearningObjectiveQuizData>({
     canvasCourseInternalId: 0,
-    quizId: 0,
-    formMode: "Insert"
+    quizId: 0
   });
 
   return (
