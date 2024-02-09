@@ -64,6 +64,9 @@ const UserDashboard: React.FC = () => {
       canvasCourseInternalId: courseInternalId,
       quizId: specifiedQuizId
     });
+    window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
+    window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
+    window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
     navigate("/learning_obj_match");
   }
 

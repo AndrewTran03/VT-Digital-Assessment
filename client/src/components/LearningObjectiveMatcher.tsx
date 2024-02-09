@@ -8,15 +8,32 @@ import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
-import { backendUrlBase, multipleChoiceQuestionLetters, CanvasLearningObjectives } from "../shared/types";
+import {
+  backendUrlBase,
+  multipleChoiceQuestionLetters,
+  CanvasLearningObjectives,
+  CanvasCourseQuizMongoDBEntry
+} from "../shared/types";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared";
 import "../styles/TableCellStyles.css";
 
 const LearningObjectiveMatcher: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
+  const canvasQuizData: CanvasCourseQuizMongoDBEntry[] =
+    canvasQuizDataArr.length === 0
+      ? JSON.parse(window.localStorage.getItem("canvasQuizDataArr") ?? "[]")
+      : canvasQuizDataArr;
+
   const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [canvasCourseInternalId] = useState(
+    canvasLearningObjectiveData.canvasCourseInternalId ||
+      parseInt(window.localStorage.getItem("canvasCourseInternalId") ?? "0")
+  );
+  const [canvasQuizId] = useState(
+    canvasLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
+  );
   const navigate = useNavigate();
   const [learningCourseObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
     _id: "",
@@ -30,10 +47,9 @@ const LearningObjectiveMatcher: React.FC = () => {
     canvasCourseInternalId: 0,
     canvasObjectives: []
   });
-  const matchingEntries = canvasQuizDataArr.filter(
-    (data) =>
-      data.canvasCourseInternalId === canvasLearningObjectiveData.canvasCourseInternalId &&
-      data.quizId === canvasLearningObjectiveData.quizId
+  const matchingEntries = canvasQuizData.filter(
+    (data: CanvasCourseQuizMongoDBEntry) =>
+      data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === canvasQuizId
   );
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
     matchingEntries.length === 1 ? matchingEntries[0].canvasMatchedLearningObjectivesArr : []
@@ -57,12 +73,10 @@ const LearningObjectiveMatcher: React.FC = () => {
   }, [matchingEntries]);
 
   async function fetchCanvasLearningObjectiveData() {
-    await axios
-      .get(`${backendUrlBase}/api/objective/${canvasLearningObjectiveData.canvasCourseInternalId}`)
-      .then((res) => {
-        const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
-        setLearningCourseObjectiveData(parsedResult);
-      });
+    await axios.get(`${backendUrlBase}/api/objective/${canvasCourseInternalId}`).then((res) => {
+      const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
+      setLearningCourseObjectiveData(parsedResult);
+    });
   }
 
   function extractTextFromHTML(htmlStr: string) {
@@ -93,6 +107,7 @@ const LearningObjectiveMatcher: React.FC = () => {
     await axios
       .put(`${backendUrlBase}/api/canvas/update_objectives/${matchingEntries[0]._id}`, selectedAnswers)
       .then((res) => console.log(res));
+    window.localStorage.clear();
     navigate(-1);
   }
 
@@ -102,7 +117,7 @@ const LearningObjectiveMatcher: React.FC = () => {
         <b>
           Learning-Objective-Match for{" "}
           <i>
-             "{matchingEntries[0].quizName}" (ID: {matchingEntries[0].quizId})
+            "{matchingEntries[0].quizName}" (ID: {matchingEntries[0].quizId})
           </i>
         </b>
       </Typography>
