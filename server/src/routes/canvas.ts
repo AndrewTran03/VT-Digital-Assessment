@@ -138,8 +138,6 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
 }
 
 async function checkCanvasQuizQuestionExistence(currEntry: MongoDBItem<CanvasCourseQuizMongoDBEntry>) {
-  let newEntryFound = false;
-
   for (let i = 0; i < currEntry.canvasQuizEntries.length; i++) {
     if (currEntry.canvasQuizEntries[i].answers !== undefined && currEntry.canvasQuizEntries[i].answers!.length > 0) {
       for (let j = 0; j < currEntry.canvasQuizEntries[i].answers!.length; j++) {
@@ -193,7 +191,7 @@ async function checkCanvasQuizQuestionExistence(currEntry: MongoDBItem<CanvasCou
       }
     }
   }
-  return newEntryFound;
+  return false;
 }
 
 let index = 0;
@@ -226,7 +224,7 @@ router.put("/api/canvas/update_objectives/:canvasQuizEntryId", async (req, res) 
       throw new Error("The specified Canvas quiz question does not exist in the MongoDB database");
     }
     canvasQuizEntryToUpdate.canvasMatchedLearningObjectivesArr = learningObjectiveArrToUpdate;
-    const canvasQuizEntryUpdateResult = canvasQuizEntryToUpdate.save();
+    const canvasQuizEntryUpdateResult = await canvasQuizEntryToUpdate.save();
     log.info("Updated the specified Canvas quiz question successfully! Congratulations!");
     return res.status(200).json(canvasQuizEntryUpdateResult);
   } catch (err) {
