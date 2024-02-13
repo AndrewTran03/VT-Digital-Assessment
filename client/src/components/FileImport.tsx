@@ -1,10 +1,12 @@
-import { useState, useEffect, ChangeEvent, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { FileUploader } from "react-drag-drop-files";
 import { backendUrlBase, APIErrorResponse, SeasonEnumValues, SingleCanvasLearningObjective } from "../shared/types";
 import { APIRequestError } from "../shared/APIRequestError";
+import "../styles/DragDropFileImport.css";
 
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
 const learningObjSchema = z.object({
@@ -16,17 +18,24 @@ const learningObjSchema = z.object({
   canvasObjective: z.string().min(1)
 });
 
+/*
+Two Step Import:
+(1) Select Course from Dropdown
+(2) Second Screen will show the existing course objectives
+  - Have import button (take in a CSV file) to add more
+*/
+// function FileImport(): ReturnType<React.FC> { // Another way to return React FC components
 const FileImport: React.FC = () => {
   const [learningObjArr, setLearningObjArr] = useState<SingleCanvasLearningObjective[]>([]);
   const [allowedToSubmit, setAllowedToSubmit] = useState(false);
   const navigate = useNavigate();
+  const acceptableFileTypes = ["CSV"];
 
   useEffect(() => {
     console.log(learningObjArr);
   }, [learningObjArr]);
 
-  function handleFileChange(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files![0];
+  function handleFileChange(file: File) {
     console.log(file.name);
     const reader = new FileReader();
     // Reset the array back to avoid learning-objective upload mismatch
@@ -92,15 +101,29 @@ const FileImport: React.FC = () => {
   }
 
   return (
-    <div>
+    <>
       <button type="reset" onClick={handleBackButtonClick}>
         Back
       </button>
-      <input type="file" accept=".csv" onChange={handleFileChange} />
       <button type="submit" disabled={!allowedToSubmit} onClick={handleButtonSubmit}>
         Submit
       </button>
-    </div>
+      {/* Reference: https://www.npmjs.com/package/react-drag-drop-files?activeTab=readme */}
+      <FileUploader
+        multiple={false}
+        label={"Upload Additional Learning Objectives Here"}
+        required={true}
+        disabled={false}
+        types={acceptableFileTypes}
+        hoverTitle={"Drop here"}
+        handleChange={handleFileChange}
+        classes={"file-uploader"}
+        onDraggingStateChange={(dragging: boolean) => console.log(dragging)}
+        dropMessageStyle={{ backgroundColor: "green", color: "black" }}
+        onDrop={(file: File) => console.log(`FILE DROPPED: ${file.name}`)}
+        onTypeError={(err: Error) => console.error(err.message)}
+      />
+    </>
   );
 };
 
