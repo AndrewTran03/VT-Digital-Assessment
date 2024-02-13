@@ -1,6 +1,6 @@
-import { useEffect, useContext, FormEvent } from "react";
+import { useEffect, useContext, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { backendUrlBase } from "../shared/types";
 import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
@@ -22,14 +22,8 @@ const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { setCanvasLearningObjectiveData } = useContext(LearningObjectiveContext);
   const canvasQuizDataArrGroupBy = Object.groupBy(canvasQuizDataArr, (entry) => entry.canvasCourseInternalId);
-  const sortedCanvasQuizDataArrGroupBy = Object.fromEntries(
-    Object.entries(canvasQuizDataArrGroupBy).sort(([keyA], [keyB]) => {
-      const canvasCourseInternalIdA = Number(keyA);
-      const canvasCourseInternalIdB = Number(keyB);
-      return canvasCourseInternalIdB - canvasCourseInternalIdA;
-    })
-  );
   const navigate = useNavigate();
+  // const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -40,8 +34,8 @@ const UserDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(sortedCanvasQuizDataArrGroupBy);
-  }, [sortedCanvasQuizDataArrGroupBy]);
+    console.log(canvasQuizDataArrGroupBy);
+  }, [canvasQuizDataArrGroupBy]);
 
   async function fetchCanvasQuizData() {
     await axios.get(`${backendUrlBase}/api/canvas`).then((res) => {
@@ -57,6 +51,11 @@ const UserDashboard: React.FC = () => {
     await fetchCanvasQuizData();
   }
 
+  function handleClickToObjectives(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    navigate("/file_import");
+  }
+
   function handleClickToMatcher(e: FormEvent<HTMLButtonElement>, courseInternalId: number, specifiedQuizId: number) {
     e.preventDefault();
     console.clear();
@@ -70,19 +69,49 @@ const UserDashboard: React.FC = () => {
     navigate("/learning_obj_match");
   }
 
+  // async function handleAPIInputClick(e: FormEvent<HTMLButtonElement>) {
+  //   e.preventDefault();
+  //   if (inputRef.current) {
+  //     console.log(inputRef.current.value.toString());
+  //     const accountDeptId = 54;
+  //     const canvasUserName = "andrewt03";
+  //     // const axiosHeaders = {
+  //     //   Authorization: `Bearer ${inputRef.current.value.toString()}`
+  //     // }
+  //     const axiosHeaders = {
+  //       Authorization: `Bearer 4511~m3UxXzGHlVNk4E8L3hlChhJE6s6NexevvSZU1ZnVBdi17eY1QsAkXbOiomynNfNY`
+  //     };
+  //     const result = await axios.get(`https://canvas.vt.edu:443/api/v1/accounts/${accountDeptId}/users?search_term=${canvasUserName}@vt.edu`, {
+  //       headers: axiosHeaders
+  //     }).catch((err) => console.error((err as Error).message));
+  //     console.log(result);
+  //   }
+  // }
+
   return (
     <>
       <Typography fontSize={24}>
         <b>Canvas Course Dashboard</b>
       </Typography>
+      <button type="button" onClick={handleClickToObjectives}>
+        <Typography>
+          <b>+ Add Learning Objectives for Your Course</b>
+        </Typography>
+      </button>
       <button type="submit" onClick={handleAPIButtonClick}>
         <Typography>
           <b>Refresh</b>
         </Typography>
       </button>
-      {sortedCanvasQuizDataArrGroupBy &&
-        Object.entries(sortedCanvasQuizDataArrGroupBy).length > 0 &&
-        Object.entries(sortedCanvasQuizDataArrGroupBy).map((value, key) => (
+      {/* <Typography>
+        Enter your API Key:
+      </Typography>
+      <input ref={inputRef} type="text">
+      </input>
+      <button type="submit" onClick={handleAPIInputClick}>Submit Key</button> */}
+      {canvasQuizDataArrGroupBy &&
+        Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
+        Object.entries(canvasQuizDataArrGroupBy).map((value, key) => (
           <Paper key={key} style={{ margin: "20px 0", borderRadius: 20, overflow: "hidden" }}>
             {value[1] && value[1].length > 0 && (
               <div key={value[1][0].canvasCourseName}>
