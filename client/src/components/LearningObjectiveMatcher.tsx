@@ -107,7 +107,9 @@ const LearningObjectiveMatcher: React.FC = () => {
     await axios
       .put(`${backendUrlBase}/api/canvas/update_objectives/${matchingEntries[0]._id}`, selectedAnswers)
       .then((res) => console.log(res));
-    window.localStorage.clear();
+    window.localStorage.removeItem("canvasQuizDataArr");
+    window.localStorage.removeItem("canvasCourseInternalId");
+    window.localStorage.removeItem("canvasQuizId");
     navigate(-1);
   }
 
@@ -232,15 +234,15 @@ const LearningObjectiveMatcher: React.FC = () => {
                     )}
                   </TableCell>
                   <TableCell style={{ border: "2px solid lightgray" }}>
+                    <FormLabel id="demo-radio-buttons-group-label" style={{ marginBottom: "10px" }}>
+                      Current Selected Learning-Objective:
+                      {!selectedAnswers[idx] ? " No answer selected yet" : ` ${selectedAnswers[idx]}`}
+                    </FormLabel>
                     <Accordion>
                       <AccordionSummary>
-                        <Typography>Click Here to Select the Learning Objective</Typography>
+                        <Typography>Click Here to Select Additional Learning Objectives</Typography>
                       </AccordionSummary>
                       <FormControl>
-                        <FormLabel id="demo-radio-buttons-group-label" style={{ marginBottom: "10px" }}>
-                          Current Selected Learning-Objective:
-                          {!selectedAnswers[idx] ? " No answer selected yet" : ` ${selectedAnswers[idx]}`}
-                        </FormLabel>
                         <RadioGroup
                           aria-labelledby="demo-radio-buttons-group-label"
                           name="radio-buttons-group"
