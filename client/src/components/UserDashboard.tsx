@@ -109,6 +109,20 @@ const UserDashboard: React.FC = () => {
     navigate("/learning_obj_match");
   }
 
+  function handleClickToStatistics(e: FormEvent<HTMLButtonElement>, courseInternalId: number, specifiedQuizId: number) {
+    e.preventDefault();
+    console.clear();
+    setCanvasLearningObjectiveData({
+      canvasCourseInternalId: courseInternalId,
+      quizId: specifiedQuizId
+    });
+    window.localStorage.setItem("canvasUserId", canvasUserId.toString());
+    window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
+    window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
+    window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
+    navigate("/statistics");
+  }
+
   async function handleAPIInputClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     if (inputRef.current) {
@@ -213,7 +227,14 @@ const UserDashboard: React.FC = () => {
                           </Typography>
                         </TableCell>
                         <TableCell style={{ width: "20%" }}>
-                          <Typography>Click to View Statistics</Typography>
+                          <Typography>
+                            <button
+                              type="submit"
+                              onClick={(e) => handleClickToStatistics(e, entry.canvasCourseInternalId, entry.quizId)}
+                            >
+                              Click to View Statistics
+                            </button>
+                          </Typography>
                         </TableCell>
                       </TableRow>
                     </TableBody>
