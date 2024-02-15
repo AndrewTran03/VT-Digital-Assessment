@@ -26,7 +26,6 @@ const LearningObjectiveMatcher: React.FC = () => {
       : canvasQuizDataArr;
 
   const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [canvasCourseInternalId] = useState(
     canvasLearningObjectiveData.canvasCourseInternalId ||
       parseInt(window.localStorage.getItem("canvasCourseInternalId") ?? "0")
@@ -34,7 +33,9 @@ const LearningObjectiveMatcher: React.FC = () => {
   const [canvasQuizId] = useState(
     canvasLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
   );
+
   const navigate = useNavigate();
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [learningCourseObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
     _id: "",
     __v: 0,
