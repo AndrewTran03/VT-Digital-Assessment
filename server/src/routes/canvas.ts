@@ -1,6 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import axios from "axios";
 import log from "../utils/logger";
 import {
   MongoDBItem,
@@ -13,7 +14,12 @@ import {
   QuestionTypeEnumValues,
   CanvasCourseInfo
 } from "../../assets/types";
-import { fetchCanvasUserInfo, fetchCanvasUserCourseData, fetchCanvasUserQuizData } from "../canvas_interact/canvas.api";
+import {
+  fetchCanvasUserInfo,
+  fetchCanvasUserInfoPublic,
+  fetchCanvasUserCourseData,
+  fetchCanvasUserQuizData
+} from "../canvas_interact/canvas.api";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 
 const router = express.Router();
@@ -94,8 +100,8 @@ async function loadInitialCanvasDataFromExternalApiAndSaveIntoDB() {
 function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>) {
   const resultArray: CanvasCourseQuizMongoDBEntry[] = [];
 
-  // Map: { { courseId, courseName }, Array <{ quizId, questioNames, [questions, [answers (optional)]] } }
-  inputMap.forEach((questionGroups, { courseId, courseName }) => {
+  // Map: { { courseId, courseName, courseDept, courseNum }, Array <{ quizId, questioNames, [questions, [answers (optional)]] } }
+  inputMap.forEach((questionGroups, { courseId, courseName, courseDept, courseNum }) => {
     questionGroups.forEach((questionGroup) => {
       const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
       const { quizId, quizName } = questionGroup;
@@ -125,6 +131,8 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
         canvasUserId: userId,
         canvasCourseInternalId: courseId,
         canvasCourseName: courseName,
+        canvasCourseDept: courseDept,
+        canvasCourseNum: courseNum,
         quizId: quizId,
         quizName: quizName,
         canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr, // Empty for now: Will be resolved later in front-end React Matching Component
@@ -194,10 +202,30 @@ async function checkCanvasQuizQuestionExistence(currEntry: MongoDBItem<CanvasCou
   return false;
 }
 
+// TEMPORARY FUNCTION
+router.get("/api/canvas/retrieveCanvasId", async (_, res) => {
+  const canvasUserId = await fetchCanvasUserInfo();
+  return res.status(200).send({ User_Id: canvasUserId });
+});
+
+router.post("/api/canvas/:canvasAccountId/:canvasUsername", async (req, res) => {
+  const canvasAccountId = parseInt(req.params.canvasAccountId);
+  const canvasUsername = req.params.canvasUsername as string;
+  const { canvasUserApiKey } = req.body;
+  console.log("Canvas Account ID:", canvasAccountId);
+  console.log("Canvas Username:", canvasUsername);
+  console.log("Canvas User API Key:", canvasUserApiKey);
+  // const canvasUserResult = await axios.get(`${backendUrl}`)
+  const canvasUserId = await fetchCanvasUserInfoPublic(canvasAccountId, canvasUsername, canvasUserApiKey);
+  console.log("FINAL USER ID: ", canvasUserId);
+  return res.status(200).send(JSON.stringify({ User_Id: canvasUserId }));
+});
+
 let index = 0;
-router.get("/api/canvas", async (_, res) => {
+router.get("/api/canvas/:canvasUserId", async (req, res) => {
   try {
-    const currItems = await CanvasCourseQuizModel.find();
+    const canvasUserId = parseInt(req.params.canvasUserId);
+    const currItems = await CanvasCourseQuizModel.find({ canvasUserId });
     log.info(currItems);
     index++;
     log.info(`END OF GET REQUEST #${index} ---------------------`);
