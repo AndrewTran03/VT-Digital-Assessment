@@ -15,7 +15,7 @@ import {
   CanvasCourseQuizMongoDBEntry
 } from "../shared/types";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
-import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared";
+import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared/contexts";
 import "../styles/TableCellStyles.css";
 
 const LearningObjectiveMatcher: React.FC = () => {
@@ -98,6 +98,15 @@ const LearningObjectiveMatcher: React.FC = () => {
     await fetchCanvasLearningObjectiveData();
   }
 
+  function handleBackButtonClick(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    console.log("Back button pressed!");
+    window.localStorage.removeItem("canvasQuizDataArr");
+    window.localStorage.removeItem("canvasCourseInternalId");
+    window.localStorage.removeItem("canvasQuizId");
+    navigate(-1);
+  }
+
   async function handleSubmit(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
@@ -123,6 +132,9 @@ const LearningObjectiveMatcher: React.FC = () => {
           </i>
         </b>
       </Typography>
+      <button type="reset" onClick={handleBackButtonClick}>
+        Back
+      </button>
       <button type="submit" onClick={handleAPIButtonClick}>
         Get Course Objective Data
       </button>
