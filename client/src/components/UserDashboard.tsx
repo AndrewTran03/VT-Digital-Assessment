@@ -1,8 +1,13 @@
 import { useEffect, useContext, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
-import { backendUrlBase } from "../shared/types";
-import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared";
+import { CanvasCourseAssociations, backendUrlBase } from "../shared/types";
+import {
+  CanvasQuizQuestionContext,
+  LearningObjectiveContext,
+  CanvasUserIdContext,
+  CanvasUserCourseNamesArrContext
+} from "../shared/contexts";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
 import {
   Paper,
@@ -21,9 +26,11 @@ import "../styles/TableCellStyles.css";
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { setCanvasLearningObjectiveData } = useContext(LearningObjectiveContext);
+  const { canvasUserId, setCanvasUserId } = useContext(CanvasUserIdContext);
+  const { setCanvasUserCourseNamesArr } = useContext(CanvasUserCourseNamesArrContext);
   const canvasQuizDataArrGroupBy = Object.groupBy(canvasQuizDataArr, (entry) => entry.canvasCourseInternalId);
   const navigate = useNavigate();
-  // const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -34,11 +41,20 @@ const UserDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log(canvasUserId);
+  }, [canvasUserId]);
+
+  useEffect(() => {
     console.log(canvasQuizDataArrGroupBy);
   }, [canvasQuizDataArrGroupBy]);
 
   async function fetchCanvasQuizData() {
-    await axios.get(`${backendUrlBase}/api/canvas`).then((res) => {
+    await axios.get(`${backendUrlBase}/api/canvas/retrieveCanvasId`).then((res) => {
+      console.log(res.data.User_Id);
+      setCanvasUserId(res.data.User_Id);
+    });
+    console.log("CANVAS USER ID:", canvasUserId);
+    await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`).then((res) => {
       const parsedResult = parseCanvasQuizQuestionMongoDBDCollection(res.data);
       console.log(parsedResult);
       setCanvasQuizDataArr(parsedResult);
@@ -53,6 +69,29 @@ const UserDashboard: React.FC = () => {
 
   function handleClickToObjectives(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
+    console.clear();
+    window.localStorage.setItem("canvasUserId", canvasUserId.toString());
+    if (canvasQuizDataArr && canvasQuizDataArr.length > 0) {
+      const canvasQuizDataArrCourseNames = new Set<string>();
+      for (const course of canvasQuizDataArr) {
+        const currEntry: CanvasCourseAssociations = {
+          deptAbbrev: course.canvasCourseDept,
+          courseNum: course.canvasCourseNum,
+          courseName: course.canvasCourseName
+        };
+        const serializedCurrEntry = JSON.stringify(currEntry);
+        if (!canvasQuizDataArrCourseNames.has(serializedCurrEntry)) {
+          canvasQuizDataArrCourseNames.add(serializedCurrEntry);
+        }
+      }
+      // Convert set to an array of serialized strings and store it in local storage
+      const serializedArray = Array.from(canvasQuizDataArrCourseNames);
+      window.localStorage.setItem("canvasUserCourseAssociations", JSON.stringify(serializedArray));
+
+      // Convert set to an array of CanvasCourseAssociations objects and update state
+      const deserializedArray = serializedArray.map((entry) => JSON.parse(entry) as CanvasCourseAssociations);
+      setCanvasUserCourseNamesArr(deserializedArray);
+    }
     navigate("/file_import");
   }
 
@@ -63,30 +102,27 @@ const UserDashboard: React.FC = () => {
       canvasCourseInternalId: courseInternalId,
       quizId: specifiedQuizId
     });
+    window.localStorage.setItem("canvasUserId", canvasUserId.toString());
     window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
     navigate("/learning_obj_match");
   }
 
-  // async function handleAPIInputClick(e: FormEvent<HTMLButtonElement>) {
-  //   e.preventDefault();
-  //   if (inputRef.current) {
-  //     console.log(inputRef.current.value.toString());
-  //     const accountDeptId = 54;
-  //     const canvasUserName = "andrewt03";
-  //     // const axiosHeaders = {
-  //     //   Authorization: `Bearer ${inputRef.current.value.toString()}`
-  //     // }
-  //     const axiosHeaders = {
-  //       Authorization: `Bearer 4511~m3UxXzGHlVNk4E8L3hlChhJE6s6NexevvSZU1ZnVBdi17eY1QsAkXbOiomynNfNY`
-  //     };
-  //     const result = await axios.get(`https://canvas.vt.edu:443/api/v1/accounts/${accountDeptId}/users?search_term=${canvasUserName}@vt.edu`, {
-  //       headers: axiosHeaders
-  //     }).catch((err) => console.error((err as Error).message));
-  //     console.log(result);
-  //   }
-  // }
+  async function handleAPIInputClick(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    if (inputRef.current) {
+      console.log(inputRef.current.value.toString());
+      const canvasAccountId = 54;
+      const canvasUsername = "andrewt03";
+      await axios
+        .post(`${backendUrlBase}/api/canvas/${canvasAccountId}/${canvasUsername}`, {
+          User_API_Key: `${inputRef.current.value.toString()}`
+        })
+        .then((res) => console.log(res))
+        .catch((err) => console.error((err as Error).message));
+    }
+  }
 
   return (
     <>
@@ -103,12 +139,11 @@ const UserDashboard: React.FC = () => {
           <b>Refresh</b>
         </Typography>
       </button>
-      {/* <Typography>
-        Enter your API Key:
-      </Typography>
-      <input ref={inputRef} type="text">
-      </input>
-      <button type="submit" onClick={handleAPIInputClick}>Submit Key</button> */}
+      <Typography>Enter your API Key:</Typography>
+      <input ref={inputRef} type="text"></input>
+      <button type="submit" onClick={handleAPIInputClick}>
+        Submit Key
+      </button>
       {canvasQuizDataArrGroupBy &&
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
         Object.entries(canvasQuizDataArrGroupBy).map((value, key) => (
