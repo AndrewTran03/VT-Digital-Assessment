@@ -85,12 +85,26 @@ async function fetchCanvasUserCourseData() {
     // log.info(`Length of ${role.toUpperCase()} array is ${currArr.length}`);
   }
   // log.info(`Total length is ${canvasCoursesArr.length}`);
+  // log.info(canvasCoursesArr);
 
   // Extracts only the relevant information from Course data: CourseIds and CourseNames
-  const courseArr: CanvasCourseInfo[] = canvasCoursesArr.map((item) => ({
-    courseId: item.id!,
-    courseName: item.name!
-  }));
+  const courseArr: CanvasCourseInfo[] = canvasCoursesArr.map((item) => {
+    // Split the course code string based on "_" or space characters
+    const parts = (item.course_code || "").split(/[_\s]+/);
+    // console.log(parts);
+
+    // Extract relevant information from the parts
+    const courseDept = parts[0];
+    const courseNum = parseInt(parts[1]);
+    // console.log("COURSE INFO:", courseDept, courseNum);
+
+    return {
+      courseId: item.id!,
+      courseName: item.name!,
+      courseDept: courseDept,
+      courseNum: courseNum
+    };
+  });
   // log.info(`Course Info- ${courseArr}. Length: ${courseIdsArr.length}`);
 
   return courseArr;
@@ -102,7 +116,7 @@ async function fetchCanvasUserQuizData(courseArr: readonly CanvasCourseInfo[]) {
   const canvasQuizAssociations = new Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>();
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
   for (let j = 0; j < courseArr.length; j++) {
-    const { courseId, courseName } = courseArr[j];
+    const { courseId, courseName, courseDept, courseNum } = courseArr[j];
 
     const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes`, {
       headers: axiosHeaders
@@ -138,16 +152,18 @@ async function fetchCanvasUserQuizData(courseArr: readonly CanvasCourseInfo[]) {
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
     // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz IDs- ${quizArr}. Length: ${quizArr.length}`);
 
-    await fetchCanvasUserQuizQuestionData(courseId, courseName, quizArr, canvasQuizAssociations);
+    await fetchCanvasUserQuizQuestionData(courseId, courseName, courseDept, courseNum, quizArr, canvasQuizAssociations);
   }
 
   return canvasQuizAssociations;
 }
 
-// End Result: A data structure as folows - Map { K: { CourseId, CourseName }, V: Array<{ QuizId, QuizQuestionsObj }> }
+// End Result: A data structure as folows - Map { K: { CourseId, CourseName, CourseDept, CourseNum }, V: Array<{ QuizId, QuizQuestionsObj }> }
 async function fetchCanvasUserQuizQuestionData(
   courseId: number,
   courseName: string,
+  courseDept: string,
+  courseNum: number,
   quizArr: CanvasQuizInfo[],
   canvasQuizAssociations: Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>
 ) {
@@ -175,7 +191,12 @@ async function fetchCanvasUserQuizQuestionData(
     };
 
     // Map courseId existence check (and updating)
-    const courseInfo: CanvasCourseInfo = { courseId: courseId, courseName: courseName };
+    const courseInfo: CanvasCourseInfo = {
+      courseId: courseId,
+      courseName: courseName,
+      courseDept: courseDept,
+      courseNum: courseNum
+    };
     const mapAccess = canvasQuizAssociations.get(courseInfo);
     if (mapAccess === undefined) {
       canvasQuizAssociations.set(courseInfo, [quizMapEntry]);
@@ -196,8 +217,34 @@ function checkQuizMapHelper(map: Map<number, Array<CanvasQuizQuestionGroup>>) {
   });
 }
 
+async function fetchCanvasUserInfoPublic(canvasAccountId: number, canvasUsername: string, canvasUserApiKey: string) {
+  const publicAxiosHeaders = {
+    Authorization: `${canvasUserApiKey}`
+  };
+
+  let userId = 0;
+  const result = await axios
+    .get(`${canvasUrl}/v1/accounts/${canvasAccountId}/users?search_term=${canvasUsername}@vt.edu`, {
+      headers: publicAxiosHeaders
+    })
+    .then((res) => {
+      console.log(res.config.url);
+      const canvasUserId = res.data[0].id as number;
+      log.info(`Canvas User ID: ${canvasUserId}`);
+      userId = canvasUserId;
+    })
+    .catch((error) => {
+      log.error(error);
+      log.error("Error in retrieving the Canvas User ID");
+      log.error(`More Descriptive Error Message: ${error}`);
+      userId = -1;
+    });
+  return userId;
+}
+
 export {
   fetchCanvasUserInfo,
+  fetchCanvasUserInfoPublic,
   fetchCanvasUserCourseData,
   fetchCanvasUserQuizData,
   fetchCanvasUserQuizQuestionData,
