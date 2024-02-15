@@ -5,8 +5,37 @@ import { CanvasCourseSingleCourseObjective, APIErrorResponse } from "../../asset
 
 const router = express.Router();
 
+router.get("/api/objective", async (_, res) => {
+  try {
+    const currItems = await CourseObjectivesModel.find();
+
+    const newCourseObjectives: CanvasCourseSingleCourseObjective[] = [];
+
+    currItems.forEach((item, idx) => {
+      const newCourseObjectiveParsed: CanvasCourseSingleCourseObjective = {
+        deptAbbrev: item.deptAbbrev,
+        courseNum: item.courseNum,
+        semester: item.semester,
+        year: item.year,
+        canvasCourseInternalId: item.canvasCourseInternalId,
+        canvasObjective: item.canvasObjectives[idx]
+      };
+      newCourseObjectives.push(newCourseObjectiveParsed);
+    });
+
+    return res.status(200).json(currItems);
+  } catch (err) {
+    log.error("Did not find any Canvas course objectives for any course! Please try again!");
+    const resErrBody: APIErrorResponse = {
+      errorLoc: "GET",
+      errorMsg: "No items found in MongoDB database"
+    };
+    return res.status(400).send(JSON.stringify(resErrBody));
+  }
+});
+
 router.get("/api/objective/:canvasIdCode", async (req, res) => {
-  const canvasIdCode = req.params.canvasIdCode;
+  const canvasIdCode = parseInt(req.params.canvasIdCode);
   try {
     const currItems = await CourseObjectivesModel.find({ canvasCourseInternalId: canvasIdCode });
 
@@ -26,7 +55,40 @@ router.get("/api/objective/:canvasIdCode", async (req, res) => {
 
     return res.status(200).json(currItems);
   } catch (err) {
-    log.error("Did not find any Canvas course objectives for any course! Please try again!");
+    log.error("Did not find any Canvas course objectives with that course internal ID! Please try again!");
+    const resErrBody: APIErrorResponse = {
+      errorLoc: "GET",
+      errorMsg: "No items found in MongoDB database"
+    };
+    return res.status(400).send(JSON.stringify(resErrBody));
+  }
+});
+
+router.get("/api/objective/course/:deptAbbrev/:courseNum", async (req, res) => {
+  const canvasDeptAbbrev = req.params.deptAbbrev;
+  const canvasCourseNum = parseInt(req.params.courseNum);
+  try {
+    const currItems = await CourseObjectivesModel.find({ deptAbbrev: canvasDeptAbbrev, courseNum: canvasCourseNum });
+
+    const newCourseObjectives: CanvasCourseSingleCourseObjective[] = [];
+
+    currItems.forEach((item, idx) => {
+      const newCourseObjectiveParsed: CanvasCourseSingleCourseObjective = {
+        deptAbbrev: item.deptAbbrev,
+        courseNum: item.courseNum,
+        semester: item.semester,
+        year: item.year,
+        canvasCourseInternalId: item.canvasCourseInternalId,
+        canvasObjective: item.canvasObjectives[idx]
+      };
+      newCourseObjectives.push(newCourseObjectiveParsed);
+    });
+
+    return res.status(200).json(currItems);
+  } catch (err) {
+    log.error(
+      "Did not find any Canvas course objectives with that department name and course number! Please try again!"
+    );
     const resErrBody: APIErrorResponse = {
       errorLoc: "GET",
       errorMsg: "No items found in MongoDB database"
