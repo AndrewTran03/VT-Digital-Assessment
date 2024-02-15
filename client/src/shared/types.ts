@@ -136,6 +136,8 @@ type CanvasCourseQuizMongoDBEntry = MongoDBCombined<{
   canvasUserId: number;
   canvasCourseInternalId: number;
   canvasCourseName: string;
+  canvasCourseDept: string;
+  canvasCourseNum: number;
   quizId: number;
   quizName: string;
   canvasMatchedLearningObjectivesArr: string[];
@@ -184,6 +186,12 @@ const multipleChoiceQuestionLetters = [
   "Z"
 ] as const;
 
+type CanvasCourseAssociations = {
+  deptAbbrev: string;
+  courseNum: number;
+  courseName: string;
+};
+
 export {
   backendUrlBase,
   MongoDBWithId,
@@ -200,5 +208,6 @@ export {
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,
   LearningObjectiveQuizData,
-  multipleChoiceQuestionLetters
+  multipleChoiceQuestionLetters,
+  CanvasCourseAssociations
 };

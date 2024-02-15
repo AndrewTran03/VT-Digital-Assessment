@@ -17,6 +17,8 @@ type APIErrorResponse = {
 type CanvasCourseInfo = {
   courseId: number;
   courseName: string;
+  courseDept: string;
+  courseNum: number;
 };
 
 type CanvasQuizInfo = {
@@ -248,6 +250,8 @@ type CanvasCourseQuizMongoDBEntry = {
   canvasUserId: number;
   canvasCourseInternalId: number;
   canvasCourseName: string;
+  canvasCourseDept: string;
+  canvasCourseNum: number;
   quizId: number;
   quizName: string;
   canvasMatchedLearningObjectivesArr: string[];
