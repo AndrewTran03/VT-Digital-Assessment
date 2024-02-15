@@ -115,14 +115,51 @@ router.post("/api/objective", async (req, res) => {
   });
 
   try {
-    const courseObjectivesInsertResult = await courseObjectivesToInsert.save();
-    log.info("Inserted the specified course objectives successfully! Congratulations!");
-    return res.status(201).json(courseObjectivesInsertResult); // 201 = Successful Resource Creation
+    const courseObjectivesFindResult = await CourseObjectivesModel.findOne({
+      deptAbbrev: deptAbbrev,
+      courseNum: courseNum,
+      semester: semester,
+      year: year
+    });
+    if (!courseObjectivesFindResult) {
+      const courseObjectivesInsertResult = await courseObjectivesToInsert.save();
+      log.info("Inserted the specified course objectives successfully! Congratulations!");
+      return res.status(201).json(courseObjectivesInsertResult); // 201 = Successful Resource Creation
+    } else {
+      courseObjectivesFindResult.canvasObjectives = newCourseObjectivesArr;
+      const canvasQuizEntryUpdateResult = await courseObjectivesFindResult.save();
+      log.info("Updated the specified Canvas learning objective successfully! Congratulations!");
+      return res.status(200).json(canvasQuizEntryUpdateResult);
+    }
   } catch (err) {
     log.error("Could not insert the specified course objectives! Please try again!");
     const resErrBody: APIErrorResponse = {
       errorLoc: "POST",
       errorMsg: "Failed to insert into the MongoDB database"
+    };
+    return res.status(400).send(JSON.stringify(resErrBody));
+  }
+});
+
+router.put("/api/objective/:canvasObjEntryId", async (req, res) => {
+  const canvasObjEntryId = req.params.canvasObjEntryId;
+  const canvasCourseLearningObjectiveArrToUpdate = req.body as string[];
+
+  try {
+    const canvasCourseObjEntryToUpdate = await CourseObjectivesModel.findById(canvasObjEntryId);
+    // Error check to avoid working with an invalid MongoDB "_id" passed to the database query
+    if (!canvasCourseObjEntryToUpdate) {
+      throw new Error("The specified Canvas course's learning objectives do not exist in the MongoDB database");
+    }
+    canvasCourseObjEntryToUpdate.canvasObjectives = canvasCourseLearningObjectiveArrToUpdate;
+    const canvasQuizEntryUpdateResult = await canvasCourseObjEntryToUpdate.save();
+    log.info("Updated the specified Canvas quiz question successfully! Congratulations!");
+    return res.status(200).json(canvasQuizEntryUpdateResult);
+  } catch (err) {
+    log.error("Could not update the specified course objectives! Please try again!");
+    const resErrBody: APIErrorResponse = {
+      errorLoc: "PUT",
+      errorMsg: "Failed to update the MongoDB database"
     };
     return res.status(400).send(JSON.stringify(resErrBody));
   }
