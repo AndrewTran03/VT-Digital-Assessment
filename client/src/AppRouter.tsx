@@ -10,6 +10,8 @@ const AppRouter: React.FC = () => {
           <Route path="/file_import" element={<FileImport />} />
           <Route path="/learning_obj_match" element={<LearningObjectiveMatcher />} />
           <Route path="/statistics" element={<QuizStatistics />} />
+          {/* Catch-All Route */}
+          <Route path="*" element={<UserDashboard />} />
         </Routes>
       </Router>
     </>
