@@ -282,6 +282,78 @@ const QuestionTypeValues = [
   "numerical_question"
 ] as const;
 
+type CanvasQuizQuestionStatistic = {
+  id: number;
+  question_type: QuestionTypeEnumValues;
+  question_text: string;
+  position: number;
+  responses: number;
+  answers: CanvasQuizQuestionAnswerStatistic[];
+  answered_student_count: number;
+  top_student_count: number;
+  middle_student_count: number;
+  bottom_student_count: number;
+  correct_student_count: number;
+  incorrect_student_count: number;
+  correct_student_ratio: number;
+  incorrect_student_ratio: number;
+  correct_top_student_count: number;
+  correct_middle_student_count: number;
+  correct_bottom_student_count: number;
+  variance: number;
+  stdev: number;
+  difficulty_index: number;
+  alpha: number;
+  point_biserials: CanvasQuizQuestionPointBiserial[];
+};
+
+type CanvasQuizQuestionAnswerStatistic = {
+  id: number;
+  text: string;
+  correct: boolean;
+  responses: number;
+  user_ids: number[];
+  user_names: string[];
+};
+
+type CanvasQuizSubmissionStatistics = {
+  scores: Record<string, number>;
+  score_average: number | null;
+  score_high: number | null;
+  score_low: number | null;
+  score_stdev: number | null;
+  correct_count_average: number;
+  incorrect_count_average: number;
+  duration_average: number;
+  unique_count: number;
+};
+
+type CanvasQuizQuestionPointBiserial = {
+  answer_id: number;
+  point_biserial: number | null;
+  correct: boolean;
+  distractor: boolean;
+};
+
+type CanvasQuizStatistic = {
+  id: number;
+  url: string;
+  html_url: string;
+  multiple_attempts_exist: boolean;
+  generated_at: string;
+  includes_all_versions: boolean;
+  includes_sis_ids: boolean;
+  points_possible: number;
+  anonymous_survey: boolean;
+  speed_grader_url: string;
+  quiz_submissions_zip_url: string;
+  question_statistics: CanvasQuizQuestionStatistic[];
+  submission_statistics: CanvasQuizSubmissionStatistics;
+  links: {
+    quiz: string;
+  };
+};
+
 export {
   APIErrorResponse,
   CanvasCourseInfo,
@@ -298,5 +370,10 @@ export {
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,
   QuestionTypeEnumValues,
-  QuestionTypeValues
+  QuestionTypeValues,
+  CanvasQuizQuestionStatistic,
+  CanvasQuizQuestionAnswerStatistic,
+  CanvasQuizSubmissionStatistics,
+  CanvasQuizQuestionPointBiserial,
+  CanvasQuizStatistic
 };
