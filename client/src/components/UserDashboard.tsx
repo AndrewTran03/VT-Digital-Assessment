@@ -1,4 +1,4 @@
-import { useEffect, useContext, FormEvent, useRef } from "react";
+import { useEffect, useContext, FormEvent, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
 import { CanvasCourseAssociations, backendUrlBase } from "../shared/types";
@@ -30,7 +30,9 @@ const UserDashboard: React.FC = () => {
   const { setCanvasUserCourseNamesArr } = useContext(CanvasUserCourseNamesArrContext);
   const canvasQuizDataArrGroupBy = Object.groupBy(canvasQuizDataArr, (entry) => entry.canvasCourseInternalId);
   const navigate = useNavigate();
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [userSubmitInfoComplete, setUserSubmitInfoComplete] = useState(false);
+  const canvasUsernameInputRef = useRef<HTMLInputElement>(null);
+  const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -123,18 +125,39 @@ const UserDashboard: React.FC = () => {
     navigate("/statistics");
   }
 
+  function handleCanvasUserInputChange(e: FormEvent<HTMLInputElement>) {
+    e.preventDefault();
+    if (
+      canvasUsernameInputRef.current &&
+      canvasApiKeyInputRef.current &&
+      canvasUsernameInputRef.current.value.length <= 0 &&
+      canvasApiKeyInputRef.current.value.length <= 0
+    ) {
+      setUserSubmitInfoComplete(false);
+    }
+  }
+
   async function handleAPIInputClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
-    if (inputRef.current) {
-      console.log(inputRef.current.value.toString());
-      const canvasAccountId = 54;
-      const canvasUsername = "andrewt03";
-      await axios
-        .post(`${backendUrlBase}/api/canvas/${canvasAccountId}/${canvasUsername}`, {
-          User_API_Key: `${inputRef.current.value.toString()}`
-        })
-        .then((res) => console.log(res))
-        .catch((err) => console.error((err as Error).message));
+    if (canvasUsernameInputRef.current && canvasApiKeyInputRef.current) {
+      if (canvasUsernameInputRef.current.value.length <= 0 || canvasApiKeyInputRef.current.value.length <= 0) {
+        alert(
+          "Either the Canvas Username or Canvas User API Key has been left empty! Please fix that before proceeding further."
+        );
+        setUserSubmitInfoComplete(false);
+      } else {
+        console.log(canvasUsernameInputRef.current.value.toString());
+        console.log(canvasApiKeyInputRef.current.value.toString());
+        setUserSubmitInfoComplete(true);
+        // const canvasAccountId = 54;
+        // const canvasUsername = "andrewt03";
+        // await axios
+        //   .post(`${backendUrlBase}/api/canvas/${canvasAccountId}/${canvasUsername}`, {
+        //     User_API_Key: `${canvasApiKeyInputRef.current.value.toString()}`
+        //   })
+        //   .then((res) => console.log(res))
+        //   .catch((err) => console.error((err as Error).message));
+      }
     }
   }
 
@@ -143,20 +166,53 @@ const UserDashboard: React.FC = () => {
       <Typography fontSize={24}>
         <b>Canvas Course Dashboard</b>
       </Typography>
-      <button type="button" onClick={handleClickToObjectives}>
+      <button type="button" onClick={handleClickToObjectives} disabled={!userSubmitInfoComplete}>
         <Typography>
           <b>+ Add Learning Objectives for Your Course</b>
         </Typography>
       </button>
-      <button type="submit" onClick={handleAPIButtonClick}>
+      <button type="submit" onClick={handleAPIButtonClick} disabled={!userSubmitInfoComplete}>
         <Typography>
           <b>Refresh</b>
         </Typography>
       </button>
-      <Typography>Enter your API Key:</Typography>
-      <input ref={inputRef} type="text"></input>
+      <Table
+        style={{
+          marginTop: "20px",
+          borderCollapse: "collapse",
+          width: "auto",
+          margin: "0 auto"
+        }}
+      >
+        <TableRow>
+          <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
+            <Typography variant="body1">Enter your Canvas Username:</Typography>
+          </TableCell>
+          <TableCell style={{ border: "none" }}>
+            <input
+              ref={canvasUsernameInputRef}
+              type="text"
+              style={{ width: "100%", padding: "8px" }}
+              onChange={handleCanvasUserInputChange}
+            />
+          </TableCell>
+        </TableRow>
+        <TableRow>
+          <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
+            <Typography variant="body1">Enter your Canvas User API Key:</Typography>
+          </TableCell>
+          <TableCell style={{ border: "none" }}>
+            <input
+              ref={canvasApiKeyInputRef}
+              type="text"
+              style={{ width: "100%", padding: "8px" }}
+              onChange={handleCanvasUserInputChange}
+            />
+          </TableCell>
+        </TableRow>
+      </Table>
       <button type="submit" onClick={handleAPIInputClick}>
-        Submit Key
+        Submit User Info
       </button>
       {canvasQuizDataArrGroupBy &&
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
