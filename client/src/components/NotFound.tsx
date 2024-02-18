@@ -14,7 +14,7 @@ const NotFound: React.FC = () => {
     if (!alertShown && !isAuthenticated) {
       alert("Invalid route!");
       setAlertShown(true);
-      window.localStorage.setItem("invalidPath", location.pathname);
+      window.localStorage.setItem("invalidPath", window.location.pathname);
     }
   }, [alertShown, cookies.Authenticated]);
 
