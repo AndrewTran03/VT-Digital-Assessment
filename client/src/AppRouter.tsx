@@ -10,7 +10,6 @@ const AppRouter: React.FC = () => {
       <Router>
         <Routes>
           <Route path="/" element={<UserLogin />} />
-          <Route path="/sign_in" element={<UserLogin />} />
           <Route path="/dashboard" element={cookies.Authenticated ? <UserDashboard /> : <Navigate to="/" />} />
           <Route path="/file_import" element={cookies.Authenticated ? <FileImport /> : <Navigate to="/" />} />
           <Route
