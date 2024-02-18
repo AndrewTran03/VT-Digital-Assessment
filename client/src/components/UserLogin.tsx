@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Table, TableCell, TableRow, Typography } from "@mui/material";
+import { Box, CircularProgress, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
 import axios, { AxiosError } from "axios";
 import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
@@ -108,32 +108,34 @@ const UserLogin: React.FC = () => {
           margin: "0 auto"
         }}
       >
-        <TableRow>
-          <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-            <Typography variant="body1">Enter your Canvas Username:</Typography>
-          </TableCell>
-          <TableCell style={{ border: "none" }}>
-            <input
-              ref={canvasUsernameInputRef}
-              type="text"
-              style={{ width: "100%", padding: "8px" }}
-              onChange={handleCanvasUserInputChange}
-            />
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-            <Typography variant="body1">Enter your Canvas User API Key:</Typography>
-          </TableCell>
-          <TableCell style={{ border: "none" }}>
-            <input
-              ref={canvasApiKeyInputRef}
-              type="text"
-              style={{ width: "100%", padding: "8px" }}
-              onChange={handleCanvasUserInputChange}
-            />
-          </TableCell>
-        </TableRow>
+        <TableBody>
+          <TableRow>
+            <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
+              <Typography variant="body1" style={{ color: "white" }}>Enter your Canvas Username:</Typography>
+            </TableCell>
+            <TableCell style={{ border: "none" }}>
+              <input
+                ref={canvasUsernameInputRef}
+                type="text"
+                style={{ width: "100%", padding: "8px" }}
+                onChange={handleCanvasUserInputChange}
+              />
+            </TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
+              <Typography variant="body1" style={{ color: "white" }}>Enter your Canvas User API Key:</Typography>
+            </TableCell>
+            <TableCell style={{ border: "none" }}>
+              <input
+                ref={canvasApiKeyInputRef}
+                type="text"
+                style={{ width: "100%", padding: "8px" }}
+                onChange={handleCanvasUserInputChange}
+              />
+            </TableCell>
+          </TableRow>
+        </TableBody>
       </Table>
       <button type="submit" onClick={handleApiInputSubmitClick} disabled={loading}>
         Submit User Info
