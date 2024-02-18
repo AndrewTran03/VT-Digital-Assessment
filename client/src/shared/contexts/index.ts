@@ -1,6 +1,6 @@
 import CanvasQuizQuestionContext from "./CanvasQuizQuestionContext";
 import LearningObjectiveContext from "./LearningObjectiveContext";
-import CanvasUserIdContext from "./CanvasUserId";
+import CanvasUserInfoContext from "./CanvasUserInfoContext";
 import CanvasUserCourseNamesArrContext from "./CanvasUserCourseNamesContext";
 
-export { CanvasQuizQuestionContext, LearningObjectiveContext, CanvasUserIdContext, CanvasUserCourseNamesArrContext };
+export { CanvasQuizQuestionContext, LearningObjectiveContext, CanvasUserInfoContext, CanvasUserCourseNamesArrContext };
