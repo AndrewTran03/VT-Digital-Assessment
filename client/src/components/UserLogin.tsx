@@ -111,7 +111,9 @@ const UserLogin: React.FC = () => {
         <TableBody>
           <TableRow>
             <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-              <Typography variant="body1" style={{ color: "white" }}>Enter your Canvas Username:</Typography>
+              <Typography variant="body1" style={{ color: "white" }}>
+                Enter your Canvas Username:
+              </Typography>
             </TableCell>
             <TableCell style={{ border: "none" }}>
               <input
@@ -124,7 +126,9 @@ const UserLogin: React.FC = () => {
           </TableRow>
           <TableRow>
             <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-              <Typography variant="body1" style={{ color: "white" }}>Enter your Canvas User API Key:</Typography>
+              <Typography variant="body1" style={{ color: "white" }}>
+                Enter your Canvas User API Key:
+              </Typography>
             </TableCell>
             <TableCell style={{ border: "none" }}>
               <input
