@@ -51,7 +51,6 @@ const UserDashboard: React.FC = () => {
   }, [canvasQuizDataArrGroupBy]);
 
   async function fetchCanvasQuizData() {
-    // const usedCanvasUserId = canvasUserId === 0 ? parseInt(window.localStorage.getItem("canvasUserId")!) : canvasUserId;
     await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`).then((res) => {
       const parsedResult = parseCanvasQuizQuestionMongoDBDCollection(res.data);
       console.log(parsedResult);
