@@ -7,7 +7,30 @@ type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+const canvasUrl = "https://canvas.vt.edu:443/api";
+
+// Required with All MongoDB Entries:
+type MongoDBId = {
+  readonly _id: string; // Primary Key (IDentifier)
+};
+
+type MongoDBEntry = Prettify<
+  MongoDBId & {
+    readonly __v: number; // Version Number (Auto-Increments - Avoiding Duplicate Entry-Modification)
+    readonly createdDate: string;
+    readonly updatedDate: string;
+  }
+>;
+
+type MongoDBCombined<T> = Prettify<MongoDBEntry & T>;
+
+type MongoDBWithId<T> = Prettify<MongoDBId & T>;
+
 type MongoDBItem<T> = Document<unknown, {}, T> & T & { _id: Types.ObjectId };
+
+type AxiosAuthHeaders = {
+  Authorization: string;
+};
 
 type APIErrorResponse = {
   errorLoc: string;
@@ -354,7 +377,17 @@ type CanvasQuizStatistic = {
   };
 };
 
+type CanvasUserAPIEntryBase = {
+  canvasUsername: string;
+  canvasUserApiKey: string;
+  canvasUserId: number;
+};
+
+type CanvasUserAPIEntry = MongoDBCombined<CanvasUserAPIEntryBase>;
+
 export {
+  canvasUrl,
+  AxiosAuthHeaders,
   APIErrorResponse,
   CanvasCourseInfo,
   CanvasQuizInfo,
@@ -375,5 +408,7 @@ export {
   CanvasQuizQuestionAnswerStatistic,
   CanvasQuizSubmissionStatistics,
   CanvasQuizQuestionPointBiserial,
-  CanvasQuizStatistic
+  CanvasQuizStatistic,
+  CanvasUserAPIEntryBase,
+  CanvasUserAPIEntry
 };
