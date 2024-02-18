@@ -192,6 +192,10 @@ type CanvasCourseAssociations = {
   courseName: string;
 };
 
+type CanvasUserInfoObj = {
+  canvasUserId: number;
+};
+
 export {
   backendUrlBase,
   MongoDBWithId,
@@ -209,5 +213,6 @@ export {
   CanvasCourseMCQAnswerMongoDBEntry,
   LearningObjectiveQuizData,
   multipleChoiceQuestionLetters,
-  CanvasCourseAssociations
+  CanvasCourseAssociations,
+  CanvasUserInfoObj
 };
