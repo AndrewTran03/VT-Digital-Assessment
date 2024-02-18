@@ -13,17 +13,17 @@ import {
   CanvasCourseQuizMongoDBEntry
 } from "../shared/types";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
-import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared/contexts";
+import { CanvasQuizQuestionContext, CanvasUserInfoContext, LearningObjectiveContext } from "../shared/contexts";
 import "../styles/TableCellStyles.css";
 
 const QuizStatistics: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
+  const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
+  const { canvasUserInfo } = useContext(CanvasUserInfoContext);
   const canvasQuizData: CanvasCourseQuizMongoDBEntry[] =
     canvasQuizDataArr.length === 0
       ? JSON.parse(window.localStorage.getItem("canvasQuizDataArr") ?? "[]")
       : canvasQuizDataArr;
-
-  const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
   const [canvasCourseInternalId] = useState(
     canvasLearningObjectiveData.canvasCourseInternalId ||
       parseInt(window.localStorage.getItem("canvasCourseInternalId") ?? "0")
@@ -31,10 +31,12 @@ const QuizStatistics: React.FC = () => {
   const [canvasQuizId] = useState(
     canvasLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
   );
-
+  const [canvasUserId] = useState(
+    canvasUserInfo.canvasUserId || parseInt(window.localStorage.getItem("canvasUserId") ?? "0")
+  );
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [learningCourseObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
+  const [, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
     _id: "",
     __v: 0,
     createdDate: "",
@@ -50,9 +52,9 @@ const QuizStatistics: React.FC = () => {
     (data: CanvasCourseQuizMongoDBEntry) =>
       data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === canvasQuizId
   );
-  const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
-    matchingEntries.length === 1 ? matchingEntries[0].canvasMatchedLearningObjectivesArr : []
-  );
+  // const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
+  //   matchingEntries.length === 1 ? matchingEntries[0].canvasMatchedLearningObjectivesArr : []
+  // );
 
   useEffect(() => {
     async function fetchData() {
@@ -80,7 +82,7 @@ const QuizStatistics: React.FC = () => {
   }
 
   async function fetchCanvasStatisticsData() {
-    await axios.get(`${backendUrlBase}/api/statistics`).then((res) => {
+    await axios.get(`${backendUrlBase}/api/statistics/${canvasUserId}`).then((res) => {
       console.log(res.data);
     });
   }
