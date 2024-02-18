@@ -39,12 +39,6 @@ const learningObjSchema = z.object({
   canvasObjective: z.string().min(1)
 });
 
-/*
-Two Step Import:
-(1) Select Course from Dropdown
-(2) Second Screen will show the existing course objectives
-  - Have import button (take in a CSV file) to add more
-*/
 // function FileImport(): ReturnType<React.FC> { // Another way to return React FC components
 const FileImport: React.FC = () => {
   const [learningObjArr, setLearningObjArr] = useState<SingleCanvasLearningObjective[]>([]);
@@ -67,7 +61,7 @@ const FileImport: React.FC = () => {
   useEffect(() => {
     async function fetchData() {
       await fetchAllCanvasUserLearningObjectiveData();
-      // console.clear();
+      console.clear();
     }
     fetchData();
   }, []);
