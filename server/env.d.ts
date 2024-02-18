@@ -12,7 +12,8 @@ const processEnvSchema = z
     DEPLOYMENT_NAME: z.string().min(1),
     MONGO_DB_NAME: z.string().min(1),
     CANVAS_OBJECTIVE_COLLECTION_NAME: z.string().min(1),
-    CANVAS_QUIZZES_COLLECTION_NAME: z.string().min(1)
+    CANVAS_QUIZZES_COLLECTION_NAME: z.string().min(1),
+    CANVAS_USER_API_COLLECTION_NAME: z.string().min(1)
   })
   .strict();
 const envParseResult = processEnvSchema.safeParse(process.env);
