@@ -2,6 +2,7 @@ import axios, { AxiosError } from "axios";
 import config from "config";
 import log from "../utils/logger";
 import {
+  canvasUrl,
   CanvasCourse,
   CanvasCourseInfo,
   CanvasQuiz,
@@ -11,20 +12,13 @@ import {
   CanvasQuizQuestionStatistic,
   CanvasQuizStatistic,
   CanvasQuizSubmissionStatistics,
-  QuestionTypeEnumValues
+  QuestionTypeEnumValues,
+  AxiosAuthHeaders
 } from "../../assets/types";
 
-const canvasUrl = "https://canvas.vt.edu:443/api";
-const canvasPublicApiToken = config.get<string>("canvasPublicApiToken");
-
-const axiosHeaders = {
-  Authorization: `Bearer ${canvasPublicApiToken}`
-};
-
-async function fetchCanvasUserQuizReportData(courseArr: readonly CanvasCourseInfo[]) {
-  console.clear();
-
+async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, courseArr: readonly CanvasCourseInfo[]) {
   const quizStatsResponses: CanvasQuizStatistic[] = [];
+
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
   for (let j = 0; j < courseArr.length; j++) {
     const { courseId } = courseArr[j];
@@ -63,7 +57,7 @@ async function fetchCanvasUserQuizReportData(courseArr: readonly CanvasCourseInf
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
     // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz IDs- ${quizArr}. Length: ${quizArr.length}`);
 
-    await fetchCanvasUserQuizAnswerReportData(courseId, quizArr, quizStatsResponses);
+    await fetchCanvasUserQuizAnswerReportData(axiosHeaders, courseId, quizArr, quizStatsResponses);
   }
   log.info(quizStatsResponses.length);
   return quizStatsResponses;
@@ -71,6 +65,7 @@ async function fetchCanvasUserQuizReportData(courseArr: readonly CanvasCourseInf
 
 // End Result: A data structure as folows - Map { K: { CourseId, CourseName, CourseDept, CourseNum }, V: Array<{ QuizId, QuizQuestionsObj }> }
 async function fetchCanvasUserQuizAnswerReportData(
+  axiosHeaders: AxiosAuthHeaders,
   courseId: number,
   quizArr: readonly CanvasQuizInfo[],
   quizStatsResponses: CanvasQuizStatistic[]

@@ -1,24 +1,41 @@
 import axios, { AxiosError } from "axios";
-import config from "config";
 import log from "../utils/logger";
 import {
+  canvasUrl,
   CanvasCourse,
   CanvasQuiz,
   CanvasQuizQuestion,
   CanvasQuizQuestionGroup,
   CanvasCourseInfo,
-  CanvasQuizInfo
+  CanvasQuizInfo,
+  AxiosAuthHeaders
 } from "../../assets/types";
 
-const canvasUrl = "https://canvas.vt.edu:443/api";
-const canvasPublicApiToken = config.get<string>("canvasPublicApiToken");
-
-const axiosHeaders = {
-  Authorization: `Bearer ${canvasPublicApiToken}`
-};
+async function fetchCanvasUserInfoAdmin(
+  axiosHeaders: AxiosAuthHeaders,
+  canvasAccountId: number,
+  canvasUsername: string
+) {
+  return await axios
+    .get(`${canvasUrl}/v1/accounts/${canvasAccountId}/users?search_term=${canvasUsername}@vt.edu`, {
+      headers: axiosHeaders
+    })
+    .then((res) => {
+      console.log(res.config.url);
+      const canvasUserId = res.data[0].id as number;
+      log.info(`Canvas User ID: ${canvasUserId}`);
+      return canvasUserId;
+    })
+    .catch((error) => {
+      log.error(error);
+      log.error("Error in retrieving the Canvas User ID");
+      log.error(`More Descriptive Error Message: ${error}`);
+      return -1;
+    });
+}
 
 // Gets your own Canvas User-Id (If Needed)
-async function fetchCanvasUserInfo() {
+async function fetchCanvasUserInfoRegUser(axiosHeaders: AxiosAuthHeaders) {
   return await axios
     .get(`${canvasUrl}/v1/users/self`, {
       headers: axiosHeaders
@@ -36,9 +53,9 @@ async function fetchCanvasUserInfo() {
 }
 
 // Returns a number[] of the Canvas user's available Course IDs
-async function fetchCanvasUserCourseData() {
-  console.clear();
+async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
   let canvasCoursesArr: CanvasCourse[] = [];
+
   const enrollmentTypeRoles = ["teacher", "ta"];
   // Get every available COURSE where the user is a TA or Course Instructor of the Canvas course
   for (let i = 0; i < enrollmentTypeRoles.length; i++) {
@@ -111,9 +128,9 @@ async function fetchCanvasUserCourseData() {
 }
 
 // Returns a Map (described below) of the Canvas user's available Quiz IDs
-async function fetchCanvasUserQuizData(courseArr: readonly CanvasCourseInfo[]) {
-  console.clear();
+async function fetchCanvasUserQuizData(axiosHeaders: AxiosAuthHeaders, courseArr: readonly CanvasCourseInfo[]) {
   const canvasQuizAssociations = new Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>();
+
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
   for (let j = 0; j < courseArr.length; j++) {
     const { courseId, courseName, courseDept, courseNum } = courseArr[j];
@@ -152,7 +169,15 @@ async function fetchCanvasUserQuizData(courseArr: readonly CanvasCourseInfo[]) {
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
     // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz IDs- ${quizArr}. Length: ${quizArr.length}`);
 
-    await fetchCanvasUserQuizQuestionData(courseId, courseName, courseDept, courseNum, quizArr, canvasQuizAssociations);
+    await fetchCanvasUserQuizQuestionData(
+      axiosHeaders,
+      courseId,
+      courseName,
+      courseDept,
+      courseNum,
+      quizArr,
+      canvasQuizAssociations
+    );
   }
 
   return canvasQuizAssociations;
@@ -160,6 +185,7 @@ async function fetchCanvasUserQuizData(courseArr: readonly CanvasCourseInfo[]) {
 
 // End Result: A data structure as folows - Map { K: { CourseId, CourseName, CourseDept, CourseNum }, V: Array<{ QuizId, QuizQuestionsObj }> }
 async function fetchCanvasUserQuizQuestionData(
+  axiosHeaders: AxiosAuthHeaders,
   courseId: number,
   courseName: string,
   courseDept: string,
@@ -217,34 +243,9 @@ function checkQuizMapHelper(map: Map<number, Array<CanvasQuizQuestionGroup>>) {
   });
 }
 
-async function fetchCanvasUserInfoPublic(canvasAccountId: number, canvasUsername: string, canvasUserApiKey: string) {
-  const publicAxiosHeaders = {
-    Authorization: `${canvasUserApiKey}`
-  };
-
-  let userId = 0;
-  const result = await axios
-    .get(`${canvasUrl}/v1/accounts/${canvasAccountId}/users?search_term=${canvasUsername}@vt.edu`, {
-      headers: publicAxiosHeaders
-    })
-    .then((res) => {
-      console.log(res.config.url);
-      const canvasUserId = res.data[0].id as number;
-      log.info(`Canvas User ID: ${canvasUserId}`);
-      userId = canvasUserId;
-    })
-    .catch((error) => {
-      log.error(error);
-      log.error("Error in retrieving the Canvas User ID");
-      log.error(`More Descriptive Error Message: ${error}`);
-      userId = -1;
-    });
-  return userId;
-}
-
 export {
-  fetchCanvasUserInfo,
-  fetchCanvasUserInfoPublic,
+  fetchCanvasUserInfoRegUser,
+  fetchCanvasUserInfoAdmin,
   fetchCanvasUserCourseData,
   fetchCanvasUserQuizData,
   fetchCanvasUserQuizQuestionData,
