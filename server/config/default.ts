@@ -7,5 +7,6 @@ export default {
   mongoDatabaseUri: `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@${process.env.DEPLOYMENT_NAME}.xqbvmpf.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`,
   mongoDatabaseName: `${process.env.MONGO_DB_NAME}`,
   canvasObjectivesMongoCollectionName: `${process.env.CANVAS_OBJECTIVE_COLLECTION_NAME}`,
-  canvasQuizzesMongoCollectionName: `${process.env.CANVAS_QUIZZES_COLLECTION_NAME}`
+  canvasQuizzesMongoCollectionName: `${process.env.CANVAS_QUIZZES_COLLECTION_NAME}`,
+  canvasUserApiCollectionName: `${process.env.CANVAS_USER_API_COLLECTION_NAME}`
 };
