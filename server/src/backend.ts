@@ -9,7 +9,6 @@ import log from "./utils/logger";
 import router from "./routes";
 import { ensureConnectionToCanvasApi } from "./utils/canvas.connection";
 import { ensureConnectionToMongoDatabase } from "./utils/mongo.connection";
-import { loadInitialCanvasDataFromExternalApiAndSaveIntoDB } from "./routes/canvas";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
@@ -32,5 +31,4 @@ app.listen(backendServerPort, async () => {
   log.info(`App started on ${backendServerUrl}`);
   await ensureConnectionToCanvasApi();
   await ensureConnectionToMongoDatabase();
-  await loadInitialCanvasDataFromExternalApiAndSaveIntoDB();
 });
