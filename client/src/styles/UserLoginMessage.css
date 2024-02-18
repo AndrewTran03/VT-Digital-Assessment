@@ -1,0 +1,10 @@
+.success-message,
+.failure-message {
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+.success-message.hidden,
+.failure-message.hidden {
+  opacity: 0;
+}
