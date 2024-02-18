@@ -39,11 +39,11 @@ async function getCanvasApiAuthHeaders(canvasUserId: number) {
     log.error((err as Error).message);
     usedCanvasAPIKey = fallbackCanvasApiKey;
   }
-  
+
   const axiosHeaders: AxiosAuthHeaders = {
     Authorization: `Bearer ${usedCanvasAPIKey}`
   };
-  
+
   return axiosHeaders;
 }
 
