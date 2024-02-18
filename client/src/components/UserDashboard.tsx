@@ -1,11 +1,11 @@
-import { useEffect, useContext, FormEvent, useRef, useState } from "react";
+import { useEffect, useContext, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { CanvasCourseAssociations, backendUrlBase } from "../shared/types";
 import {
   CanvasQuizQuestionContext,
   LearningObjectiveContext,
-  CanvasUserIdContext,
+  CanvasUserInfoContext,
   CanvasUserCourseNamesArrContext
 } from "../shared/contexts";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
@@ -26,13 +26,13 @@ import "../styles/TableCellStyles.css";
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { setCanvasLearningObjectiveData } = useContext(LearningObjectiveContext);
-  const { canvasUserId, setCanvasUserId } = useContext(CanvasUserIdContext);
+  const { canvasUserInfo } = useContext(CanvasUserInfoContext);
+  const [canvasUserId] = useState(
+    canvasUserInfo.canvasUserId || parseInt(window.localStorage.getItem("canvasUserId") ?? "0")
+  );
   const { setCanvasUserCourseNamesArr } = useContext(CanvasUserCourseNamesArrContext);
   const canvasQuizDataArrGroupBy = Object.groupBy(canvasQuizDataArr, (entry) => entry.canvasCourseInternalId);
   const navigate = useNavigate();
-  const [userSubmitInfoComplete, setUserSubmitInfoComplete] = useState(false);
-  const canvasUsernameInputRef = useRef<HTMLInputElement>(null);
-  const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -51,11 +51,7 @@ const UserDashboard: React.FC = () => {
   }, [canvasQuizDataArrGroupBy]);
 
   async function fetchCanvasQuizData() {
-    await axios.get(`${backendUrlBase}/api/canvas/retrieveCanvasId`).then((res) => {
-      console.log(res.data.User_Id);
-      setCanvasUserId(res.data.User_Id);
-    });
-    console.log("CANVAS USER ID:", canvasUserId);
+    // const usedCanvasUserId = canvasUserId === 0 ? parseInt(window.localStorage.getItem("canvasUserId")!) : canvasUserId;
     await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`).then((res) => {
       const parsedResult = parseCanvasQuizQuestionMongoDBDCollection(res.data);
       console.log(parsedResult);
@@ -63,7 +59,7 @@ const UserDashboard: React.FC = () => {
     });
   }
 
-  async function handleAPIButtonClick(e: FormEvent<HTMLButtonElement>) {
+  async function handleApiRefreshButtonClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
     await fetchCanvasQuizData();
@@ -72,7 +68,6 @@ const UserDashboard: React.FC = () => {
   function handleClickToObjectives(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
-    window.localStorage.setItem("canvasUserId", canvasUserId.toString());
     if (canvasQuizDataArr && canvasQuizDataArr.length > 0) {
       const canvasQuizDataArrCourseNames = new Set<string>();
       for (const course of canvasQuizDataArr) {
@@ -104,7 +99,6 @@ const UserDashboard: React.FC = () => {
       canvasCourseInternalId: courseInternalId,
       quizId: specifiedQuizId
     });
-    window.localStorage.setItem("canvasUserId", canvasUserId.toString());
     window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
@@ -118,47 +112,10 @@ const UserDashboard: React.FC = () => {
       canvasCourseInternalId: courseInternalId,
       quizId: specifiedQuizId
     });
-    window.localStorage.setItem("canvasUserId", canvasUserId.toString());
     window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
     navigate("/statistics");
-  }
-
-  function handleCanvasUserInputChange(e: FormEvent<HTMLInputElement>) {
-    e.preventDefault();
-    if (
-      canvasUsernameInputRef.current &&
-      canvasApiKeyInputRef.current &&
-      canvasUsernameInputRef.current.value.length <= 0 &&
-      canvasApiKeyInputRef.current.value.length <= 0
-    ) {
-      setUserSubmitInfoComplete(false);
-    }
-  }
-
-  async function handleAPIInputClick(e: FormEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    if (canvasUsernameInputRef.current && canvasApiKeyInputRef.current) {
-      if (canvasUsernameInputRef.current.value.length <= 0 || canvasApiKeyInputRef.current.value.length <= 0) {
-        alert(
-          "Either the Canvas Username or Canvas User API Key has been left empty! Please fix that before proceeding further."
-        );
-        setUserSubmitInfoComplete(false);
-      } else {
-        console.log(canvasUsernameInputRef.current.value.toString());
-        console.log(canvasApiKeyInputRef.current.value.toString());
-        setUserSubmitInfoComplete(true);
-        // const canvasAccountId = 54;
-        // const canvasUsername = "andrewt03";
-        // await axios
-        //   .post(`${backendUrlBase}/api/canvas/${canvasAccountId}/${canvasUsername}`, {
-        //     User_API_Key: `${canvasApiKeyInputRef.current.value.toString()}`
-        //   })
-        //   .then((res) => console.log(res))
-        //   .catch((err) => console.error((err as Error).message));
-      }
-    }
   }
 
   return (
@@ -166,17 +123,17 @@ const UserDashboard: React.FC = () => {
       <Typography fontSize={24}>
         <b>Canvas Course Dashboard</b>
       </Typography>
-      <button type="button" onClick={handleClickToObjectives} disabled={!userSubmitInfoComplete}>
+      <button type="button" onClick={handleClickToObjectives}>
         <Typography>
           <b>+ Add Learning Objectives for Your Course</b>
         </Typography>
       </button>
-      <button type="submit" onClick={handleAPIButtonClick} disabled={!userSubmitInfoComplete}>
+      <button type="submit" onClick={handleApiRefreshButtonClick}>
         <Typography>
           <b>Refresh</b>
         </Typography>
       </button>
-      <Table
+      {/* <Table
         style={{
           marginTop: "20px",
           borderCollapse: "collapse",
@@ -211,9 +168,15 @@ const UserDashboard: React.FC = () => {
           </TableCell>
         </TableRow>
       </Table>
-      <button type="submit" onClick={handleAPIInputClick}>
+      <button type="submit" onClick={handleApiInputSubmitClick}>
         Submit User Info
-      </button>
+      </button> */}
+      {/* Success Message */}
+      {/* {userSubmitInfoComplete && (
+        <Typography variant="body1" style={{ color: "green", marginTop: "10px" }}>
+          Successful submission. Click the "Refresh" button to update data.
+        </Typography>
+      )} */}
       {canvasQuizDataArrGroupBy &&
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
         Object.entries(canvasQuizDataArrGroupBy).map((value, key) => (
