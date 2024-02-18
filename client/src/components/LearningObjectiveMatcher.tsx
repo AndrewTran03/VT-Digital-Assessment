@@ -20,12 +20,11 @@ import "../styles/TableCellStyles.css";
 
 const LearningObjectiveMatcher: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
+  const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
   const canvasQuizData: CanvasCourseQuizMongoDBEntry[] =
     canvasQuizDataArr.length === 0
       ? JSON.parse(window.localStorage.getItem("canvasQuizDataArr") ?? "[]")
       : canvasQuizDataArr;
-
-  const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
   const [canvasCourseInternalId] = useState(
     canvasLearningObjectiveData.canvasCourseInternalId ||
       parseInt(window.localStorage.getItem("canvasCourseInternalId") ?? "0")
@@ -33,7 +32,6 @@ const LearningObjectiveMatcher: React.FC = () => {
   const [canvasQuizId] = useState(
     canvasLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
   );
-
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [learningCourseObjectiveData, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
@@ -78,12 +76,6 @@ const LearningObjectiveMatcher: React.FC = () => {
       const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
       setLearningCourseObjectiveData(parsedResult);
     });
-  }
-
-  function extractTextFromHTML(htmlStr: string) {
-    const htmlParser = new DOMParser();
-    const document = htmlParser.parseFromString(htmlStr, "text/html");
-    return document.body.textContent || "";
   }
 
   function handleAdjustmentTextareaHeight() {
