@@ -1,7 +1,7 @@
 import log from "./logger";
 import config from "config";
 import { fetchCanvasUserInfoRegUser } from "../canvas_interact/canvas.api";
-import { CanvasUserApiModel } from "../models/canvas.user.api";
+import { CanvasUserApiModel } from "../models/canvas.user.api.model";
 import { AxiosAuthHeaders } from "../../assets/types";
 
 const fallbackCanvasApiKey = config.get<string>("canvasPublicApiToken"); // Andrew Tran's API token (fallback)

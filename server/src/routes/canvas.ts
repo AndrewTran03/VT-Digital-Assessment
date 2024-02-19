@@ -23,7 +23,7 @@ import {
   fetchCanvasUserQuizData
 } from "../canvas_interact/canvas.api";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
-import { CanvasUserApiModel } from "../models/canvas.user.api";
+import { CanvasUserApiModel } from "../models/canvas.user.api.model";
 import { getCanvasApiAuthHeaders } from "../utils/canvas.connection";
 
 const router = express.Router();
