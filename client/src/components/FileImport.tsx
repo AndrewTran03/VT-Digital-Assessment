@@ -140,6 +140,7 @@ const FileImport: React.FC = () => {
     // with consecutive submissions
     setLearningObjArr([]);
 
+    reader.readAsText(file);
     reader.onload = (e: ProgressEvent<FileReader>) => {
       const fileContents = e.target?.result as string;
       const lines = fileContents.split("\n"); // Line Delimited
@@ -226,7 +227,6 @@ const FileImport: React.FC = () => {
         }
       });
     };
-    reader.readAsText(file);
   }
 
   async function handleButtonSubmit(e: FormEvent<HTMLButtonElement>) {
