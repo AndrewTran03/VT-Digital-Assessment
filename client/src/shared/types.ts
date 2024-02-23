@@ -5,6 +5,10 @@ type Prettify<T> = {
   [K in keyof T]: T[K];
 } & {};
 
+type numberLike = number | null;
+type booleanLike = boolean | null;
+type numberArrLike = number[] | null;
+
 const backendUrlBase = "http://localhost:3000";
 
 // Required with All MongoDB Entries:
@@ -196,6 +200,97 @@ type CanvasUserInfoObj = {
   canvasUserId: number;
 };
 
+type CanvasQuizStatistic = {
+  id: number;
+  url: string;
+  html_url: string;
+  multiple_attempts_exist: boolean;
+  generated_at: string;
+  includes_all_versions: boolean;
+  includes_sis_ids: boolean;
+  points_possible: number;
+  anonymous_survey: boolean;
+  speed_grader_url: string;
+  quiz_submissions_zip_url: string;
+  question_statistics: CanvasQuizQuestionStatistic[];
+  submission_statistics: CanvasQuizSubmissionStatistics;
+  links: {
+    quiz: string;
+  };
+};
+
+type CanvasQuizQuestionStatistic = {
+  id: number;
+  question_type: QuestionTypeEnumValues;
+  question_text: string;
+  position: number;
+  responses: number;
+  answers: CanvasQuizQuestionAnswerStatistic[];
+  answerSets: CanvasQuizQuestionAnswerSetStatistic[];
+  answered_student_count: numberLike;
+  top_student_count: numberLike;
+  middle_student_count: numberLike;
+  bottom_student_count: numberLike;
+  correct_student_count: numberLike;
+  incorrect_student_count: numberLike;
+  correct_student_ratio: numberLike;
+  incorrect_student_ratio: numberLike;
+  correct_top_student_count: numberLike;
+  correct_middle_student_count: numberLike;
+  correct_bottom_student_count: numberLike;
+  variance: numberLike;
+  stdev: numberLike;
+  difficulty_index: numberLike;
+  alpha: numberLike;
+  point_biserials: CanvasQuizQuestionPointBiserial[];
+  // For "numerical_question" type questions
+  full_credit: numberLike;
+  incorrect: numberLike;
+  // For "numerical_question, short_answer, and multiple_dropdowns" type questions
+  correct: numberLike;
+  // For "multiple_dropdowns" type questions
+  partially_correct: numberLike;
+};
+
+type CanvasQuizQuestionAnswerStatistic = {
+  id: string;
+  text: string;
+  correct: boolean;
+  responses: number;
+  user_ids: number[];
+  user_names: string[];
+  // For "numerical_question" type questions
+  margin: numberLike;
+  isRange: booleanLike;
+  // For (some) "numerical_question" type questions
+  value: numberArrLike;
+};
+
+type CanvasQuizQuestionAnswerSetStatistic = {
+  id: string;
+  text: string;
+  answers: CanvasQuizQuestionAnswerStatistic[];
+};
+
+type CanvasQuizSubmissionStatistics = {
+  scores: Record<string, number>;
+  score_average: numberLike;
+  score_high: numberLike;
+  score_low: numberLike;
+  score_stdev: numberLike;
+  correct_count_average: numberLike;
+  incorrect_count_average: numberLike;
+  duration_average: numberLike;
+  unique_count: numberLike;
+};
+
+type CanvasQuizQuestionPointBiserial = {
+  answer_id: number;
+  point_biserial: numberLike;
+  correct: boolean;
+  distractor: boolean;
+};
+
 export {
   backendUrlBase,
   MongoDBWithId,
@@ -214,5 +309,6 @@ export {
   LearningObjectiveQuizData,
   multipleChoiceQuestionLetters,
   CanvasCourseAssociations,
-  CanvasUserInfoObj
+  CanvasUserInfoObj,
+  CanvasQuizStatistic
 };
