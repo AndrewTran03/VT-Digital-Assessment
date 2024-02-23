@@ -1,6 +1,4 @@
-// import ReactD3 from "react-d3-components";
-// const BarChart = ReactD3.BarChart;
-import { XYPlot, XAxis, YAxis, HorizontalGridLines, LineSeries } from "react-vis";
+import { XYPlot, XAxis, YAxis, HorizontalBarSeries } from "react-vis";
 import { useState, useEffect, useContext, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -10,16 +8,23 @@ import {
   backendUrlBase,
   multipleChoiceQuestionLetters,
   CanvasLearningObjectives,
-  CanvasCourseQuizMongoDBEntry
+  CanvasCourseQuizMongoDBEntry,
+  CanvasQuizStatistic
 } from "../shared/types";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
-import { CanvasQuizQuestionContext, CanvasUserInfoContext, LearningObjectiveContext } from "../shared/contexts";
+import {
+  CanvasQuizQuestionContext,
+  CanvasQuizStatisticContext,
+  CanvasUserInfoContext,
+  LearningObjectiveContext
+} from "../shared/contexts";
 import "../styles/TableCellStyles.css";
 
 const QuizStatistics: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
   const { canvasUserInfo } = useContext(CanvasUserInfoContext);
+  const { canvasQuizQuestionStatisticDataArr } = useContext(CanvasQuizStatisticContext);
   const canvasQuizData: CanvasCourseQuizMongoDBEntry[] =
     canvasQuizDataArr.length === 0
       ? JSON.parse(window.localStorage.getItem("canvasQuizDataArr") ?? "[]")
@@ -33,6 +38,11 @@ const QuizStatistics: React.FC = () => {
   );
   const [canvasUserId] = useState(
     canvasUserInfo.canvasUserId || parseInt(window.localStorage.getItem("canvasUserId") ?? "0")
+  );
+  const [canvasStatData] = useState(
+    canvasQuizQuestionStatisticDataArr.length === 0
+      ? JSON.parse(window.localStorage.getItem("canvasStatsArr") ?? "[]")
+      : canvasQuizQuestionStatisticDataArr
   );
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -48,43 +58,65 @@ const QuizStatistics: React.FC = () => {
     canvasCourseInternalId: 0,
     canvasObjectives: []
   });
-  const matchingEntries = canvasQuizData.filter(
+  const matchingCourseEntries = canvasQuizData.filter(
     (data: CanvasCourseQuizMongoDBEntry) =>
       data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === canvasQuizId
   );
-  // const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
-  //   matchingEntries.length === 1 ? matchingEntries[0].canvasMatchedLearningObjectivesArr : []
-  // );
+  const matchingStatEntries = canvasStatData.filter(
+    (data: CanvasQuizStatistic) =>
+      data.url.includes(canvasCourseInternalId.toString()) && data.url.includes(canvasQuizId.toString())
+  );
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(false);
+
+  async function fetchData() {
+    await fetchCanvasLearningObjectiveData();
+    await fetchCanvasStatisticsData();
+    console.clear();
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      await fetchCanvasLearningObjectiveData();
-      await fetchCanvasStatisticsData();
-      console.clear();
-    }
     fetchData();
   }, []);
 
   useEffect(() => {
-    console.assert(matchingEntries.length === 1);
-    console.log(matchingEntries.length);
-    if (matchingEntries.length === 1) {
-      console.log("LENGTH IS 1: FILTERING IS A SUCCESS!");
-      console.log(matchingEntries[0]);
+    console.assert(matchingCourseEntries.length === 1);
+    console.log(matchingCourseEntries.length);
+    if (matchingCourseEntries.length === 1) {
+      console.log("LENGTH IS 1: COURSE FILTERING IS A SUCCESS!");
+      console.log(matchingCourseEntries[0]);
     }
-  }, [matchingEntries]);
+  }, [matchingCourseEntries]);
+
+  useEffect(() => {
+    console.assert(matchingStatEntries.length === 1);
+    console.log(matchingStatEntries.length);
+    if (matchingStatEntries.length === 1) {
+      console.log("LENGTH IS 1: STATS FILTERING IS A SUCCESS!");
+      console.log(matchingStatEntries[0]);
+    }
+  }, [matchingStatEntries]);
 
   async function fetchCanvasLearningObjectiveData() {
+    setCoursesLoading(true);
     await axios.get(`${backendUrlBase}/api/objective/${canvasCourseInternalId}`).then((res) => {
       const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
       setLearningCourseObjectiveData(parsedResult);
     });
+    setCoursesLoading(false);
   }
 
   async function fetchCanvasStatisticsData() {
-    await axios.get(`${backendUrlBase}/api/statistics/${canvasUserId}`).then((res) => {
-      console.log(res.data);
-    });
+    setStatsLoading(true);
+    await axios
+      .post(
+        `${backendUrlBase}/api/statistics/${canvasUserId}/${canvasCourseInternalId}/${canvasQuizId}`,
+        matchingStatEntries[0]
+      )
+      .then((res) => {
+        console.log(res.data);
+      });
+    setStatsLoading(false);
   }
 
   function handleAdjustmentTextareaHeight() {
@@ -110,10 +142,19 @@ const QuizStatistics: React.FC = () => {
     e.preventDefault();
     console.log("Back button pressed!");
     window.localStorage.removeItem("canvasQuizDataArr");
+    window.localStorage.removeItem("canvasStatsArr");
     window.localStorage.removeItem("canvasCourseInternalId");
     window.localStorage.removeItem("canvasQuizId");
     navigate(-1);
   }
+
+  const data = [
+    { x: 10, y: 1 },
+    { x: 15, y: 2 },
+    { x: 20, y: 3 },
+    { x: 25, y: 4 },
+    { x: 30, y: 5 }
+  ];
 
   return (
     <>
@@ -121,17 +162,17 @@ const QuizStatistics: React.FC = () => {
         <b>
           Match Learning-Objectives for{" "}
           <i>
-            "{matchingEntries[0].quizName}" (ID: {matchingEntries[0].quizId})
+            "{matchingCourseEntries[0].quizName}" (ID: {matchingCourseEntries[0].quizId})
           </i>
         </b>
       </Typography>
       <button type="reset" onClick={handleBackButtonClick}>
         Back
       </button>
-      <button type="submit" onClick={handleCourseObjectiveAPIButtonClick}>
+      <button type="submit" onClick={handleCourseObjectiveAPIButtonClick} disabled={coursesLoading}>
         Get Course Objective Data
       </button>
-      <button type="submit" onClick={handleCourseStatisticsAPIButtonClick}>
+      <button type="submit" onClick={handleCourseStatisticsAPIButtonClick} disabled={statsLoading}>
         Get Course Statistics Data
       </button>
       <Paper style={{ borderRadius: 20, overflow: "hidden" }}>
@@ -156,9 +197,9 @@ const QuizStatistics: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {matchingEntries[0] &&
-              matchingEntries[0].canvasQuizEntries.map((quizQuestion, idx) => (
-                <TableRow key={`${matchingEntries[0]._id}_${idx}`}>
+            {matchingCourseEntries[0] &&
+              matchingCourseEntries[0].canvasQuizEntries.map((quizQuestion, idx) => (
+                <TableRow key={`${matchingCourseEntries[0]._id}_${idx}`}>
                   <TableCell className="table-cell" style={{ maxWidth: "50%", border: "1px solid lightgray" }}>
                     <Typography style={{ maxWidth: "100%" }}>
                       <b>Question {idx + 1}:</b>
@@ -242,17 +283,10 @@ const QuizStatistics: React.FC = () => {
                     )}
                   </TableCell>
                   <TableCell style={{ border: "2px solid lightgray" }}>
-                    <XYPlot width={300} height={300}>
-                      <HorizontalGridLines />
-                      <LineSeries
-                        data={[
-                          { x: 1, y: 10 },
-                          { x: 2, y: 5 },
-                          { x: 3, y: 15 }
-                        ]}
-                      />
+                    <XYPlot width={300} height={200} yType="ordinal">
                       <XAxis />
                       <YAxis />
+                      <HorizontalBarSeries data={data} barWidth={0.5} />
                     </XYPlot>
                   </TableCell>
                 </TableRow>

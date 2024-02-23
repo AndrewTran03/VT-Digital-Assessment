@@ -1,12 +1,13 @@
 import { useEffect, useContext, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { CanvasCourseAssociations, backendUrlBase } from "../shared/types";
+import { CanvasCourseAssociations, CanvasQuizStatistic, backendUrlBase } from "../shared/types";
 import {
   CanvasQuizQuestionContext,
   LearningObjectiveContext,
   CanvasUserInfoContext,
-  CanvasUserCourseNamesArrContext
+  CanvasUserCourseNamesArrContext,
+  CanvasQuizStatisticContext
 } from "../shared/contexts";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
 import {
@@ -31,14 +32,20 @@ const UserDashboard: React.FC = () => {
     canvasUserInfo.canvasUserId || parseInt(window.localStorage.getItem("canvasUserId") ?? "0")
   );
   const { setCanvasUserCourseNamesArr } = useContext(CanvasUserCourseNamesArrContext);
+  const { canvasQuizQuestionStatisticDataArr, setCanvasQuizQuestionStatisticDataArr } =
+    useContext(CanvasQuizStatisticContext);
   const canvasQuizDataArrGroupBy = Object.groupBy(canvasQuizDataArr, (entry) => entry.canvasCourseInternalId);
   const navigate = useNavigate();
+  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(false);
+
+  async function fetchData() {
+    await fetchCanvasQuizData();
+    await fetchCanvasStatisticsData();
+    console.clear();
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      await fetchCanvasQuizData();
-      console.clear();
-    }
     fetchData();
   }, []);
 
@@ -51,17 +58,29 @@ const UserDashboard: React.FC = () => {
   }, [canvasQuizDataArrGroupBy]);
 
   async function fetchCanvasQuizData() {
+    setCoursesLoading(true);
     await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`).then((res) => {
       const parsedResult = parseCanvasQuizQuestionMongoDBDCollection(res.data);
       console.log(parsedResult);
       setCanvasQuizDataArr(parsedResult);
     });
+    setCoursesLoading(false);
+  }
+
+  async function fetchCanvasStatisticsData() {
+    setStatsLoading(true);
+    await axios.get(`${backendUrlBase}/api/statistics/${canvasUserId}`).then((res) => {
+      console.log(res.data);
+      setCanvasQuizQuestionStatisticDataArr(res.data as CanvasQuizStatistic[]);
+    });
+    setStatsLoading(false);
   }
 
   async function handleApiRefreshButtonClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
     await fetchCanvasQuizData();
+    await fetchCanvasStatisticsData();
   }
 
   function handleClickToObjectives(e: FormEvent<HTMLButtonElement>) {
@@ -114,6 +133,7 @@ const UserDashboard: React.FC = () => {
     window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
+    window.localStorage.setItem("canvasStatsArr", JSON.stringify(canvasQuizQuestionStatisticDataArr));
     navigate("/statistics");
   }
 
@@ -122,60 +142,16 @@ const UserDashboard: React.FC = () => {
       <Typography fontSize={24}>
         <b>Canvas Course Dashboard</b>
       </Typography>
-      <button type="button" onClick={handleClickToObjectives}>
+      <button type="button" onClick={handleClickToObjectives} disabled={coursesLoading || statsLoading}>
         <Typography>
           <b>+ Add Learning Objectives for Your Course</b>
         </Typography>
       </button>
-      <button type="submit" onClick={handleApiRefreshButtonClick}>
+      <button type="submit" onClick={handleApiRefreshButtonClick} disabled={coursesLoading || statsLoading}>
         <Typography>
           <b>Refresh</b>
         </Typography>
       </button>
-      {/* <Table
-        style={{
-          marginTop: "20px",
-          borderCollapse: "collapse",
-          width: "auto",
-          margin: "0 auto"
-        }}
-      >
-        <TableRow>
-          <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-            <Typography variant="body1">Enter your Canvas Username:</Typography>
-          </TableCell>
-          <TableCell style={{ border: "none" }}>
-            <input
-              ref={canvasUsernameInputRef}
-              type="text"
-              style={{ width: "100%", padding: "8px" }}
-              onChange={handleCanvasUserInputChange}
-            />
-          </TableCell>
-        </TableRow>
-        <TableRow>
-          <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-            <Typography variant="body1">Enter your Canvas User API Key:</Typography>
-          </TableCell>
-          <TableCell style={{ border: "none" }}>
-            <input
-              ref={canvasApiKeyInputRef}
-              type="text"
-              style={{ width: "100%", padding: "8px" }}
-              onChange={handleCanvasUserInputChange}
-            />
-          </TableCell>
-        </TableRow>
-      </Table>
-      <button type="submit" onClick={handleApiInputSubmitClick}>
-        Submit User Info
-      </button> */}
-      {/* Success Message */}
-      {/* {userSubmitInfoComplete && (
-        <Typography variant="body1" style={{ color: "green", marginTop: "10px" }}>
-          Successful submission. Click the "Refresh" button to update data.
-        </Typography>
-      )} */}
       {canvasQuizDataArrGroupBy &&
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
         Object.entries(canvasQuizDataArrGroupBy).map((value, key) => (
@@ -239,6 +215,7 @@ const UserDashboard: React.FC = () => {
                             <button
                               type="submit"
                               onClick={(e) => handleClickToMatcher(e, entry.canvasCourseInternalId, entry.quizId)}
+                              disabled={coursesLoading}
                             >
                               Click to Assign Learning Objectives
                             </button>
@@ -249,6 +226,7 @@ const UserDashboard: React.FC = () => {
                             <button
                               type="submit"
                               onClick={(e) => handleClickToStatistics(e, entry.canvasCourseInternalId, entry.quizId)}
+                              disabled={statsLoading}
                             >
                               Click to View Statistics
                             </button>
