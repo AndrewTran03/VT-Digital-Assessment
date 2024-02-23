@@ -13,7 +13,11 @@ import {
   CanvasQuizStatistic,
   CanvasQuizSubmissionStatistics,
   QuestionTypeEnumValues,
-  AxiosAuthHeaders
+  AxiosAuthHeaders,
+  numberLike,
+  booleanLike,
+  numberArrLike,
+  CanvasQuizQuestionAnswerSetStatistic
 } from "../../assets/types";
 
 async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, courseArr: readonly CanvasCourseInfo[]) {
@@ -23,7 +27,7 @@ async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, cou
   for (let j = 0; j < courseArr.length; j++) {
     const { courseId } = courseArr[j];
 
-    const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes`, {
+    const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes?per_page=100`, {
       headers: axiosHeaders
     });
 
@@ -55,7 +59,6 @@ async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, cou
 
     // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
-    // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz IDs- ${quizArr}. Length: ${quizArr.length}`);
 
     await fetchCanvasUserQuizAnswerReportData(axiosHeaders, courseId, quizArr, quizStatsResponses);
   }
@@ -74,18 +77,23 @@ async function fetchCanvasUserQuizAnswerReportData(
   for (let k = 0; k < quizArr.length; k++) {
     const { quizId } = quizArr[k];
 
-    const quizQuestionsRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/statistics`, {
-      headers: axiosHeaders
-    });
+    const quizQuestionsRes = await axios.get(
+      `${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/statistics?per_page=100`,
+      {
+        headers: axiosHeaders
+      }
+    );
     console.assert(quizQuestionsRes.data.quiz_statistics.length === 1);
 
     const newCanvasQuizStatistic = parseCanvasQuizQuestionStatResultHelper(quizQuestionsRes.data.quiz_statistics[0]);
     quizStatsResponses.push(newCanvasQuizStatistic);
   }
-  log.warn(quizStatsResponses);
+  log.info(quizStatsResponses);
 }
 
 function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
+  const defaultValue = null;
+
   const id = quizStatsEntry.id as number;
   const url = quizStatsEntry.url;
   const html_url = quizStatsEntry.html_url;
@@ -106,16 +114,70 @@ function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
       const question_text = quesStatEntry.question_text;
       const position = quesStatEntry.position as number;
       const responses = quesStatEntry.responses as number;
+      // For "numerical_question" type questions
+      const full_credit: numberLike = (quesStatEntry.full_credit as number) ?? defaultValue;
+      const incorrect: numberLike = (quesStatEntry.incorrect as number) ?? defaultValue;
+      // For "numerical_question, short_answer, and multiple_dropdowns" type questions
+      const correct: numberLike = (quesStatEntry.correct as number) ?? defaultValue;
+      // For "multiple_dropdowns" type questions
+      const partially_correct: numberLike = (quesStatEntry.partially_correct as number) ?? defaultValue;
 
+      const answerSets: CanvasQuizQuestionAnswerSetStatistic[] = [];
       const answers: CanvasQuizQuestionAnswerStatistic[] = [];
-      if (quesStatEntry.answers && quesStatEntry.answers.length > 0) {
+      // For "multiple_dropdowns" type questions
+      if (quesStatEntry.answer_sets && quesStatEntry.answer_sets.length > 0) {
+        quesStatEntry.answer_sets.forEach((answer_set: any) => {
+          const answerSetId = answer_set.id as string;
+          const answerSetText = answer_set.text as string;
+          const answersForAnswerSet: CanvasQuizQuestionAnswerStatistic[] = [];
+          if (answer_set.answers && answer_set.answers.length > 0) {
+            answer_set.answers.forEach((answerEntry: any) => {
+              const answerId = answerEntry.id as string;
+              const answerText = answerEntry.text as string;
+              const isCorrect = answerEntry.correct as boolean;
+              const responseCount = answerEntry.responses as number;
+              const userIds: number[] = answerEntry.user_ids as number[];
+              const userNames: string[] = answerEntry.user_names as string[];
+              const margin = null;
+              const isRange = null;
+              const value = null;
+
+              const newAnswer: CanvasQuizQuestionAnswerStatistic = {
+                id: answerId,
+                text: answerText,
+                correct: isCorrect,
+                responses: responseCount,
+                user_ids: userIds,
+                user_names: userNames,
+                margin: margin,
+                isRange: isRange,
+                value: value
+              };
+              answersForAnswerSet.push(newAnswer);
+            });
+          }
+          const newAnswerSet: CanvasQuizQuestionAnswerSetStatistic = {
+            id: answerSetId,
+            text: answerSetText,
+            answers: answersForAnswerSet
+          };
+          answerSets.push(newAnswerSet);
+        });
+      }
+      // For all other type of questions
+      else if (quesStatEntry.answers && quesStatEntry.answers.length > 0) {
         quesStatEntry.answers.forEach((answerEntry: any) => {
-          const answerId = answerEntry.id as number;
+          const answerId = answerEntry.id as string;
           const answerText = answerEntry.text as string;
           const isCorrect = answerEntry.correct as boolean;
           const responseCount = answerEntry.responses as number;
           const userIds: number[] = answerEntry.user_ids as number[];
           const userNames: string[] = answerEntry.user_names as string[];
+          // For "numerical_question" type questions
+          const margin: numberLike = (answerEntry.margin as number) ?? defaultValue;
+          const isRange: booleanLike = (answerEntry.is_range as boolean) ?? defaultValue;
+          // For (some) "numerical_question" type questions
+          const value: numberArrLike = (answerEntry.value as number[]) ?? defaultValue;
 
           const newAnswer: CanvasQuizQuestionAnswerStatistic = {
             id: answerId,
@@ -123,32 +185,37 @@ function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
             correct: isCorrect,
             responses: responseCount,
             user_ids: userIds,
-            user_names: userNames
+            user_names: userNames,
+            margin: margin,
+            isRange: isRange,
+            value: value
           };
           answers.push(newAnswer);
         });
       }
-      const answered_student_count = quesStatEntry.answered_student_count as number;
-      const top_student_count = quesStatEntry.top_student_count as number;
-      const middle_student_count = quesStatEntry.middle_student_count as number;
-      const bottom_student_count = quesStatEntry.bottom_student_count as number;
-      const correct_student_count = quesStatEntry.correct_student_count as number;
-      const incorrect_student_count = quesStatEntry.incorrect_student_count as number;
-      const correct_student_ratio = quesStatEntry.correct_student_ratio as number;
-      const incorrect_student_ratio = quesStatEntry.incorrect_student_ratio as number;
-      const correct_top_student_count = quesStatEntry.correct_top_student_count as number;
-      const correct_middle_student_count = quesStatEntry.correct_middle_student_count as number;
-      const correct_bottom_student_count = quesStatEntry.correct_bottom_student_count as number;
-      const variance = quesStatEntry.variance as number;
-      const stdev = quesStatEntry.stdev as number;
-      const difficulty_index = quesStatEntry.difficulty_index as number;
-      const alpha = quesStatEntry.alpha as number;
+      const answered_student_count: numberLike = (quesStatEntry.answered_student_count as number) ?? defaultValue;
+      const top_student_count: numberLike = (quesStatEntry.top_student_count as number) ?? defaultValue;
+      const middle_student_count: numberLike = (quesStatEntry.middle_student_count as number) ?? defaultValue;
+      const bottom_student_count: numberLike = (quesStatEntry.bottom_student_count as number) ?? defaultValue;
+      const correct_student_count: numberLike = (quesStatEntry.correct_student_count as number) ?? defaultValue;
+      const incorrect_student_count: numberLike = (quesStatEntry.incorrect_student_count as number) ?? defaultValue;
+      const correct_student_ratio: numberLike = (quesStatEntry.correct_student_ratio as number) ?? defaultValue;
+      const incorrect_student_ratio: numberLike = (quesStatEntry.incorrect_student_ratio as number) ?? defaultValue;
+      const correct_top_student_count: numberLike = (quesStatEntry.correct_top_student_count as number) ?? defaultValue;
+      const correct_middle_student_count: numberLike =
+        (quesStatEntry.correct_middle_student_count as number) ?? defaultValue;
+      const correct_bottom_student_count: numberLike =
+        (quesStatEntry.correct_bottom_student_count as number) ?? defaultValue;
+      const variance: numberLike = (quesStatEntry.variance as number) ?? defaultValue;
+      const stdev: numberLike = (quesStatEntry.stdev as number) ?? defaultValue;
+      const difficulty_index: numberLike = (quesStatEntry.difficulty_index as number) ?? defaultValue;
+      const alpha: numberLike = (quesStatEntry.alpha as number) ?? defaultValue;
 
       const point_biserials: CanvasQuizQuestionPointBiserial[] = [];
       if (quesStatEntry.point_biserials && quesStatEntry.point_biserials.length > 0) {
         quesStatEntry.point_biserials.forEach((pointBiserialEntry: any) => {
           const answerId = pointBiserialEntry.answer_id as number;
-          const pointBiserial = pointBiserialEntry.point_biserial as number | null;
+          const pointBiserial: numberLike = (pointBiserialEntry.point_biserial as number) ?? defaultValue;
           const correct = pointBiserialEntry.correct as boolean;
           const distractor = pointBiserialEntry.distractor as boolean;
 
@@ -169,6 +236,7 @@ function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
         position: position,
         responses: responses,
         answers: answers,
+        answerSets: answerSets,
         answered_student_count: answered_student_count,
         top_student_count: top_student_count,
         middle_student_count: middle_student_count,
@@ -184,7 +252,11 @@ function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
         stdev: stdev,
         difficulty_index: difficulty_index,
         alpha: alpha,
-        point_biserials: point_biserials
+        point_biserials: point_biserials,
+        full_credit: full_credit,
+        correct: correct,
+        incorrect: incorrect,
+        partially_correct: partially_correct
       };
       question_statistics.push(newQuesStat);
     });
