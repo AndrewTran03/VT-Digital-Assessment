@@ -263,7 +263,7 @@ const LearningObjectiveMatcher: React.FC = () => {
                       Current Selected Learning-Objective:
                       {!selectedAnswers[idx] ? " No answer selected yet" : ` ${selectedAnswers[idx]}`}
                     </FormLabel>
-                    <Accordion>
+                    <Accordion style={{ borderRadius: 20, overflow: "hidden" }} >
                       <AccordionSummary>
                         <Typography>Click Here to Select Additional Learning Objectives</Typography>
                       </AccordionSummary>
