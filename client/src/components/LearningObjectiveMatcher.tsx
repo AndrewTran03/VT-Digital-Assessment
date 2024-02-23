@@ -247,9 +247,7 @@ const LearningObjectiveMatcher: React.FC = () => {
                           overflowY: "hidden"
                         }}
                         placeholder={
-                          quizQuestion.answers &&
-                          quizQuestion.answers[0] &&
-                          quizQuestion.answers[0].text
+                          quizQuestion.answers && quizQuestion.answers[0] && quizQuestion.answers[0].text
                             ? `Default Answer Provided: "${quizQuestion.answers[0].text}"`
                             : "No Default Answer Provided: This is a default placeholder answer text"
                         }
