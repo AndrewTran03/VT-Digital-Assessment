@@ -249,7 +249,6 @@ const LearningObjectiveMatcher: React.FC = () => {
                         placeholder={
                           quizQuestion.answers &&
                           quizQuestion.answers[0] &&
-                          quizQuestion.answers[0] &&
                           quizQuestion.answers[0].text
                             ? `Default Answer Provided: "${quizQuestion.answers[0].text}"`
                             : "No Default Answer Provided: This is a default placeholder answer text"
@@ -263,7 +262,7 @@ const LearningObjectiveMatcher: React.FC = () => {
                       Current Selected Learning-Objective:
                       {!selectedAnswers[idx] ? " No answer selected yet" : ` ${selectedAnswers[idx]}`}
                     </FormLabel>
-                    <Accordion style={{ borderRadius: 20, overflow: "hidden" }} >
+                    <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
                       <AccordionSummary>
                         <Typography>Click Here to Select Additional Learning Objectives</Typography>
                       </AccordionSummary>
