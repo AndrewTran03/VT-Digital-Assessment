@@ -23,8 +23,8 @@ export class CanvasQuizStats {
   private quesExpectationCategories: CanvasLearningObjectiveCategories[] = [];
 
   // Categories
-  private static readonly EXCEEDS_EXPECTATIONS = 0.8; // or higher
-  private static readonly MEETS_EXPECTATIONS = 0.6; // from here up to but not including Exceeds Score
+  private static readonly EXCEEDS_EXPECTATIONS = 0.87; // or higher
+  private static readonly MEETS_EXPECTATIONS = 0.75; // from here up to but not including Exceeds Score
   private static readonly BELOW_EXPECTATIONS = 0; // from here up to but not including Meets Score
 
   constructor(stats: CanvasQuizStatistic, quesLearningObjArr: string[]) {
