@@ -33,7 +33,11 @@ export class CanvasQuizStats {
   }
 
   private get computeQuizAveragePointsEarned() {
-    return this.canvasQuizStatistic.submission_statistics.score_average;
+    const submissionStatisticsCategory = this.canvasQuizStatistic.submission_statistics;
+    if (submissionStatisticsCategory.score_high && submissionStatisticsCategory.score_average) {
+      return submissionStatisticsCategory.score_average / submissionStatisticsCategory.score_high;
+    }
+    return null;
   }
 
   private get computeQuizMedianPointsEarned() {
@@ -53,9 +57,11 @@ export class CanvasQuizStats {
     quizScores.sort((a, b) => a - b);
 
     const medianIndex = Math.floor(quizScores.length / 2);
-    return quizScores.length % 2 === 0
-      ? (quizScores[medianIndex - 1] + quizScores[medianIndex]) / 2
-      : quizScores[medianIndex];
+    return (
+      (quizScores.length % 2 === 0
+        ? (quizScores[medianIndex - 1] + quizScores[medianIndex]) / 2
+        : quizScores[medianIndex]) / 100
+    );
   }
 
   private get computeQuizPercentageCategories() {
@@ -333,7 +339,7 @@ export class CanvasQuizStats {
             for (const answer of question_statistic.answers) {
               const currAnswer = answer;
               const newAnswerEntry: CanvasQuizQuestionAnswerFrequencyArrEntry = {
-                answer_text: currAnswer.text,
+                answer_text: currAnswer.text ?? currAnswer.id, // Nullish operator for "essay_question" case
                 frequency_count: currAnswer.responses
               };
               frequencyArr.push(newAnswerEntry);
