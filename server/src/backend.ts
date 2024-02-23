@@ -12,8 +12,8 @@ import { ensureConnectionToMongoDatabase } from "./utils/mongo.connection";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
-app.use(bodyParser.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(bodyParser.json({ limit: "1mb" }));
+app.use(bodyParser.urlencoded({ limit: "1mb", extended: true }));
 app.use(cors({ credentials: true }));
 app.use(router);
 app.use((_, res, next: NextFunction) => {

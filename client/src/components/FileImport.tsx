@@ -1,4 +1,4 @@
-import { useState, useEffect, FormEvent, useContext } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { z } from "zod";
@@ -8,11 +8,9 @@ import {
   backendUrlBase,
   SeasonEnumValues,
   SingleCanvasLearningObjective,
-  CanvasLearningObjectives,
-  CanvasCourseAssociations
+  CanvasLearningObjectives
 } from "../shared/types";
 import "../styles/DragDropFileImport.css";
-import { CanvasUserCourseNamesArrContext } from "../shared/contexts";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import {
   Accordion,
@@ -42,13 +40,6 @@ const learningObjSchema = z.object({
 // function FileImport(): ReturnType<React.FC> { // Another way to return React FC components
 const FileImport: React.FC = () => {
   const [learningObjArr, setLearningObjArr] = useState<SingleCanvasLearningObjective[]>([]);
-  // const { canvasUserCourseNamesArr } = useContext(CanvasUserCourseNamesArrContext);
-  // const canvasUserCourseNames: CanvasCourseAssociations[] =
-  //   canvasUserCourseNamesArr && canvasUserCourseNamesArr.length > 0
-  //     ? canvasUserCourseNamesArr
-  //     : (JSON.parse(window.localStorage.getItem("canvasUserCourseAssociations") ?? "[]") as string[]).map((entry) =>
-  //         JSON.parse(entry)
-  //       );
   const [allUserlearningCourseObjectiveData, setAllUserLearningCourseObjectiveData] = useState<
     CanvasLearningObjectives[]
   >([]);
@@ -66,11 +57,6 @@ const FileImport: React.FC = () => {
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   console.log("Canvas Course Names:");
-  //   console.log(canvasUserCourseNames);
-  // }, [canvasUserCourseNames]);
-
   useEffect(() => {
     console.log("All User Learning Objective Arr:");
     console.log(allUserlearningCourseObjectiveData);
@@ -87,21 +73,6 @@ const FileImport: React.FC = () => {
     const uniqueCourseObjectiveData = removeDuplicateCanvasUserLearningObjectiveData(allCourseObjectiveData);
     setAllUserLearningCourseObjectiveData(uniqueCourseObjectiveData);
   }
-
-  // Consideration: User Security (Only courses that appear on User's Dashboard)
-  // async function fetchAllCanvasUserLearningObjectiveData() {
-  //   const allCourseObjectiveData: CanvasLearningObjectives[] = [];
-  //   for (let i = 0; i < canvasUserCourseNames.length; i++) {
-  //     const { deptAbbrev, courseNum } = canvasUserCourseNames[i];
-  //     const result = await axios.get(`${backendUrlBase}/api/objective/course/${deptAbbrev}/${courseNum}`);
-  //     for (let j = 0; j < result.data.length; j++) {
-  //       const parsedResult = parseLearningObjectiveMongoDBDCollection(result.data[j]);
-  //       allCourseObjectiveData.push(parsedResult);
-  //     }
-  //   }
-  //   const uniqueCourseObjectiveData = removeDuplicateCanvasUserLearningObjectiveData(allCourseObjectiveData);
-  //   setAllUserLearningCourseObjectiveData(uniqueCourseObjectiveData);
-  // }
 
   function removeDuplicateCanvasUserLearningObjectiveData(learningObjectiveData: CanvasLearningObjectives[]) {
     const uniqueCanvasUserLearningObjectiveData: CanvasLearningObjectives[] = [];
@@ -150,7 +121,7 @@ const FileImport: React.FC = () => {
       // (If Any...) Pre-populate with existing Canvas Learning Objectives
       if (lines.length > 1 && potentialMatchingCourseLearningObj.length === 1) {
         const entries = lines[1].split(","); // Since this is a CSV file
-        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasCourseInternalIdStr, ...rest] = entries;
+        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasCourseInternalIdStr, ..._] = entries;
 
         const courseNum = parseInt(courseNumStr);
         const semester = semesterStr as SeasonEnumValues;
