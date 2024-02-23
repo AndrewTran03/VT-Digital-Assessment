@@ -1,5 +1,5 @@
 import express from "express";
-import { CourseObjectivesModel, canvasObjectivesMongoCollectionName } from "../models/objectives.model";
+import { CourseObjectivesModel, canvasObjectivesMongoCollectionName } from "../models/canvas.objectives.model";
 import log from "../utils/logger";
 import { CanvasCourseSingleCourseObjective, APIErrorResponse } from "../../assets/types";
 
