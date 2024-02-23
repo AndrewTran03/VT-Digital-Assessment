@@ -9,6 +9,10 @@ type Prettify<T> = {
 
 const canvasUrl = "https://canvas.vt.edu:443/api";
 
+type numberLike = number | null;
+type booleanLike = boolean | null;
+type numberArrLike = number[] | null;
+
 // Required with All MongoDB Entries:
 type MongoDBId = {
   readonly _id: string; // Primary Key (IDentifier)
@@ -261,7 +265,8 @@ const SeasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
 enum QuestionType {
   multiple_choice_question = "multiple_choice_question",
   essay_question = "essay_question",
-  multiple_dropdown_question = "multiple_dropdown_question",
+  true_false_question = "true_false_question",
+  multiple_dropdowns_question = "multiple_dropdowns_question",
   fill_in_multiple_blanks_question = "fill_in_multiple_blanks_question",
   multiple_answers_question = "multiple_answers_question",
   short_answer_question = "short_answer_question",
@@ -305,59 +310,6 @@ const QuestionTypeValues = [
   "numerical_question"
 ] as const;
 
-type CanvasQuizQuestionStatistic = {
-  id: number;
-  question_type: QuestionTypeEnumValues;
-  question_text: string;
-  position: number;
-  responses: number;
-  answers: CanvasQuizQuestionAnswerStatistic[];
-  answered_student_count: number;
-  top_student_count: number;
-  middle_student_count: number;
-  bottom_student_count: number;
-  correct_student_count: number;
-  incorrect_student_count: number;
-  correct_student_ratio: number;
-  incorrect_student_ratio: number;
-  correct_top_student_count: number;
-  correct_middle_student_count: number;
-  correct_bottom_student_count: number;
-  variance: number;
-  stdev: number;
-  difficulty_index: number;
-  alpha: number;
-  point_biserials: CanvasQuizQuestionPointBiserial[];
-};
-
-type CanvasQuizQuestionAnswerStatistic = {
-  id: number;
-  text: string;
-  correct: boolean;
-  responses: number;
-  user_ids: number[];
-  user_names: string[];
-};
-
-type CanvasQuizSubmissionStatistics = {
-  scores: Record<string, number>;
-  score_average: number | null;
-  score_high: number | null;
-  score_low: number | null;
-  score_stdev: number | null;
-  correct_count_average: number;
-  incorrect_count_average: number;
-  duration_average: number;
-  unique_count: number;
-};
-
-type CanvasQuizQuestionPointBiserial = {
-  answer_id: number;
-  point_biserial: number | null;
-  correct: boolean;
-  distractor: boolean;
-};
-
 type CanvasQuizStatistic = {
   id: number;
   url: string;
@@ -377,6 +329,96 @@ type CanvasQuizStatistic = {
   };
 };
 
+type CanvasQuizQuestionStatistic = {
+  id: number;
+  question_type: QuestionTypeEnumValues;
+  question_text: string;
+  position: number;
+  responses: number;
+  answers: CanvasQuizQuestionAnswerStatistic[];
+  answerSets: CanvasQuizQuestionAnswerSetStatistic[];
+  answered_student_count: numberLike;
+  top_student_count: numberLike;
+  middle_student_count: numberLike;
+  bottom_student_count: numberLike;
+  correct_student_count: numberLike;
+  incorrect_student_count: numberLike;
+  correct_student_ratio: numberLike;
+  incorrect_student_ratio: numberLike;
+  correct_top_student_count: numberLike;
+  correct_middle_student_count: numberLike;
+  correct_bottom_student_count: numberLike;
+  variance: numberLike;
+  stdev: numberLike;
+  difficulty_index: numberLike;
+  alpha: numberLike;
+  point_biserials: CanvasQuizQuestionPointBiserial[];
+  // For "numerical_question" type questions
+  full_credit: numberLike;
+  incorrect: numberLike;
+  // For "numerical_question, short_answer, and multiple_dropdowns" type questions
+  correct: numberLike;
+  // For "multiple_dropdowns" type questions
+  partially_correct: numberLike;
+};
+
+type CanvasQuizQuestionAnswerStatistic = {
+  id: string;
+  text: string;
+  correct: boolean;
+  responses: number;
+  user_ids: number[];
+  user_names: string[];
+  // For "numerical_question" type questions
+  margin: numberLike;
+  isRange: booleanLike;
+  // For (some) "numerical_question" type questions
+  value: numberArrLike;
+};
+
+type CanvasQuizQuestionAnswerSetStatistic = {
+  id: string;
+  text: string;
+  answers: CanvasQuizQuestionAnswerStatistic[];
+};
+
+type CanvasQuizSubmissionStatistics = {
+  scores: Record<string, number>;
+  score_average: numberLike;
+  score_high: numberLike;
+  score_low: numberLike;
+  score_stdev: numberLike;
+  correct_count_average: numberLike;
+  incorrect_count_average: numberLike;
+  duration_average: numberLike;
+  unique_count: numberLike;
+};
+
+type CanvasQuizQuestionPointBiserial = {
+  answer_id: number;
+  point_biserial: numberLike;
+  correct: boolean;
+  distractor: boolean;
+};
+
+type CanvasQuizQuestionAnswerFrequencyStatistic = {
+  question_type: QuestionTypeEnumValues;
+  question_text: string;
+  answer_frequencies: (CanvasQuizQuestionAnswerFrequencyArrEntry | CanvasQuizQuestionAnswerSetFrequencyArrEntry)[];
+};
+
+type CanvasQuizQuestionAnswerFrequencyArrEntry = {
+  answer_text: string;
+  frequency_count: number;
+};
+
+type CanvasQuizQuestionAnswerSetFrequencyArrEntry = {
+  answer_set_text: string;
+  answer_frequencies: CanvasQuizQuestionAnswerFrequencyArrEntry[];
+};
+
+type CanvasLearningObjectiveCategories = "EXCEEDS" | "MEETS" | "BELOW" | null;
+
 type CanvasUserAPIEntryBase = {
   canvasUsername: string;
   canvasUserApiKey: string;
@@ -385,8 +427,21 @@ type CanvasUserAPIEntryBase = {
 
 type CanvasUserAPIEntry = MongoDBCombined<CanvasUserAPIEntryBase>;
 
+type CanvasQuizStatisticsResultObj = {
+  quizAveragePointsEarned: numberLike;
+  quizMedianPointsEarned: numberLike;
+  quizPercentageCategories: number[];
+  perQuestionItemDifficulty: numberLike[];
+  perQuestionAveragePointsEarned: numberLike[];
+  perQuestionAnswerFrequencies: CanvasQuizQuestionAnswerFrequencyStatistic[];
+  perLearningObjPercentageCategories: Array<[string, number[]]>;
+};
+
 export {
   canvasUrl,
+  numberLike,
+  booleanLike,
+  numberArrLike,
   AxiosAuthHeaders,
   APIErrorResponse,
   CanvasCourseInfo,
@@ -406,9 +461,15 @@ export {
   QuestionTypeValues,
   CanvasQuizQuestionStatistic,
   CanvasQuizQuestionAnswerStatistic,
+  CanvasQuizQuestionAnswerSetStatistic,
   CanvasQuizSubmissionStatistics,
   CanvasQuizQuestionPointBiserial,
   CanvasQuizStatistic,
   CanvasUserAPIEntryBase,
-  CanvasUserAPIEntry
+  CanvasUserAPIEntry,
+  CanvasQuizQuestionAnswerFrequencyStatistic,
+  CanvasQuizQuestionAnswerFrequencyArrEntry,
+  CanvasQuizQuestionAnswerSetFrequencyArrEntry,
+  CanvasLearningObjectiveCategories,
+  CanvasQuizStatisticsResultObj
 };
