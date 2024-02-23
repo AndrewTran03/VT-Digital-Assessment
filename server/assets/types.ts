@@ -417,16 +417,6 @@ type CanvasQuizQuestionAnswerSetFrequencyArrEntry = {
   answer_frequencies: CanvasQuizQuestionAnswerFrequencyArrEntry[];
 };
 
-type CanvasLearningObjectiveCategories = "EXCEEDS" | "MEETS" | "BELOW" | null;
-
-type CanvasUserAPIEntryBase = {
-  canvasUsername: string;
-  canvasUserApiKey: string;
-  canvasUserId: number;
-};
-
-type CanvasUserAPIEntry = MongoDBCombined<CanvasUserAPIEntryBase>;
-
 type CanvasQuizStatisticsResultObj = {
   quizAveragePointsEarned: numberLike;
   quizMedianPointsEarned: numberLike;
@@ -436,6 +426,16 @@ type CanvasQuizStatisticsResultObj = {
   perQuestionAnswerFrequencies: CanvasQuizQuestionAnswerFrequencyStatistic[];
   perLearningObjPercentageCategories: Array<[string, number[]]>;
 };
+
+type CanvasLearningObjectiveCategories = "EXCEEDS" | "MEETS" | "BELOW" | null;
+
+type CanvasUserAPIEntryBase = {
+  canvasUsername: string;
+  canvasUserApiKey: string;
+  canvasUserId: number;
+};
+
+type CanvasUserAPIEntry = MongoDBCombined<CanvasUserAPIEntryBase>;
 
 export {
   canvasUrl,
