@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   CanvasCourseMCQAnswerMongoDBEntry,
   CanvasCourseQuizMongoDBEntry,
@@ -7,7 +8,7 @@ import {
   SeasonEnumValues
 } from "./types";
 
-function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]) {
+function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]): CanvasCourseQuizMongoDBEntry[] {
   const canvasEntriesArr: CanvasCourseQuizMongoDBEntry[] = [];
   quizData.forEach((data: any) => {
     const _id = data._id;
@@ -81,7 +82,7 @@ function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]) {
   return canvasEntriesArr;
 }
 
-function parseLearningObjectiveMongoDBDCollection(data: any) {
+function parseLearningObjectiveMongoDBDCollection(data: any): CanvasLearningObjectives {
   const _id = data._id;
   const __v = data.__v as number;
   const createdDate = data.created_date;
