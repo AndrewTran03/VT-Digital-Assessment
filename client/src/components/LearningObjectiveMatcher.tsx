@@ -1,13 +1,22 @@
 import { useState, useEffect, useContext, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Paper, Table, TableHead, TableRow, TableCell, TableBody, Accordion, AccordionSummary } from "@mui/material";
-import Typography from "@mui/material/Typography";
-import Radio from "@mui/material/Radio";
-import RadioGroup from "@mui/material/RadioGroup";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import FormControl from "@mui/material/FormControl";
-import FormLabel from "@mui/material/FormLabel";
+import {
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Accordion,
+  AccordionSummary,
+  Typography,
+  Radio,
+  RadioGroup,
+  FormControlLabel,
+  FormLabel,
+  FormControl
+} from "@mui/material";
 import {
   backendUrlBase,
   multipleChoiceQuestionLetters,
@@ -53,12 +62,14 @@ const LearningObjectiveMatcher: React.FC = () => {
   const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
     matchingEntries.length === 1 ? matchingEntries[0].canvasMatchedLearningObjectivesArr : []
   );
+  const [coursesLoading, setCoursesLoading] = useState(false);
+
+  async function fetchData() {
+    await fetchCanvasLearningObjectiveData();
+    console.clear();
+  }
 
   useEffect(() => {
-    async function fetchData() {
-      await fetchCanvasLearningObjectiveData();
-      console.clear();
-    }
     fetchData();
   }, []);
 
@@ -72,10 +83,12 @@ const LearningObjectiveMatcher: React.FC = () => {
   }, [matchingEntries]);
 
   async function fetchCanvasLearningObjectiveData() {
+    setCoursesLoading(true);
     await axios.get(`${backendUrlBase}/api/objective/${canvasCourseInternalId}`).then((res) => {
       const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
       setLearningCourseObjectiveData(parsedResult);
     });
+    setCoursesLoading(false);
   }
 
   function handleAdjustmentTextareaHeight() {
@@ -128,7 +141,7 @@ const LearningObjectiveMatcher: React.FC = () => {
       <button type="reset" onClick={handleBackButtonClick}>
         Back
       </button>
-      <button type="submit" onClick={handleAPIButtonClick}>
+      <button type="submit" onClick={handleAPIButtonClick} disabled={coursesLoading}>
         Get Course Objective Data
       </button>
       <Paper style={{ borderRadius: 20, overflow: "hidden" }}>
@@ -279,7 +292,7 @@ const LearningObjectiveMatcher: React.FC = () => {
           </TableBody>
         </Table>
       </Paper>
-      <button type="submit" disabled={matchingEntries.length !== 1} onClick={handleSubmit}>
+      <button type="submit" disabled={matchingEntries.length !== 1 || coursesLoading} onClick={handleSubmit}>
         Submit Results
       </button>
     </>
