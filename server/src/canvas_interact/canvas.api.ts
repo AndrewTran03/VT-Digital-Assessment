@@ -66,7 +66,7 @@ async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
       enrollment_state: "active",
       state: ["available"]
     };
-    const courseRes = await axios.get(`${canvasUrl}/v1/courses`, {
+    const courseRes = await axios.get(`${canvasUrl}/v1/courses?per_page=100`, {
       params: courseParams,
       headers: axiosHeaders
     });
@@ -99,21 +99,16 @@ async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
     });
     const currArr = Object.values(canvasCoursesTemp);
     canvasCoursesArr = canvasCoursesArr.concat(currArr);
-    // log.info(`Length of ${role.toUpperCase()} array is ${currArr.length}`);
   }
-  // log.info(`Total length is ${canvasCoursesArr.length}`);
-  // log.info(canvasCoursesArr);
 
   // Extracts only the relevant information from Course data: CourseIds and CourseNames
   const courseArr: CanvasCourseInfo[] = canvasCoursesArr.map((item) => {
     // Split the course code string based on "_" or space characters
     const parts = (item.course_code || "").split(/[_\s]+/);
-    // console.log(parts);
 
     // Extract relevant information from the parts
     const courseDept = parts[0];
     const courseNum = parseInt(parts[1]);
-    // console.log("COURSE INFO:", courseDept, courseNum);
 
     return {
       courseId: item.id!,
@@ -122,7 +117,6 @@ async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
       courseNum: courseNum
     };
   });
-  // log.info(`Course Info- ${courseArr}. Length: ${courseIdsArr.length}`);
 
   return courseArr;
 }
@@ -135,7 +129,7 @@ async function fetchCanvasUserQuizData(axiosHeaders: AxiosAuthHeaders, courseArr
   for (let j = 0; j < courseArr.length; j++) {
     const { courseId, courseName, courseDept, courseNum } = courseArr[j];
 
-    const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes`, {
+    const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes?per_page=100`, {
       headers: axiosHeaders
     });
 
@@ -167,7 +161,6 @@ async function fetchCanvasUserQuizData(axiosHeaders: AxiosAuthHeaders, courseArr
 
     // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
-    // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz IDs- ${quizArr}. Length: ${quizArr.length}`);
 
     await fetchCanvasUserQuizQuestionData(
       axiosHeaders,
@@ -198,9 +191,12 @@ async function fetchCanvasUserQuizQuestionData(
   for (let k = 0; k < quizArr.length; k++) {
     const { quizId, quizName } = quizArr[k];
 
-    const quizQuestionsRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/questions`, {
-      headers: axiosHeaders
-    });
+    const quizQuestionsRes = await axios.get(
+      `${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/questions?per_page=100`,
+      {
+        headers: axiosHeaders
+      }
+    );
 
     // Assigns each CanvasQuizQuestion object to proper array index, then drops it (keeps object)
     // PREV: JSON - 0: { ...object... } => TS: arr[0] = ...object...
@@ -209,7 +205,6 @@ async function fetchCanvasUserQuizQuestionData(
       canvasQuizQuestionTemp[idx] = quizQues;
     });
     const canvasCurrQuizQuestionsArr = Object.values(canvasQuizQuestionTemp);
-    // log.info(`Course ID# ${courseId} and CourseName ${courseName}: Quiz ID# ${quizId}:, Quiz Name: ${quizName}, Quiz Length- ${canvasCurrQuizQuestionsArr.length}`);
     const quizMapEntry: CanvasQuizQuestionGroup = {
       quizId: quizId,
       quizName: quizName,
