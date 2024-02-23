@@ -151,16 +151,21 @@ const LearningObjectiveMatcher: React.FC = () => {
               <TableCell
                 style={{
                   border: "1px solid lightgray",
-                  width: "50%"
+                  width: "50%",
+                  textAlign: "center"
                 }}
               >
                 <Typography>
                   <b>Canvas Quiz Question</b>
                 </Typography>
               </TableCell>
-              <TableCell style={{ border: "1px solid lightgray" }}>
+              <TableCell style={{
+                  border: "1px solid lightgray",
+                  width: "50%",
+                  textAlign: "center"
+                }}>
                 <Typography>
-                  <b>Learning Objective</b>
+                  <b>Learning Objective Matching</b>
                 </Typography>
               </TableCell>
             </TableRow>
