@@ -291,6 +291,32 @@ type CanvasQuizQuestionPointBiserial = {
   distractor: boolean;
 };
 
+type CanvasQuizStatisticsResultObj = {
+  quizAveragePointsEarned: numberLike;
+  quizMedianPointsEarned: numberLike;
+  quizPercentageCategories: number[];
+  perQuestionItemDifficulty: numberLike[];
+  perQuestionAveragePointsEarned: numberLike[];
+  perQuestionAnswerFrequencies: CanvasQuizQuestionAnswerFrequencyStatistic[];
+  perLearningObjPercentageCategories: Array<[string, number[]]>;
+};
+
+type CanvasQuizQuestionAnswerFrequencyStatistic = {
+  question_type: QuestionTypeEnumValues;
+  question_text: string;
+  answer_frequencies: (CanvasQuizQuestionAnswerFrequencyArrEntry | CanvasQuizQuestionAnswerSetFrequencyArrEntry)[];
+};
+
+type CanvasQuizQuestionAnswerFrequencyArrEntry = {
+  answer_text: string;
+  frequency_count: number;
+};
+
+type CanvasQuizQuestionAnswerSetFrequencyArrEntry = {
+  answer_set_text: string;
+  answer_frequencies: CanvasQuizQuestionAnswerFrequencyArrEntry[];
+};
+
 export {
   backendUrlBase,
   MongoDBWithId,
@@ -310,5 +336,6 @@ export {
   multipleChoiceQuestionLetters,
   CanvasCourseAssociations,
   CanvasUserInfoObj,
-  CanvasQuizStatistic
+  CanvasQuizStatistic,
+  CanvasQuizStatisticsResultObj
 };
