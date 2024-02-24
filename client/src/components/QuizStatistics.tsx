@@ -245,7 +245,16 @@ const QuizStatistics: React.FC = () => {
             <TableRow>
               <TableCell>
                 <Typography>
-                  <b>Quiz Percentage Categories:</b> {quizStatsResultsObj.quizPercentageCategories.toString() ?? "[]"}
+                  <b>Quiz Percentage Categories:</b>
+                  <ul>
+                    {quizStatsResultsObj.quizPercentageCategories &&
+                      quizStatsResultsObj.quizPercentageCategories.length > 0 &&
+                      quizStatsResultsObj.quizPercentageCategories.map((percentageCategory, idx: number) => (
+                        <li>
+                          {PERCENTAGE_CATEGORIES[idx]}: {percentageCategory.toString()}
+                        </li>
+                      ))}
+                  </ul>
                 </Typography>
               </TableCell>
               {quizStatsResultsObj.quizPercentageCategories && (
@@ -261,9 +270,9 @@ const QuizStatistics: React.FC = () => {
                     <XAxis />
                     <YAxis tickTotal={quizStatsResultsObj.quizPercentageCategories.length} />
                     <HorizontalBarSeries
-                      data={quizStatsResultsObj.quizPercentageCategories.map((category, idx) => ({
+                      data={quizStatsResultsObj.quizPercentageCategories.map((percentageCategory, idx: number) => ({
                         y: PERCENTAGE_CATEGORIES[idx],
-                        x: category
+                        x: percentageCategory.toString()
                       }))}
                       barWidth={0.1}
                     />
@@ -393,7 +402,7 @@ const QuizStatistics: React.FC = () => {
           </TableHead>
           <TableBody>
             {matchingCourseEntries[0] &&
-              matchingCourseEntries[0].canvasQuizEntries.map((quizQuestion, idx) => (
+              matchingCourseEntries[0].canvasQuizEntries.map((quizQuestion, idx: number) => (
                 <TableRow key={`${matchingCourseEntries[0]._id}_${idx}`}>
                   <TableCell className="table-cell" style={{ maxWidth: "50%", border: "1px solid lightgray" }}>
                     <Typography style={{ maxWidth: "100%" }}>
@@ -430,7 +439,7 @@ const QuizStatistics: React.FC = () => {
                       quizQuestion.questionType === "multiple_answers_question" ||
                       quizQuestion.questionType === "multiple_dropdowns_question" ||
                       quizQuestion.questionType === "true_false_question") &&
-                      quizQuestion.answers!.map((answer, idx) => (
+                      quizQuestion.answers!.map((answer, idx: number) => (
                         <Typography>
                           {answer.weight > 0 ? (
                             <b>{`(${multipleChoiceQuestionLetters[idx]}) ${answer.text}`}</b>
@@ -478,195 +487,163 @@ const QuizStatistics: React.FC = () => {
                     )}
                   </TableCell>
                   <TableCell style={{ border: "2px solid lightgray" }}>
-                    <Table>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell
-                            style={{
-                              border: "1px solid lightgray",
-                              overflowX: "auto",
-                              wordBreak: "break-all",
-                              flex: "1 1 50%"
-                            }}
-                          >
-                            <Typography>
-                              <b>Average Points Earned</b>
-                            </Typography>
-                          </TableCell>
-                          <TableCell style={{ border: "1px solid lightgray" }}>
-                            <Typography>
-                              {quizStatsResultsObj.perQuestionAveragePointsEarned[idx]
-                                ? `${quizStatsResultsObj.perQuestionAveragePointsEarned[idx]?.toFixed(3).toString()} / 1.000`
-                                : "No data to report"}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell
-                            style={{
-                              border: "1px solid lightgray",
-                              overflowX: "auto",
-                              wordBreak: "break-all",
-                              flex: "1 1 50%"
-                            }}
-                          >
-                            <Typography style={{ width: "50%" }}>
-                              <b>Item Difficulty Index</b>
-                            </Typography>
-                          </TableCell>
-                          <TableCell style={{ border: "1px solid lightgray" }}>
-                            <Typography>
-                              {quizStatsResultsObj.perQuestionItemDifficulty[idx]
-                                ? `${quizStatsResultsObj.perQuestionItemDifficulty[idx]?.toFixed(3).toString()}`
-                                : "No data to report"}
-                            </Typography>
-                          </TableCell>
-                        </TableRow>
-                        {quizStatsResultsObj.perQuestionAnswerFrequencies[idx] &&
-                          (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
-                            "multiple_choice_question" ||
-                            quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
-                              "multiple_answers_question" ||
-                            quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
-                              "true_false_question" ||
-                            quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type === "essay_question" ||
-                            quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
-                              "numerical_question" ||
-                            quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
-                              "short_answer_question") &&
-                          (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length > 0 ? (
-                            <>
-                              <XYPlot
-                                width={600}
-                                height={
-                                  quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length * 50
-                                }
-                                xDomain={[
-                                  -0.1,
-                                  Math.max(
-                                    ...quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.map(
-                                      (value: CanvasQuizQuestionAnswerFrequencyArrEntry) => value.frequency_count
-                                    )
-                                  ) * 1.1
-                                ]}
-                                yDomain={[
-                                  -0.1,
-                                  quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length - 1
-                                ]}
-                                margin={{ left: 100 }}
-                              >
-                                <XAxis />
-                                <YAxis
-                                  tickTotal={
-                                    quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length
-                                  }
-                                  hideLine
-                                  tickFormat={(tickIdx: number) => {
-                                    if (!Number.isInteger(tickIdx)) {
-                                      return ""; // Return empty string for ticks beyond the available data
-                                    }
-                                    const answerText =
-                                      quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies[tickIdx]
-                                        .answer_text;
-                                    if (answerText === "bottom") {
-                                      return "No-Credit";
-                                    } else if (answerText === "middle") {
-                                      return "Half-Credit";
-                                    } else if (answerText === "top") {
-                                      return "Full-Credit";
-                                    }
-                                    return answerText.length > 10 ? answerText.slice(0, 10) + "..." : answerText; // Truncate long labels
-                                  }}
-                                />
-                                <HorizontalGridLines />
-                                <VerticalGridLines />
-                                <HorizontalBarSeries
-                                  data={quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.map(
-                                    (value: CanvasQuizQuestionAnswerFrequencyArrEntry, innerIdx: number) => ({
-                                      y: innerIdx,
-                                      x: value.frequency_count
-                                    })
-                                  )}
-                                  barWidth={0.1}
-                                />
-                              </XYPlot>
-                            </>
-                          ) : (
-                            <>No Answer Frequency Data found at this time.</>
-                          ))}
-                        {quizStatsResultsObj.perQuestionAnswerFrequencies[idx] &&
-                          (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ==
-                            "fill_in_multiple_blanks_question" ||
-                            quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
-                              "multiple_dropdowns_question") &&
-                          (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_set_frequencies.length > 0 ? (
-                            <>
-                              {quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_set_frequencies.map(
-                                (answer_set: CanvasQuizQuestionAnswerSetFrequencyArrEntry) => (
-                                  <>
-                                    <Table>
-                                      <TableHead>
-                                        <TableRow>
-                                          <Typography style={{ marginTop: 10 }}>
-                                            --- "{answer_set.answer_set_text}" Section ---
-                                          </Typography>
-                                        </TableRow>
-                                      </TableHead>
-                                      <TableBody>
-                                        <TableRow>
-                                          <XYPlot
-                                            width={600}
-                                            height={answer_set.answer_frequencies.length * 50}
-                                            xDomain={[
-                                              -0.1,
-                                              Math.max(
-                                                ...answer_set.answer_frequencies.map(
-                                                  (value: CanvasQuizQuestionAnswerFrequencyArrEntry) =>
-                                                    value.frequency_count
-                                                )
-                                              ) * 1.1
-                                            ]}
-                                            yDomain={[-0.1, answer_set.answer_frequencies.length - 1]}
-                                            margin={{ left: 100 }}
-                                          >
-                                            <XAxis />
-                                            <YAxis
-                                              tickTotal={answer_set.answer_frequencies.length}
-                                              hideLine
-                                              tickFormat={(tickIdx: number) => {
-                                                const answerText = answer_set.answer_frequencies[tickIdx].answer_text;
-                                                return answerText.length > 10
-                                                  ? answerText.slice(0, 10) + "..."
-                                                  : answerText; // Truncate long labels
-                                              }}
-                                            />
-                                            <HorizontalGridLines />
-                                            <VerticalGridLines />
-                                            <HorizontalBarSeries
-                                              data={answer_set.answer_frequencies.map(
-                                                (
-                                                  value: CanvasQuizQuestionAnswerFrequencyArrEntry,
-                                                  innerIdx: number
-                                                ) => ({
-                                                  y: innerIdx,
-                                                  x: value.frequency_count
-                                                })
-                                              )}
-                                              barWidth={0.1}
-                                            />
-                                          </XYPlot>
-                                        </TableRow>
-                                      </TableBody>
-                                    </Table>
-                                  </>
+                    <Typography>
+                      <b>Average Points Earned for Question:</b>{" "}
+                      {quizStatsResultsObj.perQuestionAveragePointsEarned[idx]
+                        ? `${quizStatsResultsObj.perQuestionAveragePointsEarned[idx]?.toFixed(3).toString()} / 1.000`
+                        : "No data to report"}
+                    </Typography>
+                    <Typography>
+                      <b>Item Difficulty Index for Question:</b>{" "}
+                      {quizStatsResultsObj.perQuestionItemDifficulty[idx]
+                        ? `${quizStatsResultsObj.perQuestionItemDifficulty[idx]?.toFixed(3).toString()}`
+                        : "No data to report"}
+                    </Typography>
+                    <br />
+                    <Typography>
+                      <b>Answer Frequency Statistics for Question: </b>
+                    </Typography>
+                    {quizStatsResultsObj.perQuestionAnswerFrequencies[idx] &&
+                      (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
+                        "multiple_choice_question" ||
+                        quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
+                          "multiple_answers_question" ||
+                        quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type === "true_false_question" ||
+                        quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type === "essay_question" ||
+                        quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type === "numerical_question" ||
+                        quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
+                          "short_answer_question") &&
+                      (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length > 0 ? (
+                        <>
+                          <XYPlot
+                            width={600}
+                            height={
+                              quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length * 50
+                            }
+                            xDomain={[
+                              -0.1,
+                              Math.max(
+                                ...quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.map(
+                                  (value: CanvasQuizQuestionAnswerFrequencyArrEntry) => value.frequency_count
                                 )
+                              ) * 1.1
+                            ]}
+                            yDomain={[
+                              -0.1,
+                              quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length - 1
+                            ]}
+                            margin={{ left: 100 }}
+                          >
+                            <XAxis />
+                            <YAxis
+                              tickTotal={
+                                quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length
+                              }
+                              tickFormat={(tickIdx: number) => {
+                                if (!Number.isInteger(tickIdx)) {
+                                  return ""; // Return empty string for ticks beyond the available data
+                                }
+                                const answerText =
+                                  quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies[tickIdx]
+                                    .answer_text;
+                                if (answerText === null || answerText === "null") {
+                                  return "Other";
+                                } else if (answerText === "bottom") {
+                                  return "No-Credit";
+                                } else if (answerText === "middle") {
+                                  return "Half-Credit";
+                                } else if (answerText === "top") {
+                                  return "Full-Credit";
+                                }
+                                return answerText.length > 10 ? answerText.slice(0, 10) + "..." : answerText; // Truncate long labels
+                              }}
+                            />
+                            <HorizontalGridLines />
+                            <VerticalGridLines />
+                            <HorizontalBarSeries
+                              data={quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.map(
+                                (value: CanvasQuizQuestionAnswerFrequencyArrEntry, innerIdx: number) => ({
+                                  y: innerIdx,
+                                  x: value.frequency_count
+                                })
                               )}
-                            </>
-                          ) : (
-                            <>No Answer Frequency Data found at this time.</>
-                          ))}
-                      </TableBody>
-                    </Table>
+                              barWidth={0.1}
+                            />
+                          </XYPlot>
+                        </>
+                      ) : (
+                        <>No data to report.</>
+                      ))}
+                    {quizStatsResultsObj.perQuestionAnswerFrequencies[idx] &&
+                      (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ==
+                        "fill_in_multiple_blanks_question" ||
+                        quizStatsResultsObj.perQuestionAnswerFrequencies[idx].question_type ===
+                          "multiple_dropdowns_question") &&
+                      (quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_set_frequencies.length > 0 ? (
+                        <>
+                          {quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_set_frequencies.map(
+                            (answer_set: CanvasQuizQuestionAnswerSetFrequencyArrEntry) => (
+                              <>
+                                <Table>
+                                  <TableHead>
+                                    <TableRow>
+                                      <Typography style={{ marginTop: 10 }}>
+                                        --- "{answer_set.answer_set_text}" Section ---
+                                      </Typography>
+                                    </TableRow>
+                                  </TableHead>
+                                  <TableBody>
+                                    <TableRow>
+                                      <XYPlot
+                                        width={600}
+                                        height={answer_set.answer_frequencies.length * 50}
+                                        xDomain={[
+                                          -0.1,
+                                          Math.max(
+                                            ...answer_set.answer_frequencies.map(
+                                              (value: CanvasQuizQuestionAnswerFrequencyArrEntry) =>
+                                                value.frequency_count
+                                            )
+                                          ) * 1.1
+                                        ]}
+                                        yDomain={[-0.1, answer_set.answer_frequencies.length - 1]}
+                                        margin={{ left: 100 }}
+                                      >
+                                        <XAxis />
+                                        <YAxis
+                                          tickTotal={answer_set.answer_frequencies.length}
+                                          tickFormat={(tickIdx: number) => {
+                                            const answerText = answer_set.answer_frequencies[tickIdx].answer_text;
+                                            if (answerText === null || answerText === "null") {
+                                              return "Other";
+                                            }
+                                            return answerText.length > 10
+                                              ? answerText.slice(0, 10) + "..."
+                                              : answerText; // Truncate long labels
+                                          }}
+                                        />
+                                        <HorizontalGridLines />
+                                        <VerticalGridLines />
+                                        <HorizontalBarSeries
+                                          data={answer_set.answer_frequencies.map(
+                                            (value: CanvasQuizQuestionAnswerFrequencyArrEntry, innerIdx: number) => ({
+                                              y: innerIdx,
+                                              x: value.frequency_count
+                                            })
+                                          )}
+                                          barWidth={0.1}
+                                        />
+                                      </XYPlot>
+                                    </TableRow>
+                                  </TableBody>
+                                </Table>
+                              </>
+                            )
+                          )}
+                        </>
+                      ) : (
+                        <>No data to report.</>
+                      ))}
                   </TableCell>
                 </TableRow>
               ))}
