@@ -9,7 +9,7 @@ import {
   CanvasCourseInfo,
   CanvasQuizInfo,
   AxiosAuthHeaders
-} from "../../assets/types";
+} from "../types";
 
 async function fetchCanvasUserInfoAdmin(
   axiosHeaders: AxiosAuthHeaders,

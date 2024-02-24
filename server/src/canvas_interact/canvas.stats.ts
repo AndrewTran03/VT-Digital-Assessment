@@ -18,7 +18,7 @@ import {
   booleanLike,
   numberArrLike,
   CanvasQuizQuestionAnswerSetStatistic
-} from "../../assets/types";
+} from "../types";
 
 async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, courseArr: readonly CanvasCourseInfo[]) {
   const quizStatsResponses: CanvasQuizStatistic[] = [];

@@ -15,7 +15,7 @@ import {
   CanvasCourseInfo,
   CanvasQuiz,
   AxiosAuthHeaders
-} from "../../assets/types";
+} from "../types";
 import {
   fetchCanvasUserInfoRegUser,
   fetchCanvasUserInfoAdmin,
