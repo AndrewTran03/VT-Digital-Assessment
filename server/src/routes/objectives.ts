@@ -1,7 +1,7 @@
 import express from "express";
 import { CourseObjectivesModel, canvasObjectivesMongoCollectionName } from "../models/canvas.objectives.model";
 import log from "../utils/logger";
-import { CanvasCourseSingleCourseObjective, APIErrorResponse } from "../types";
+import { CanvasCourseSingleCourseObjective, APIErrorResponse } from "../shared/types";
 
 const router = express.Router();
 

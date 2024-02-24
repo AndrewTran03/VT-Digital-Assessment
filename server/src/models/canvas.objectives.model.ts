@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import config from "config";
-import { CanvasCourseObjectiveGroup, SeasonValues } from "../types";
+import { CanvasCourseObjectiveGroup, SeasonValues } from "../shared/types";
 
 const mongoDBName = config.get<string>("mongoDatabaseName");
 const canvasObjectivesMongoCollectionName = config.get<string>("canvasObjectivesMongoCollectionName");

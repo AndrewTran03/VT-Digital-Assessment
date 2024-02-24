@@ -5,7 +5,7 @@ import {
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,
   QuestionTypeValues
-} from "../types";
+} from "../shared/types";
 
 const mongoDBName = config.get<string>("mongoDatabaseName");
 const canvasQuizzesMongoCollectionName = config.get<string>("canvasQuizzesMongoCollectionName");

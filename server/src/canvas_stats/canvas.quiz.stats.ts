@@ -7,7 +7,7 @@ import {
   numberLike,
   CanvasLearningObjectiveCategories,
   CanvasQuizStatisticsResultObj
-} from "../types";
+} from "../shared/types";
 import log from "../utils/logger";
 
 enum EXPECTATIONS {

@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import config from "config";
-import { CanvasUserAPIEntryBase } from "../types";
+import { CanvasUserAPIEntryBase } from "../shared/types";
 
 const mongoDBName = config.get<string>("mongoDatabaseName");
 const canvasUserApiCollectionName = config.get<string>("canvasUserApiCollectionName");
