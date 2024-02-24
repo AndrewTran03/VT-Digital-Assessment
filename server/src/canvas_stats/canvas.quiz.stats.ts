@@ -77,18 +77,22 @@ export class CanvasQuizStats {
         this.quesExpectationCategories.push(null);
       } else if (questionAverage >= CanvasQuizStats.EXCEEDS_EXPECTATIONS) {
         this.quesExpectationCategories.push("EXCEEDS" as const);
+        exceedsCount++;
       } else if (
         questionAverage >= CanvasQuizStats.MEETS_EXPECTATIONS &&
         questionAverage < CanvasQuizStats.EXCEEDS_EXPECTATIONS
       ) {
         this.quesExpectationCategories.push("MEETS" as const);
+        meetsCount++;
       } else if (
         questionAverage >= CanvasQuizStats.BELOW_EXPECTATIONS &&
         questionAverage < CanvasQuizStats.MEETS_EXPECTATIONS
       ) {
         this.quesExpectationCategories.push("BELOW" as const);
+        belowCount++;
       } else {
         this.quesExpectationCategories.push(null);
+        nullCount++;
       }
     }
 
