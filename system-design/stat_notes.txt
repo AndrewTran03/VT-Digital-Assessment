@@ -1,0 +1,16 @@
+Required Canvas Quiz Statistics List (So Far):
+
+Per Question:
+- Item difficulty (proportion of correct answers) => difficulty_index
+- Average points earned
+- Median Points earned 
+- Percentage responses in Exceeds/Meets/Below categories
+- Answer Frequency (with number and percentage)
+
+Per Quiz:
+- Average points earned
+- Median Points earned (NOT DOING)
+- Percentage questions in Exceeds/Meets/Below categories (NOT DOING)
+
+Per Learning objective:
+- Percentage responses in Exceeds/Meets/Below categories
