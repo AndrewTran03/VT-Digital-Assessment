@@ -404,7 +404,8 @@ type CanvasQuizQuestionPointBiserial = {
 type CanvasQuizQuestionAnswerFrequencyStatistic = {
   question_type: QuestionTypeEnumValues;
   question_text: string;
-  answer_frequencies: (CanvasQuizQuestionAnswerFrequencyArrEntry | CanvasQuizQuestionAnswerSetFrequencyArrEntry)[];
+  answer_frequencies: CanvasQuizQuestionAnswerFrequencyArrEntry[];
+  answer_set_frequencies: CanvasQuizQuestionAnswerSetFrequencyArrEntry[];
 };
 
 type CanvasQuizQuestionAnswerFrequencyArrEntry = {

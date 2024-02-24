@@ -335,6 +335,7 @@ export class CanvasQuizStats {
         case "numerical_question":
         case "short_answer_question": {
           const frequencyArr: CanvasQuizQuestionAnswerFrequencyArrEntry[] = [];
+          const frequencySetArr: CanvasQuizQuestionAnswerSetFrequencyArrEntry[] = [];
           if (question_statistic.answers && question_statistic.answers.length > 0) {
             for (const answer of question_statistic.answers) {
               const currAnswer = answer;
@@ -348,14 +349,16 @@ export class CanvasQuizStats {
           const newCanvasQuizQuestionEntry: CanvasQuizQuestionAnswerFrequencyStatistic = {
             question_text: question_statistic.question_text as QuestionTypeEnumValues,
             question_type: question_statistic.question_type,
-            answer_frequencies: frequencyArr
+            answer_frequencies: frequencyArr,
+            answer_set_frequencies: frequencySetArr
           };
           canvasQuizQuestionAnswerFrequencies.push(newCanvasQuizQuestionEntry);
           break;
         }
         case "fill_in_multiple_blanks_question":
         case "multiple_dropdowns_question": {
-          const frequencyArrForAnswerSets: CanvasQuizQuestionAnswerSetFrequencyArrEntry[] = [];
+          const frequencyArr: CanvasQuizQuestionAnswerFrequencyArrEntry[] = [];
+          const frequencySetArr: CanvasQuizQuestionAnswerSetFrequencyArrEntry[] = [];
           if (question_statistic.answerSets && question_statistic.answerSets.length > 0) {
             for (const answerSet of question_statistic.answerSets) {
               const frequencyArrForAnswers: CanvasQuizQuestionAnswerFrequencyArrEntry[] = [];
@@ -372,13 +375,14 @@ export class CanvasQuizStats {
                 answer_set_text: answerSet.text,
                 answer_frequencies: frequencyArrForAnswers
               };
-              frequencyArrForAnswerSets.push(newAnswerSetEntry);
+              frequencySetArr.push(newAnswerSetEntry);
             }
           }
           const newCanvasQuizQuestionEntry: CanvasQuizQuestionAnswerFrequencyStatistic = {
             question_text: question_statistic.question_text as QuestionTypeEnumValues,
             question_type: question_statistic.question_type,
-            answer_frequencies: frequencyArrForAnswerSets
+            answer_frequencies: frequencyArr,
+            answer_set_frequencies: frequencySetArr
           };
           canvasQuizQuestionAnswerFrequencies.push(newCanvasQuizQuestionEntry);
           break;
