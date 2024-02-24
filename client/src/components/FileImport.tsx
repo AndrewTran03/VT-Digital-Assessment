@@ -10,8 +10,6 @@ import {
   SingleCanvasLearningObjective,
   CanvasLearningObjectives
 } from "../shared/types";
-import "../styles/DragDropFileImport.css";
-import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import {
   Accordion,
   AccordionSummary,
@@ -26,6 +24,8 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
+import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
+import "../styles/DragDropFileImport.css";
 
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
 const learningObjSchema = z.object({

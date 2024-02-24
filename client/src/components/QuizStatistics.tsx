@@ -2,8 +2,17 @@ import { XYPlot, XAxis, YAxis, HorizontalBarSeries, HorizontalGridLines, Vertica
 import { useState, useEffect, useContext, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { Paper, Table, TableHead, TableRow, TableCell, TableBody, Accordion, AccordionSummary } from "@mui/material";
-import Typography from "@mui/material/Typography";
+import {
+  Paper,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
+  Accordion,
+  AccordionSummary,
+  Typography
+} from "@mui/material";
 import {
   backendUrlBase,
   multipleChoiceQuestionLetters,
