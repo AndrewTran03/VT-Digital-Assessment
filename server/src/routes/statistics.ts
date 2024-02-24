@@ -15,6 +15,7 @@ router.get("/api/statistics/:canvasUserId", async (req, res) => {
   const axiosHeaders = await getCanvasApiAuthHeaders(canvasUserId);
   const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
   const canvasQuizStatisticArr = await fetchCanvasUserQuizReportData(axiosHeaders, canvasUserCourseIds);
+  index++;
   log.info(`END OF STATS GET REQUEST #${index} ---------------------`);
   return res.status(200).send(JSON.stringify(canvasQuizStatisticArr, null, 2));
 });
