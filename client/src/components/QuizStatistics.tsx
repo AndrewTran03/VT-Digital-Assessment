@@ -1,13 +1,4 @@
-import {
-  XYPlot,
-  XAxis,
-  YAxis,
-  HorizontalBarSeries,
-  HorizontalGridLines,
-  VerticalGridLines,
-  VerticalBarSeries,
-  LabelSeries
-} from "react-vis";
+import { XYPlot, XAxis, YAxis, HorizontalBarSeries, HorizontalGridLines, VerticalGridLines } from "react-vis";
 import { useState, useEffect, useContext, FormEvent, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -16,14 +7,12 @@ import Typography from "@mui/material/Typography";
 import {
   backendUrlBase,
   multipleChoiceQuestionLetters,
-  CanvasLearningObjectives,
   CanvasCourseQuizMongoDBEntry,
   CanvasQuizStatistic,
   CanvasQuizStatisticsResultObj,
   CanvasQuizQuestionAnswerFrequencyArrEntry,
   CanvasQuizQuestionAnswerSetFrequencyArrEntry
 } from "../shared/types";
-import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import {
   CanvasQuizQuestionContext,
   CanvasQuizStatisticContext,
@@ -58,18 +47,6 @@ const QuizStatistics: React.FC = () => {
       : canvasQuizQuestionStatisticDataArr;
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const [, setLearningCourseObjectiveData] = useState<CanvasLearningObjectives>({
-    _id: "",
-    __v: 0,
-    createdDate: "",
-    updatedDate: "",
-    deptAbbrev: "",
-    courseNum: 0,
-    semester: "Summer",
-    year: 0,
-    canvasCourseInternalId: 0,
-    canvasObjectives: []
-  });
   const matchingCourseEntries = canvasQuizData.filter(
     (data: CanvasCourseQuizMongoDBEntry) =>
       data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === canvasQuizId
@@ -87,13 +64,11 @@ const QuizStatistics: React.FC = () => {
     (data: CanvasQuizStatistic) =>
       data.url.includes(canvasCourseInternalId.toString()) && data.url.includes(canvasQuizId.toString())
   );
-  const [coursesLoading, setCoursesLoading] = useState(false);
   const [statsLoading, setStatsLoading] = useState(false);
   const [isOverallQuizStatisticsAccordionOpen, setIsOverallQuizStatisticsAccordionOpen] = useState(false);
   const [isLearningObjStatisticsAccordionOpen, setIsLearningObjStatisticsAccordionOpen] = useState(false);
 
   async function fetchData() {
-    await fetchCanvasLearningObjectiveData();
     await fetchCanvasStatisticsData();
     console.clear();
   }
@@ -119,15 +94,6 @@ const QuizStatistics: React.FC = () => {
       console.log(matchingStatEntries[0]);
     }
   }, [matchingStatEntries]);
-
-  async function fetchCanvasLearningObjectiveData() {
-    setCoursesLoading(true);
-    await axios.get(`${backendUrlBase}/api/objective/${canvasCourseInternalId}`).then((res) => {
-      const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
-      setLearningCourseObjectiveData(parsedResult);
-    });
-    setCoursesLoading(false);
-  }
 
   async function fetchCanvasStatisticsData() {
     setStatsLoading(true);
@@ -158,12 +124,6 @@ const QuizStatistics: React.FC = () => {
     }
   }
 
-  async function handleCourseObjectiveAPIButtonClick(e: FormEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    console.clear();
-    await fetchCanvasLearningObjectiveData();
-  }
-
   async function handleCourseStatisticsAPIButtonClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
@@ -192,9 +152,6 @@ const QuizStatistics: React.FC = () => {
       </Typography>
       <button type="reset" onClick={handleBackButtonClick}>
         Back
-      </button>
-      <button type="submit" onClick={handleCourseObjectiveAPIButtonClick} disabled={coursesLoading}>
-        Get Course Objective Data
       </button>
       <button type="submit" onClick={handleCourseStatisticsAPIButtonClick} disabled={statsLoading}>
         Get Course Statistics Data
