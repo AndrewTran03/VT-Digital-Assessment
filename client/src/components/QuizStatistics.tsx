@@ -78,8 +78,8 @@ const QuizStatistics: React.FC = () => {
   const [isLearningObjStatisticsAccordionOpen, setIsLearningObjStatisticsAccordionOpen] = useState(false);
 
   async function fetchData() {
-    await fetchCanvasStatisticsData();
     console.clear();
+    await fetchCanvasStatisticsData();
   }
 
   useEffect(() => {
