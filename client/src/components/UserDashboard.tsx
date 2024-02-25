@@ -137,6 +137,12 @@ const UserDashboard: React.FC = () => {
     navigate("/statistics");
   }
 
+  function handleLogout(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    console.clear();
+    navigate("/");
+  }
+
   return (
     <>
       <Typography fontSize={24}>
@@ -150,6 +156,11 @@ const UserDashboard: React.FC = () => {
       <button type="submit" onClick={handleApiRefreshButtonClick} disabled={coursesLoading || statsLoading}>
         <Typography>
           <b>Refresh</b>
+        </Typography>
+      </button>
+      <button type="submit" onClick={handleLogout}>
+        <Typography>
+          <b>Logout</b>
         </Typography>
       </button>
       {canvasQuizDataArrGroupBy &&
