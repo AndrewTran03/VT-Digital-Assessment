@@ -13,7 +13,6 @@ import {
   CanvasQuizQuestionGroup,
   QuestionTypeEnumValues,
   CanvasCourseInfo,
-  CanvasQuiz,
   AxiosAuthHeaders
 } from "../shared/types";
 import {
@@ -85,9 +84,14 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
       // Check for existence of entry check (to avoid potential duplicates to be added)
       const newEntryFound = await checkCanvasQuizQuestionExistence(canvasQuizItemToInsert);
       if (!newEntryFound) {
-        log.error("Did NOT insert...something already matches this");
+        log.error("Did NOT insert...something already (exactly) matches this");
         continue;
       }
+      // Delete "older" Canvas quiz entries (if they exist)
+      const deleteOlderCanvasQuizItemResult = await CanvasCourseQuizModel.findOneAndDelete({
+        canvasUserId: canvasQuizItemToInsert.canvasUserId,
+        quizId: canvasQuizItemToInsert.quizId
+      });
       const canvasQuizItemInsertResult = await canvasQuizItemToInsert.save();
       log.info("Inserted the specified course objectives successfully! Congratulations!");
     } catch (err) {
