@@ -40,9 +40,9 @@ const UserDashboard: React.FC = () => {
   const [statsLoading, setStatsLoading] = useState(false);
 
   async function fetchData() {
+    console.clear();
     await fetchCanvasQuizData();
     await fetchCanvasStatisticsData();
-    console.clear();
   }
 
   useEffect(() => {
