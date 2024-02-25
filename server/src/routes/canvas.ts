@@ -93,7 +93,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
         quizId: canvasQuizItemToInsert.quizId
       });
       if (deleteOlderCanvasQuizItemResult) {
-        log.warn(`Older Canvas quiz entry with index ${i} detected...deleting older one and inserting new one into MongoDB database...`);
+        log.warn(
+          `Older Canvas quiz entry with index ${i} detected...deleting older one and inserting new one into MongoDB database...`
+        );
       }
       const canvasQuizItemInsertResult = await canvasQuizItemToInsert.save();
       log.info("Inserted the specified course objectives successfully! Congratulations!");
