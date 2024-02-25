@@ -359,8 +359,24 @@ const QuizStatistics: React.FC = () => {
                           height: "100%"
                         }}
                       >
-                        <Typography>
+                        <Typography
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            flexGrow: 1,
+                            height: "100%"
+                          }}
+                        >
                           Course Learning Objective {objIdx + 1}: {learningObjectiveArr[0]}
+                          <ul>
+                            {learningObjectiveArr[1].map((category: number, innerIdx: number) => (
+                              <li>
+                                {PERCENTAGE_CATEGORIES[innerIdx]}: {category}
+                              </li>
+                            ))}
+                          </ul>
                         </Typography>
                       </TableCell>
                       <TableCell
