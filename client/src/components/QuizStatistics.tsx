@@ -191,94 +191,128 @@ const QuizStatistics: React.FC = () => {
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell>
-                <Typography>
-                  <b>Quiz Average:</b> {quizStatsResultsObj.quizAveragePointsEarned ?? "Quiz Average Not Defined"}
-                </Typography>
-              </TableCell>
-              {quizStatsResultsObj.quizAveragePointsEarned && (
-                <TableCell
-                  style={{
-                    border: "2px solid lightgray",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center"
-                  }}
-                >
-                  <XYPlot width={300} height={200} xDomain={[0, 1]} yType="ordinal" margin={{ left: 100 }}>
-                    <XAxis />
-                    <YAxis tickTotal={1} />
-                    <HorizontalBarSeries
-                      data={[{ y: "Quiz Average", x: quizStatsResultsObj.quizAveragePointsEarned }]}
-                      barWidth={0.1}
-                    />
-                  </XYPlot>
-                </TableCell>
-              )}
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <Typography>
-                  <b>Quiz Median:</b> {quizStatsResultsObj.quizMedianPointsEarned ?? "Quiz Median Not Defined"}
-                </Typography>
-              </TableCell>
-              {quizStatsResultsObj.quizMedianPointsEarned && (
-                <TableCell
-                  style={{
-                    border: "2px solid lightgray",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center"
-                  }}
-                >
-                  <XYPlot width={300} height={200} xDomain={[0, 1]} yType="ordinal" margin={{ left: 100 }}>
-                    <XAxis />
-                    <YAxis tickTotal={1} />
-                    <HorizontalBarSeries
-                      data={[{ y: "Quiz Median", x: quizStatsResultsObj.quizMedianPointsEarned }]}
-                      barWidth={0.1}
-                    />
-                  </XYPlot>
-                </TableCell>
-              )}
-            </TableRow>
-            <TableRow>
-              <TableCell>
-                <Typography>
-                  <b>Quiz Percentage Categories:</b>
-                  <ul>
-                    {quizStatsResultsObj.quizPercentageCategories &&
-                      quizStatsResultsObj.quizPercentageCategories.length > 0 &&
-                      quizStatsResultsObj.quizPercentageCategories.map((percentageCategory, idx: number) => (
-                        <li>
-                          {PERCENTAGE_CATEGORIES[idx]}: {percentageCategory.toString()}
-                        </li>
-                      ))}
-                  </ul>
-                </Typography>
-              </TableCell>
-              {quizStatsResultsObj.quizPercentageCategories && (
-                <TableCell
-                  style={{
-                    border: "2px solid lightgray",
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center"
-                  }}
-                >
-                  <XYPlot width={300} height={300} xDomain={[0, 1]} yType="ordinal" margin={{ left: 100 }}>
-                    <XAxis />
-                    <YAxis tickTotal={quizStatsResultsObj.quizPercentageCategories.length} />
-                    <HorizontalBarSeries
-                      data={quizStatsResultsObj.quizPercentageCategories.map((percentageCategory, idx: number) => ({
-                        y: PERCENTAGE_CATEGORIES[idx],
-                        x: percentageCategory.toString()
-                      }))}
-                      barWidth={0.1}
-                    />
-                  </XYPlot>
-                </TableCell>
-              )}
+              <Table>
+                <TableRow>
+                  <TableCell
+                    style={{
+                      border: "2px solid lightgray",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexGrow: 1,
+                      height: "100%"
+                    }}
+                  >
+                    <Typography>
+                      <b>Quiz Average:</b> {quizStatsResultsObj.quizAveragePointsEarned ?? "Quiz Average Not Defined"}
+                    </Typography>
+                  </TableCell>
+                  {quizStatsResultsObj.quizAveragePointsEarned && (
+                    <TableCell
+                      style={{
+                        border: "2px solid lightgray",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <XYPlot width={600} height={300} xDomain={[0, 1]} yType="ordinal" margin={{ left: 100 }}>
+                        <XAxis />
+                        <YAxis tickTotal={1} />
+                        <HorizontalBarSeries
+                          data={[{ y: "Quiz Average", x: quizStatsResultsObj.quizAveragePointsEarned }]}
+                          barWidth={0.05}
+                        />
+                      </XYPlot>
+                    </TableCell>
+                  )}
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    style={{
+                      border: "2px solid lightgray",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexGrow: 1,
+                      height: "100%"
+                    }}
+                  >
+                    <Typography>
+                      <b>Quiz Median:</b> {quizStatsResultsObj.quizMedianPointsEarned ?? "Quiz Median Not Defined"}
+                    </Typography>
+                  </TableCell>
+                  {quizStatsResultsObj.quizMedianPointsEarned && (
+                    <TableCell
+                      style={{
+                        border: "2px solid lightgray",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <XYPlot width={600} height={300} xDomain={[0, 1]} yType="ordinal" margin={{ left: 100 }}>
+                        <XAxis />
+                        <YAxis tickTotal={1} />
+                        <HorizontalBarSeries
+                          data={[{ y: "Quiz Median", x: quizStatsResultsObj.quizMedianPointsEarned }]}
+                          barWidth={0.05}
+                        />
+                      </XYPlot>
+                    </TableCell>
+                  )}
+                </TableRow>
+                <TableRow>
+                  <TableCell
+                    style={{
+                      border: "2px solid lightgray",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      flexGrow: 1,
+                      height: "100%"
+                    }}
+                  >
+                    <Typography>
+                      <b>Quiz Percentage Categories:</b>
+                      <ul>
+                        {quizStatsResultsObj.quizPercentageCategories &&
+                          quizStatsResultsObj.quizPercentageCategories.length > 0 &&
+                          quizStatsResultsObj.quizPercentageCategories.map((percentageCategory, idx: number) => (
+                            <li>
+                              {PERCENTAGE_CATEGORIES[idx]}: {percentageCategory.toString()}
+                            </li>
+                          ))}
+                      </ul>
+                    </Typography>
+                  </TableCell>
+                  {quizStatsResultsObj.quizPercentageCategories && (
+                    <TableCell
+                      style={{
+                        border: "2px solid lightgray",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center"
+                      }}
+                    >
+                      <XYPlot width={600} height={300} xDomain={[0, 1]} yType="ordinal" margin={{ left: 100 }}>
+                        <XAxis />
+                        <YAxis tickTotal={quizStatsResultsObj.quizPercentageCategories.length} />
+                        <HorizontalBarSeries
+                          data={quizStatsResultsObj.quizPercentageCategories.map((percentageCategory, idx: number) => ({
+                            y: PERCENTAGE_CATEGORIES[idx],
+                            x: percentageCategory.toString()
+                          }))}
+                          barWidth={0.1}
+                        />
+                      </XYPlot>
+                    </TableCell>
+                  )}
+                </TableRow>
+              </Table>
             </TableRow>
           </TableBody>
         </Table>
@@ -337,12 +371,7 @@ const QuizStatistics: React.FC = () => {
                           alignItems: "center"
                         }}
                       >
-                        <XYPlot
-                          width={600}
-                          height={200}
-                          xDomain={[-0.1, quizStatsResultsObj.perQuestionAveragePointsEarned.length * 1.1]}
-                          margin={{ left: 80 }}
-                        >
+                        <XYPlot width={600} height={200} xDomain={[-0.01, 1]} margin={{ left: 80 }}>
                           <XAxis />
                           <YAxis
                             tickTotal={4}
@@ -532,7 +561,7 @@ const QuizStatistics: React.FC = () => {
                               -0.1,
                               quizStatsResultsObj.perQuestionAnswerFrequencies[idx].answer_frequencies.length - 1
                             ]}
-                            margin={{ left: 100 }}
+                            margin={{ left: 90 }}
                           >
                             <XAxis />
                             <YAxis
@@ -607,7 +636,7 @@ const QuizStatistics: React.FC = () => {
                                           ) * 1.1
                                         ]}
                                         yDomain={[-0.1, answer_set.answer_frequencies.length - 1]}
-                                        margin={{ left: 100 }}
+                                        margin={{ left: 90 }}
                                       >
                                         <XAxis />
                                         <YAxis
