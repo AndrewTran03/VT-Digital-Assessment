@@ -49,11 +49,12 @@ const FileImport: React.FC = () => {
   const navigate = useNavigate();
   const acceptableFileTypes = ["CSV"];
 
+  async function fetchData() {
+    console.clear();
+    await fetchAllCanvasUserLearningObjectiveData();
+  }
+
   useEffect(() => {
-    async function fetchData() {
-      await fetchAllCanvasUserLearningObjectiveData();
-      console.clear();
-    }
     fetchData();
   }, []);
 

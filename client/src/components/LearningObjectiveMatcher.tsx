@@ -65,8 +65,8 @@ const LearningObjectiveMatcher: React.FC = () => {
   const [coursesLoading, setCoursesLoading] = useState(false);
 
   async function fetchData() {
-    await fetchCanvasLearningObjectiveData();
     console.clear();
+    await fetchCanvasLearningObjectiveData();
   }
 
   useEffect(() => {
