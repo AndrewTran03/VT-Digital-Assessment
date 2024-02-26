@@ -8,12 +8,16 @@ import { CanvasUserInfoContext } from "../shared/contexts";
 import { useNavigate } from "react-router-dom";
 import "../styles/UserLoginMessage.css";
 
+const TRANSITION_TIMER_COUNT = 10;
+const LOADING_TIMER_COUNT = 3;
+
 const UserLogin: React.FC = () => {
   const { setCanvasUserInfo } = useContext(CanvasUserInfoContext);
   const [authCookie, setAuthCookie, removeCookies] = useCookies(["Authenticated"]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [userSubmitInfoComplete, setUserSubmitInfoComplete] = useState(false);
+  const [countdown, setCountdown] = useState(LOADING_TIMER_COUNT);
   const canvasUsernameInputRef = useRef<HTMLInputElement>(null);
   const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
   const navigate = useNavigate();
@@ -37,6 +41,16 @@ const UserLogin: React.FC = () => {
       setAuthCookie("Authenticated", false, { path: "/" });
     }
   }, [authCookie.Authenticated, setAuthCookie]);
+
+  useEffect(() => {
+    if (userSubmitInfoComplete) {
+      const intervalId = window.setInterval(() => {
+        setCountdown((prevCount) => prevCount - 1);
+      }, LOADING_TIMER_COUNT * 1000);
+
+      return () => clearInterval(intervalId);
+    }
+  }, [userSubmitInfoComplete]);
 
   function handleCanvasUserInputChange(e: FormEvent<HTMLInputElement>) {
     e.preventDefault();
@@ -78,7 +92,7 @@ const UserLogin: React.FC = () => {
               setTimeout(() => {
                 setUserSubmitInfoComplete(false);
                 navigate("/dashboard");
-              }, 3000);
+              }, TRANSITION_TIMER_COUNT * 1000);
             }
           })
           .catch((err: AxiosError) => {
@@ -91,7 +105,7 @@ const UserLogin: React.FC = () => {
             setTimeout(() => {
               setError(false);
               navigate("/dashboard");
-            }, 10000);
+            }, TRANSITION_TIMER_COUNT * 1000);
           });
         setLoading(false);
       }
@@ -159,6 +173,10 @@ const UserLogin: React.FC = () => {
       {userSubmitInfoComplete && (
         <Typography className="success-message" variant="body1" style={{ color: "green", marginTop: "10px" }}>
           Successful submission! Please wait as we move over to the User Dashboard.
+          <br />
+          {countdown}
+          <br />
+          <CircularProgress />
         </Typography>
       )}
       {/* Failure Message */}
