@@ -11,6 +11,7 @@ import {
 } from "../shared/contexts";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
 import {
+  CircularProgress,
   Paper,
   Table,
   TableBody,
@@ -188,6 +189,20 @@ const UserDashboard: React.FC = () => {
           <b>Logout</b>
         </Typography>
       </button>
+      {coursesLoading && (
+        <>
+          <br />
+          <Typography>Course Quizzes and Learning Objectives Loading...</Typography>
+          <CircularProgress />
+        </>
+      )}
+      {statsLoading && (
+        <>
+          <br />
+          <Typography>Course Quiz Statistics Loading...</Typography>
+          <CircularProgress />
+        </>
+      )}
       {canvasQuizDataArrGroupBy &&
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
         Object.entries(canvasQuizDataArrGroupBy).map((value, key) => (
