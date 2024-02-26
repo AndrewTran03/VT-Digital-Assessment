@@ -344,7 +344,7 @@ const QuizStatistics: React.FC = () => {
           <TableBody>
             <TableRow>
               {quizStatsResultsObj.perLearningObjPercentageCategories &&
-                quizStatsResultsObj.perLearningObjPercentageCategories.length > 0 &&
+              quizStatsResultsObj.perLearningObjPercentageCategories.length > 0 ? (
                 quizStatsResultsObj.perLearningObjPercentageCategories.map((learningObjectiveArr, objIdx: number) => (
                   <Table>
                     <TableRow key={learningObjectiveArr[0]} style={{ height: "100%" }}>
@@ -409,7 +409,22 @@ const QuizStatistics: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   </Table>
-                ))}
+                ))
+              ) : (
+                <Typography
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexGrow: 1,
+                    height: "100%"
+                  }}
+                >
+                  No Learning-Objective-Based Statistics can be reported. <br /> Please check if you have assigned
+                  Canvas Learning Objectives for this quiz yet prior to opening this modal!
+                </Typography>
+              )}
             </TableRow>
           </TableBody>
         </Table>
@@ -633,7 +648,7 @@ const QuizStatistics: React.FC = () => {
                                   <TableHead>
                                     <TableRow>
                                       <Typography style={{ marginTop: 10 }}>
-                                        --- "{answer_set.answer_set_text}" Section ---
+                                        --- Section "{answer_set.answer_set_text}" ---
                                       </Typography>
                                     </TableRow>
                                   </TableHead>
