@@ -172,9 +172,7 @@ const UserLogin: React.FC = () => {
       {/* Success Message */}
       {userSubmitInfoComplete && (
         <Typography className="success-message" variant="body1" style={{ color: "green", marginTop: "10px" }}>
-          Successful submission! Please wait as we move over to the User Dashboard.
-          <br />
-          {countdown}
+          Successful submission! Please wait as we move over to the User Dashboard. {countdown}
           <br />
           <CircularProgress />
         </Typography>
