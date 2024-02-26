@@ -74,11 +74,11 @@ const UserLogin: React.FC = () => {
         setUserSubmitInfoComplete(false);
       } else {
         const canvasAccountId = 54;
-        const canvasUsername = canvasUsernameInputRef.current.value.toString();
+        const canvasUsername = canvasUsernameInputRef.current.value.toString().trim();
         setLoading(true);
         await axios
           .put(`${backendUrlBase}/api/canvas/retrieveCanvasId/${canvasAccountId}/${canvasUsername}`, {
-            canvasUserApiKey: `${canvasApiKeyInputRef.current.value.toString()}`
+            canvasUserApiKey: `${canvasApiKeyInputRef.current.value.toString().trim()}`
           })
           .then((res) => {
             console.log(res.data);
