@@ -123,18 +123,43 @@ const UserDashboard: React.FC = () => {
     navigate("/learning_obj_match");
   }
 
-  function handleClickToStatistics(e: FormEvent<HTMLButtonElement>, courseInternalId: number, specifiedQuizId: number) {
+  function handleClickToStatistics(
+    e: FormEvent<HTMLButtonElement>,
+    specifiedCourseInternalId: number,
+    specifiedQuizId: number
+  ) {
     e.preventDefault();
     console.clear();
     setCanvasLearningObjectiveData({
-      canvasCourseInternalId: courseInternalId,
+      canvasCourseInternalId: specifiedCourseInternalId,
       quizId: specifiedQuizId
     });
-    window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
+    window.localStorage.setItem("canvasCourseInternalId", specifiedCourseInternalId.toString());
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
     window.localStorage.setItem("canvasStatsArr", JSON.stringify(canvasQuizQuestionStatisticDataArr));
     navigate("/statistics");
+  }
+
+  // Edge-Case: Handles if No Statistics Available for that Quiz (Students have NOT taken quiz yet)
+  function checkValidStatsEntryToDisplay(specifiedCourseInternalId: number, specifiedQuizId: number) {
+    const specifiedQuizToNavigate = canvasQuizQuestionStatisticDataArr.filter(
+      (entry) =>
+        entry.url.includes(specifiedCourseInternalId.toString()) && entry.url.includes(specifiedQuizId.toString())
+    );
+    if (
+      specifiedQuizToNavigate &&
+      specifiedQuizToNavigate.length === 1 &&
+      ((specifiedQuizToNavigate[0].question_statistics &&
+        specifiedQuizToNavigate[0].question_statistics.length === 0) ||
+        (specifiedQuizToNavigate[0].submission_statistics &&
+          specifiedQuizToNavigate[0].submission_statistics.scores &&
+          Object.keys(specifiedQuizToNavigate[0].submission_statistics.scores).length === 0 &&
+          JSON.stringify(specifiedQuizToNavigate[0].submission_statistics.scores) === "{}"))
+    ) {
+      return true; // Disable that "Statistics" button
+    }
+    return false;
   }
 
   function handleLogout(e: FormEvent<HTMLButtonElement>) {
@@ -237,7 +262,10 @@ const UserDashboard: React.FC = () => {
                             <button
                               type="submit"
                               onClick={(e) => handleClickToStatistics(e, entry.canvasCourseInternalId, entry.quizId)}
-                              disabled={statsLoading}
+                              disabled={
+                                statsLoading ||
+                                checkValidStatsEntryToDisplay(entry.canvasCourseInternalId, entry.quizId)
+                              }
                             >
                               Click to View Statistics
                             </button>
