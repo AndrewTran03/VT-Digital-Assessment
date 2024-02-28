@@ -1,7 +1,9 @@
 {
   "name": "client",
+  "version": "1.0.0",
+  "author": "Andrew Tran",
+  "description": "VT-Digital-Assessment Frontend",
   "private": true,
-  "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
