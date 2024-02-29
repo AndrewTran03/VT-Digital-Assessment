@@ -616,7 +616,7 @@ const QuizStatistics: React.FC = () => {
                                   return "Full-Credit";
                                 }
                                 return answerText.length > 10
-                                  ? `${answerText.slice(0, 5)}...${answerText.slice(answerText.length - 5, answerText.length)}`
+                                  ? `${answerText.slice(0, 3)}...${answerText.slice(answerText.length - 5, answerText.length)}`
                                   : answerText; // Truncate long labels
                               }}
                             />
@@ -680,7 +680,7 @@ const QuizStatistics: React.FC = () => {
                                               return "Other";
                                             }
                                             return answerText.length > 10
-                                              ? `${answerText.slice(0, 5)}...${answerText.slice(answerText.length - 5, answerText.length)}`
+                                              ? `${answerText.slice(0, 3)}...${answerText.slice(answerText.length - 5, answerText.length)}`
                                               : answerText; // Truncate long labels
                                           }}
                                         />
