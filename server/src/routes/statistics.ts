@@ -1,6 +1,6 @@
 import express from "express";
 import log from "../utils/logger";
-import { APIErrorResponse, CanvasQuizStatisticsResultObj } from "../shared/types";
+import { APIErrorResponse, CanvasQuizStatistic, CanvasQuizStatisticsResultObj } from "../shared/types";
 import { fetchCanvasUserCourseData } from "../canvas_interact/canvas.api";
 import { fetchCanvasUserQuizReportData } from "../canvas_interact/canvas.stats";
 import { getCanvasApiAuthHeaders } from "../utils/canvas.connection";
@@ -14,7 +14,7 @@ router.get("/api/statistics/:canvasUserId", async (req, res) => {
   const canvasUserId = parseInt(req.params.canvasUserId);
   const axiosHeaders = await getCanvasApiAuthHeaders(canvasUserId);
   const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
-  const canvasQuizStatisticArr = await fetchCanvasUserQuizReportData(axiosHeaders, canvasUserCourseIds);
+  const canvasQuizStatisticArr = await fetchCanvasUserQuizReportData(axiosHeaders, canvasUserId, canvasUserCourseIds);
   index++;
   log.info(`END OF STATS GET REQUEST #${index} ---------------------`);
   return res.status(200).send(JSON.stringify(canvasQuizStatisticArr, null, 2));
@@ -24,7 +24,7 @@ router.post("/api/statistics/:canvasUserId/:canvasCourseInternalId/:canvasQuizId
   const canvasUserId = parseInt(req.params.canvasUserId);
   const canvasCourseInternalId = parseInt(req.params.canvasCourseInternalId);
   const canvasQuizId = parseInt(req.params.canvasQuizId);
-  const currStatEntry = req.body;
+  const currStatEntry = req.body as CanvasQuizStatistic;
   log.warn(currStatEntry);
   try {
     const currLearningObjMatchingsToFind = await CanvasCourseQuizModel.findOne({

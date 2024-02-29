@@ -1,5 +1,5 @@
-import axios, { AxiosError } from "axios";
-import config from "config";
+import axios from "axios";
+import { load } from "cheerio";
 import log from "../utils/logger";
 import {
   canvasUrl,
@@ -19,8 +19,13 @@ import {
   numberArrLike,
   CanvasQuizQuestionAnswerSetStatistic
 } from "../shared/types";
+import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 
-async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, courseArr: readonly CanvasCourseInfo[]) {
+async function fetchCanvasUserQuizReportData(
+  axiosHeaders: AxiosAuthHeaders,
+  userId: number,
+  courseArr: readonly CanvasCourseInfo[]
+) {
   const quizStatsResponses: CanvasQuizStatistic[] = [];
 
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
@@ -60,7 +65,7 @@ async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, cou
     // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
 
-    await fetchCanvasUserQuizAnswerReportData(axiosHeaders, courseId, quizArr, quizStatsResponses);
+    await fetchCanvasUserQuizAnswerReportData(axiosHeaders, userId, courseId, quizArr, quizStatsResponses);
   }
   log.info(quizStatsResponses.length);
   return quizStatsResponses;
@@ -69,6 +74,7 @@ async function fetchCanvasUserQuizReportData(axiosHeaders: AxiosAuthHeaders, cou
 // End Result: A data structure as folows - Map { K: { CourseId, CourseName, CourseDept, CourseNum }, V: Array<{ QuizId, QuizQuestionsObj }> }
 async function fetchCanvasUserQuizAnswerReportData(
   axiosHeaders: AxiosAuthHeaders,
+  userId: number,
   courseId: number,
   quizArr: readonly CanvasQuizInfo[],
   quizStatsResponses: CanvasQuizStatistic[]
@@ -86,9 +92,45 @@ async function fetchCanvasUserQuizAnswerReportData(
     console.assert(quizQuestionsRes.data.quiz_statistics.length === 1);
 
     const newCanvasQuizStatistic = parseCanvasQuizQuestionStatResultHelper(quizQuestionsRes.data.quiz_statistics[0]);
+    // FIXME: Reorders statistics to be in correct order (matching up question order and answer statistics order)
+    // NOTE: Quiz Questions API endpoint and Quiz Statistics API endpoint return quiz question data in different order
+    const unorganizedQuestionStatistics = newCanvasQuizStatistic.question_statistics;
+    log.warn(userId);
+    log.warn(courseId);
+    log.warn(quizId);
+    const quizQuestionsToFind = await CanvasCourseQuizModel.findOne({
+      canvasUserId: userId,
+      canvasCourseInternalId: courseId,
+      quizId: quizId
+    });
+    // console.assert(quizQuestionsToFind, "quizQuestionsToFind is falsy!");
+    // Conditional check to avoid working on "empty" quizId entries
+    log.info("ENTRY:");
+    log.info(quizQuestionsToFind);
+    if (quizQuestionsToFind && unorganizedQuestionStatistics.length > 0) {
+      const orderedQuestionStatistics: CanvasQuizQuestionStatistic[] = [];
+      for (const quizQuestion of quizQuestionsToFind.canvasQuizEntries) {
+        for (let i = 0; i < unorganizedQuestionStatistics.length; i++) {
+          const currEntry = unorganizedQuestionStatistics[i];
+          if (
+            extractTextFromHTMLHelper(quizQuestion.questionText) === extractTextFromHTMLHelper(currEntry.question_text)
+          ) {
+            orderedQuestionStatistics.push(currEntry);
+            break;
+          }
+        }
+      }
+      newCanvasQuizStatistic.question_statistics = orderedQuestionStatistics;
+    }
     quizStatsResponses.push(newCanvasQuizStatistic);
   }
   log.info(quizStatsResponses);
+}
+
+function extractTextFromHTMLHelper(html: string) {
+  const $ = load(html);
+  const text = $("body").text();
+  return text;
 }
 
 function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
