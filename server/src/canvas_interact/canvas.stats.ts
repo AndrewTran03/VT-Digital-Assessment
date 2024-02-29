@@ -104,12 +104,11 @@ async function fetchCanvasUserQuizAnswerReportData(
     if (quizQuestionsToFind && unorganizedQuestionStatistics.length > 0) {
       const orderedQuestionStatistics: CanvasQuizQuestionStatistic[] = [];
       for (const quizQuestion of quizQuestionsToFind.canvasQuizEntries) {
-        for (let i = 0; i < unorganizedQuestionStatistics.length; i++) {
-          const currEntry = unorganizedQuestionStatistics[i];
+        for (const currQuestionStatistic of unorganizedQuestionStatistics) {
           const quizQuestionText = extractTextFromHTMLHelper(quizQuestion.questionText);
-          const currEntryQuestionText = extractTextFromHTMLHelper(currEntry.question_text);
+          const currEntryQuestionText = extractTextFromHTMLHelper(currQuestionStatistic.question_text);
           if (quizQuestionText === currEntryQuestionText) {
-            orderedQuestionStatistics.push(currEntry);
+            orderedQuestionStatistics.push(currQuestionStatistic);
             break;
           }
         }
