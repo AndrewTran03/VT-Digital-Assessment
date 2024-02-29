@@ -109,9 +109,9 @@ async function fetchCanvasUserQuizAnswerReportData(
       for (const quizQuestion of quizQuestionsToFind.canvasQuizEntries) {
         for (let i = 0; i < unorganizedQuestionStatistics.length; i++) {
           const currEntry = unorganizedQuestionStatistics[i];
-          if (
-            extractTextFromHTMLHelper(quizQuestion.questionText) === extractTextFromHTMLHelper(currEntry.question_text)
-          ) {
+          const quizQuestionText = extractTextFromHTMLHelper(quizQuestion.questionText);
+          const currEntryQuestionText = extractTextFromHTMLHelper(currEntry.question_text);
+          if (quizQuestionText === currEntryQuestionText) {
             orderedQuestionStatistics.push(currEntry);
             break;
           }
