@@ -25,7 +25,6 @@ router.post("/api/statistics/:canvasUserId/:canvasCourseInternalId/:canvasQuizId
   const canvasCourseInternalId = parseInt(req.params.canvasCourseInternalId);
   const canvasQuizId = parseInt(req.params.canvasQuizId);
   const currStatEntry = req.body as CanvasQuizStatistic;
-  log.warn(currStatEntry);
   try {
     const currLearningObjMatchingsToFind = await CanvasCourseQuizModel.findOne({
       canvasUserId: canvasUserId,
