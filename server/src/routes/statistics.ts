@@ -43,7 +43,7 @@ router.post("/api/statistics/:canvasUserId/:canvasCourseInternalId/:canvasQuizId
   } catch (err) {
     log.error("Error with interacting with the MongoDB database! Please try again!");
     const resErrBody: APIErrorResponse = {
-      errorLoc: "GET",
+      errorLoc: "POST",
       errorMsg: "No items found in MongoDB database"
     };
     return res.status(400).send(JSON.stringify(resErrBody));
