@@ -615,7 +615,9 @@ const QuizStatistics: React.FC = () => {
                                 } else if (answerText === "top") {
                                   return "Full-Credit";
                                 }
-                                return answerText.length > 10 ? answerText.slice(0, 10) + "..." : answerText; // Truncate long labels
+                                return answerText.length > 10
+                                  ? `${answerText.slice(0, 5)}...${answerText.slice(answerText.length - 5, answerText.length)}`
+                                  : answerText; // Truncate long labels
                               }}
                             />
                             <HorizontalGridLines />
@@ -678,7 +680,7 @@ const QuizStatistics: React.FC = () => {
                                               return "Other";
                                             }
                                             return answerText.length > 10
-                                              ? answerText.slice(0, 10) + "..."
+                                              ? `${answerText.slice(0, 5)}...${answerText.slice(answerText.length - 5, answerText.length)}`
                                               : answerText; // Truncate long labels
                                           }}
                                         />
