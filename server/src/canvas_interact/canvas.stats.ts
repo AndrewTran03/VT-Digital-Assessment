@@ -92,7 +92,7 @@ async function fetchCanvasUserQuizAnswerReportData(
     console.assert(quizQuestionsRes.data.quiz_statistics.length === 1);
 
     const newCanvasQuizStatistic = parseCanvasQuizQuestionStatResultHelper(quizQuestionsRes.data.quiz_statistics[0]);
-    // FIXME: Reorders statistics to be in correct order (matching up question order and answer statistics order)
+    // Reorders statistics to be in correct order (matching up question order and answer statistics order)
     // NOTE: Quiz Questions API endpoint and Quiz Statistics API endpoint return quiz question data in different order
     const unorganizedQuestionStatistics = newCanvasQuizStatistic.question_statistics;
     log.warn(userId);
