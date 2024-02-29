@@ -103,10 +103,7 @@ async function fetchCanvasUserQuizAnswerReportData(
       canvasCourseInternalId: courseId,
       quizId: quizId
     });
-    // console.assert(quizQuestionsToFind, "quizQuestionsToFind is falsy!");
     // Conditional check to avoid working on "empty" quizId entries
-    log.info("ENTRY:");
-    log.info(quizQuestionsToFind);
     if (quizQuestionsToFind && unorganizedQuestionStatistics.length > 0) {
       const orderedQuestionStatistics: CanvasQuizQuestionStatistic[] = [];
       for (const quizQuestion of quizQuestionsToFind.canvasQuizEntries) {
