@@ -95,9 +95,6 @@ async function fetchCanvasUserQuizAnswerReportData(
     // Reorders statistics to be in correct order (matching up question order and answer statistics order)
     // NOTE: Quiz Questions API endpoint and Quiz Statistics API endpoint return quiz question data in different order
     const unorganizedQuestionStatistics = newCanvasQuizStatistic.question_statistics;
-    log.warn(userId);
-    log.warn(courseId);
-    log.warn(quizId);
     const quizQuestionsToFind = await CanvasCourseQuizModel.findOne({
       canvasUserId: userId,
       canvasCourseInternalId: courseId,
