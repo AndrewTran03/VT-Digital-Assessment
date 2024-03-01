@@ -20,6 +20,7 @@ const UserLogin: React.FC = () => {
   const [countdown, setCountdown] = useState(LOADING_TIMER_COUNT);
   const canvasUsernameInputRef = useRef<HTMLInputElement>(null);
   const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
+  const [canvasApiKeyEncrpytedState, setCanvasApiKeyEncryptedState] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -147,10 +148,17 @@ const UserLogin: React.FC = () => {
             <TableCell style={{ border: "none" }}>
               <input
                 ref={canvasApiKeyInputRef}
-                type="text"
+                type={canvasApiKeyEncrpytedState ? "password" : "text"}
                 style={{ width: "100%", padding: "8px" }}
                 onChange={handleCanvasUserInputChange}
               />
+            </TableCell>
+            <TableCell style={{ border: "none" }}>
+              <button type="submit" onClick={() => setCanvasApiKeyEncryptedState((prevState) => !prevState)}>
+                <Typography style={{ fontSize: "12px" }}>
+                  {canvasApiKeyEncrpytedState ? "Show " : "Hide "}Your Typed API Key
+                </Typography>
+              </button>
             </TableCell>
           </TableRow>
         </TableBody>
