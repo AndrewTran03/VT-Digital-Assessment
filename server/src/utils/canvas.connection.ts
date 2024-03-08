@@ -1,6 +1,6 @@
 import log from "./logger";
 import config from "config";
-import { fetchCanvasUserInfoRegUser } from "../canvas_interact/canvas.api";
+import { fetchCanvasUserInfoRegUser } from "../canvas_interact/canvas.api.shared";
 import { CanvasUserApiModel } from "../models/canvas.user.api.model";
 import { AxiosAuthHeaders } from "../shared/types";
 
