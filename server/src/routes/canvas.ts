@@ -1,7 +1,6 @@
 import express from "express";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
-import axios from "axios";
 import log from "../utils/logger";
 import {
   MongoDBItem,
@@ -15,12 +14,9 @@ import {
   CanvasCourseInfo,
   AxiosAuthHeaders
 } from "../shared/types";
-import {
-  fetchCanvasUserInfoRegUser,
-  fetchCanvasUserInfoAdmin,
-  fetchCanvasUserCourseData,
-  fetchCanvasUserQuizData
-} from "../canvas_interact/canvas.api";
+import { fetchCanvasUserInfoRegUser, fetchCanvasUserInfoAdmin } from "../canvas_interact/canvas.api.shared";
+import { fetchCanvasUserCourseData } from "../canvas_interact/canvas.api.course";
+import { fetchCanvasUserQuizData } from "../canvas_interact/canvas.api.quiz";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 import { CanvasUserApiModel } from "../models/canvas.user.api.model";
 import { getCanvasApiAuthHeaders } from "../utils/canvas.connection";
