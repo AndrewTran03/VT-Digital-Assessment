@@ -1,5 +1,4 @@
 import axios from "axios";
-import { load } from "cheerio";
 import log from "../utils/logger";
 import {
   canvasUrl,
@@ -19,6 +18,7 @@ import {
   numberArrLike,
   CanvasQuizQuestionAnswerSetStatistic
 } from "../shared/types";
+import { extractTextFromHTMLHelper } from "../utils/html.extracter";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 
 async function fetchCanvasUserQuizReportData(
@@ -118,12 +118,6 @@ async function fetchCanvasUserQuizAnswerReportData(
     quizStatsResponses.push(newCanvasQuizStatistic);
   }
   log.info(quizStatsResponses);
-}
-
-function extractTextFromHTMLHelper(html: string) {
-  const $ = load(html);
-  const text = $("body").text();
-  return text;
 }
 
 function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
