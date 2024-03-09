@@ -36,7 +36,7 @@ router.post("/api/statistics/:canvasUserId/:canvasCourseInternalId/:canvasQuizId
     }
     const learningObjectiveArr = currLearningObjMatchingsToFind.canvasMatchedLearningObjectivesArr;
     const stats = new CanvasQuizStats(currStatEntry, learningObjectiveArr);
-    const quizStatResults = stats.computeStats();
+    const quizStatResults = stats.computeQuizStats();
     log.warn(quizStatResults);
     log.info("STATUS: GOT HERE STAT -----------");
     return res.status(200).send(JSON.stringify(quizStatResults, null, 2));

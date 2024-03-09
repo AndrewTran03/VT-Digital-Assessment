@@ -459,7 +459,7 @@ export class CanvasQuizStats {
   }
 
   // Uses the "Builder" software design pattern
-  public computeStats() {
+  public computeQuizStats() {
     const quizStatsResultObj: CanvasQuizStatisticsResultObj = {
       quizAveragePointsEarned: this.computeQuizAveragePointsEarned,
       quizMedianPointsEarned: this.computeQuizMedianPointsEarned,
