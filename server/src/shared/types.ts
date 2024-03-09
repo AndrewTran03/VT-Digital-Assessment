@@ -9,6 +9,7 @@ type Prettify<T> = {
 
 const canvasUrl = "https://canvas.vt.edu:443/api";
 
+type stringLike = string | null;
 type numberLike = number | null;
 type booleanLike = boolean | null;
 type numberArrLike = number[] | null;
@@ -353,12 +354,12 @@ type CanvasQuizQuestionStatistic = {
   difficulty_index: numberLike;
   alpha: numberLike;
   point_biserials: CanvasQuizQuestionPointBiserial[];
-  // For "numerical_question" type questions
+  // F| "numerical_question" type questions
   full_credit: numberLike;
   incorrect: numberLike;
-  // For "numerical_question, short_answer, and multiple_dropdowns" type questions
+  // F| "numerical_question, short_answer, and multiple_dropdowns" type questions
   correct: numberLike;
-  // For "multiple_dropdowns" type questions
+  // F| "multiple_dropdowns" type questions
   partially_correct: numberLike;
 };
 
@@ -369,10 +370,10 @@ type CanvasQuizQuestionAnswerStatistic = {
   responses: number;
   user_ids: number[];
   user_names: string[];
-  // For "numerical_question" type questions
+  // F| "numerical_question" type questions
   margin: numberLike;
   isRange: booleanLike;
-  // For (some) "numerical_question" type questions
+  // F| (some) "numerical_question" type questions
   value: numberArrLike;
 };
 
@@ -438,8 +439,62 @@ type CanvasUserAPIEntryBase = {
 
 type CanvasUserAPIEntry = MongoDBCombined<CanvasUserAPIEntryBase>;
 
+type CanvasUserAssignmentWithRubricEntryBase = Prettify<
+  Omit<CourseObjectiveBase, "semester" | "year"> & {
+    canvasUserId: number;
+    canvasCourseName: string;
+    canvasCourseAssignmentId: number;
+    canvasCourseAssignmentRubricId: number;
+    canvasCourseAssignmentRubricTitle: string;
+    canvasCourseAssignmentRubricUsedForGrading: boolean;
+    canvasCourseAssignmentRubricCategoryIds: string[];
+    canvasCourseAssignmentRubricObjArr: CanvasCourseAssignmentRubricObjBase[];
+    canvasCourseAssignmentRubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionEntry[];
+  }
+>;
+
+type CanvasCourseAssignmentRubricObjBase = {
+  id: number;
+  title: string;
+  maxPoints: number;
+  data: AssignmentRubricCriteriaBase[];
+};
+
+type AssignmentRubricCriteriaBase = {
+  id: string;
+  maxCategoryPoints: number;
+  description: string;
+  ratings: AssignmentRubricRatingBase[];
+};
+
+type AssignmentRubricRatingBase = {
+  description: string;
+  ratingPoints: number;
+};
+
+type CanvasLinkPaginationHeaders = {
+  current: string;
+  next: string;
+  prev: string;
+  first: string;
+  last: string;
+};
+
+type CanvasAssignmentSubmissionWorkflowState = "graded" | "submitted" | "unsubmitted" | "pending_review";
+
+type CanvasCourseAssignmentRubricSubmissionEntry = {
+  canvasAssignmentScore: number;
+  rubricCategoryScores: CanvasCourseAssignmentRubricCategorySubmissionScore[];
+};
+
+type CanvasCourseAssignmentRubricCategorySubmissionScore = {
+  id: string;
+  points: number;
+};
+
 export {
   canvasUrl,
+  stringLike,
   numberLike,
   booleanLike,
   numberArrLike,
@@ -472,5 +527,13 @@ export {
   CanvasQuizQuestionAnswerFrequencyArrEntry,
   CanvasQuizQuestionAnswerSetFrequencyArrEntry,
   CanvasLearningObjectiveCategories,
-  CanvasQuizStatisticsResultObj
+  CanvasQuizStatisticsResultObj,
+  CanvasUserAssignmentWithRubricEntryBase,
+  AssignmentRubricRatingBase,
+  AssignmentRubricCriteriaBase,
+  CanvasCourseAssignmentRubricObjBase,
+  CanvasLinkPaginationHeaders,
+  CanvasAssignmentSubmissionWorkflowState,
+  CanvasCourseAssignmentRubricSubmissionEntry,
+  CanvasCourseAssignmentRubricCategorySubmissionScore
 };

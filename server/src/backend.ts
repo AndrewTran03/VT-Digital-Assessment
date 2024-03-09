@@ -6,11 +6,18 @@ import bodyParser from "body-parser";
 import config from "config";
 import cors from "cors";
 import http from "http";
+import fs from "fs/promises";
 import { Server } from "socket.io";
 import log from "./utils/logger";
 import router from "./routes";
-import { ensureConnectionToCanvasApi } from "./utils/canvas.connection";
+import { ensureConnectionToCanvasApi, getCanvasApiAuthHeaders } from "./utils/canvas.connection";
 import { ensureConnectionToMongoDatabase } from "./utils/mongo.connection";
+import { fetchCanvasUserCourseData } from "./canvas_interact/canvas.api.course";
+import {
+  fetchCanvasUserAssignmentData,
+  fetchCanvasUserAssignmentRubricData,
+  fetchCanvasUserAssignmentSubmissionData
+} from "./canvas_interact/canvas.api.assignment";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
@@ -51,4 +58,30 @@ server.listen(backendServerPort, async () => {
   log.info(`Server started on ${backendServerUrl}`);
   await ensureConnectionToCanvasApi();
   await ensureConnectionToMongoDatabase();
+
+  const axiosHeaders = await getCanvasApiAuthHeaders(171111);
+  const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
+  const assignmentResult = await fetchCanvasUserAssignmentData(171111, axiosHeaders, canvasUserCourseIds);
+  console.assert(assignmentResult.length !== 0, "Error here");
+  await fetchCanvasUserAssignmentRubricData(axiosHeaders, assignmentResult);
+  await fetchCanvasUserAssignmentSubmissionData(axiosHeaders, assignmentResult);
+  log.trace("BEFORE: " + assignmentResult.length);
+  const assignmenResultFiltered = assignmentResult.filter(
+    (entry) =>
+      // entry.canvasCourseAssignmentRubricUsedForGrading || entry.canvasCourseAssignmentRubricSubmissionArr.length > 0
+      entry.canvasCourseAssignmentRubricSubmissionArr.length > 0
+  );
+  log.trace("AFTER: " + assignmenResultFiltered.length);
+  for (const assignmentEntry of assignmenResultFiltered) {
+    const { canvasCourseInternalId, canvasCourseAssignmentId } = assignmentEntry;
+    try {
+      await fs.writeFile(
+        `final_assignments_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
+        JSON.stringify(assignmentEntry, null, 2)
+      );
+      console.log("Data written to data.json");
+    } catch (error) {
+      console.error("Error writing data to file:", error);
+    }
+  }
 });
