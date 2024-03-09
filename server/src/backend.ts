@@ -76,7 +76,7 @@ server.listen(backendServerPort, async () => {
     const { canvasCourseInternalId, canvasCourseAssignmentId } = assignmentEntry;
     try {
       await fs.writeFile(
-        `final_assignments_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
+        `./logs/final_assignments_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
         JSON.stringify(assignmentEntry, null, 2)
       );
       console.log("Data written to data.json");

@@ -158,7 +158,7 @@ async function fetchCanvasUserAssignmentRubricData(
     // Write the fetched data to a JSON file
     try {
       await fs.writeFile(
-        `assignments_new_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
+        `./logs/assignments_new_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
         JSON.stringify(assignmentEntry, null, 2)
       );
       console.log("Data written to data.json");
@@ -221,7 +221,7 @@ async function fetchCanvasUserAssignmentSubmissionData(
         // Check if there is a next page
         if (submissionRes.headers["link"]) {
           // log.warn(submissionRes.headers["link"]);
-          const links = parseLinkHeader(submissionRes.headers["link"]);
+          const links = parseLinkHeaderHelper(submissionRes.headers["link"]);
           // console.log(JSON.stringify(links, null, 2));
           if (Object.keys(links).includes("next")) {
             nextPageUrl = links["next"];
@@ -246,7 +246,7 @@ async function fetchCanvasUserAssignmentSubmissionData(
     // Write the fetched data to a JSON file
     try {
       await fs.writeFile(
-        `assignments_new_2_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
+        `./logs/assignments_new_2_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
         JSON.stringify(assignmentEntry, null, 2)
       );
       console.log("Data written to data.json");
@@ -257,7 +257,7 @@ async function fetchCanvasUserAssignmentSubmissionData(
 }
 
 // Helper Function to parse the Link header and extract relevant URLs
-function parseLinkHeader(header: string) {
+function parseLinkHeaderHelper(header: string) {
   const links: CanvasLinkPaginationHeaders = {
     current: "",
     next: "",
