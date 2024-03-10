@@ -8,5 +8,6 @@ export default {
   mongoDatabaseName: `${process.env.MONGO_DB_NAME}`,
   canvasObjectivesMongoCollectionName: `${process.env.CANVAS_OBJECTIVE_COLLECTION_NAME}`,
   canvasQuizzesMongoCollectionName: `${process.env.CANVAS_QUIZZES_COLLECTION_NAME}`,
-  canvasUserApiCollectionName: `${process.env.CANVAS_USER_API_COLLECTION_NAME}`
+  canvasUserApiCollectionName: `${process.env.CANVAS_USER_API_COLLECTION_NAME}`,
+  canvasAssignmentWithRubricMongoCollectionName: `${process.env.CANVAS_ASSIGNMENT_RUBRIC_COLLECTION_NAME}`
 };
