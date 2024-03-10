@@ -70,7 +70,7 @@ const UserDashboard: React.FC = () => {
 
   async function fetchCanvasStatisticsData() {
     setStatsLoading(true);
-    await axios.get(`${backendUrlBase}/api/statistics/${canvasUserId}`).then((res) => {
+    await axios.get(`${backendUrlBase}/api/statistics/quiz/${canvasUserId}`).then((res) => {
       console.log(res.data);
       setCanvasQuizQuestionStatisticDataArr(res.data as CanvasQuizStatistic[]);
     });

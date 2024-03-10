@@ -10,7 +10,7 @@ import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 const router = express.Router();
 
 let index = 0;
-router.get("/api/statistics/:canvasUserId", async (req, res) => {
+router.get("/api/statistics/quiz/:canvasUserId", async (req, res) => {
   const canvasUserId = parseInt(req.params.canvasUserId);
   const axiosHeaders = await getCanvasApiAuthHeaders(canvasUserId);
   const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
@@ -20,7 +20,7 @@ router.get("/api/statistics/:canvasUserId", async (req, res) => {
   return res.status(200).send(JSON.stringify(canvasQuizStatisticArr, null, 2));
 });
 
-router.post("/api/statistics/:canvasUserId/:canvasCourseInternalId/:canvasQuizId", async (req, res) => {
+router.post("/api/statistics/quiz/:canvasUserId/:canvasCourseInternalId/:canvasQuizId", async (req, res) => {
   const canvasUserId = parseInt(req.params.canvasUserId);
   const canvasCourseInternalId = parseInt(req.params.canvasCourseInternalId);
   const canvasQuizId = parseInt(req.params.canvasQuizId);
@@ -50,4 +50,4 @@ router.post("/api/statistics/:canvasUserId/:canvasCourseInternalId/:canvasQuizId
   }
 });
 
-export { router as statsRouter };
+export { router as quizStatsRouter };

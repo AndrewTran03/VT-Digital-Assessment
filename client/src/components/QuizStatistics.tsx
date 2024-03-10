@@ -108,7 +108,7 @@ const QuizStatistics: React.FC = () => {
     setStatsLoading(true);
     await axios
       .post(
-        `${backendUrlBase}/api/statistics/${canvasUserId}/${canvasCourseInternalId}/${canvasQuizId}`,
+        `${backendUrlBase}/api/statistics/quiz/${canvasUserId}/${canvasCourseInternalId}/${canvasQuizId}`,
         matchingStatEntries[0]
       )
       .then((res) => {
