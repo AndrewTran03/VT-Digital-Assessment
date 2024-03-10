@@ -1,21 +1,15 @@
 import {
+  numberLike,
+  EXPECTATIONS,
   CanvasQuizQuestionAnswerFrequencyArrEntry,
   CanvasQuizQuestionAnswerFrequencyStatistic,
   CanvasQuizQuestionAnswerSetFrequencyArrEntry,
   CanvasQuizStatistic,
   QuestionTypeEnumValues,
-  numberLike,
   CanvasLearningObjectiveCategories,
   CanvasQuizStatisticsResultObj
 } from "../shared/types";
 import log from "../utils/logger";
-
-enum EXPECTATIONS {
-  EXCEEDS_EXPECTATIONS = 0,
-  MEETS_EXPECTATIONS = 1,
-  BELOW_EXPECTATIONS = 2,
-  NULL = 3
-}
 
 export class CanvasQuizStats {
   private canvasQuizStatistic: CanvasQuizStatistic;
@@ -91,6 +85,7 @@ export class CanvasQuizStats {
         this.quesExpectationCategories.push("BELOW" as const);
         belowCount++;
       } else {
+        // Invalid entry: Negative score
         this.quesExpectationCategories.push(null);
         nullCount++;
       }
@@ -317,14 +312,14 @@ export class CanvasQuizStats {
     return questionAverages;
   }
 
-  // TODO: To be implemented
+  // TODO: To be implemented - NOT APPLICABLE
   private get computePerQuestionMedianPointsEarned(): numberLike[] {
-    return []; // QUESTION: Relevance?
+    return [];
   }
 
-  // TODO: To be implemented
+  // TODO: To be implemented - NOT APPLICABLE
   private get computePerQuestionPercentageCategories(): numberLike[] {
-    return []; // QUESTION: Relevance?
+    return [];
   }
 
   private get computePerQuestionAnswerFrequencies() {
@@ -449,8 +444,8 @@ export class CanvasQuizStats {
       }
 
       const currMapEntryNumberArr = learningObjectiveMapFrequences.get(canvasLearningObj)!;
-      const totalQuestionsInLearningObj = currMapEntryNumberArr.reduce((acc, score) => acc + score, 0);
-      const percentageCategoryArr = currMapEntryNumberArr.map((entry) => entry / totalQuestionsInLearningObj);
+      const totalQuestionPointsInLearningObj = currMapEntryNumberArr.reduce((acc, score) => acc + score, 0);
+      const percentageCategoryArr = currMapEntryNumberArr.map((entry) => entry / totalQuestionPointsInLearningObj);
       percentageLearningObjectiveMapFrequences.set(canvasLearningObj, percentageCategoryArr);
     }
 
