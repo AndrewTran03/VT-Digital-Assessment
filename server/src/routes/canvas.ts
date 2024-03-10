@@ -216,11 +216,11 @@ async function checkCanvasQuizQuestionExistence(currEntry: MongoDBItem<CanvasCou
 router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", async (req, res) => {
   const canvasAccountId = parseInt(req.params.canvasAccountId);
   const canvasUsername = req.params.canvasUsername as string;
-  console.log(req.body);
+  log.info(req.body);
   const { canvasUserApiKey } = req.body;
-  console.log("Canvas Account ID:", canvasAccountId);
-  console.log("Canvas Username:", canvasUsername);
-  console.log("Canvas User API Key:", canvasUserApiKey);
+  log.info("Canvas Account ID:", canvasAccountId);
+  log.info("Canvas Username:", canvasUsername);
+  log.info("Canvas User API Key:", canvasUserApiKey);
   try {
     const axiosHeaders: AxiosAuthHeaders = {
       Authorization: `Bearer ${canvasUserApiKey}`
@@ -237,7 +237,7 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
       }
     }
     console.assert(canvasUserId !== -1);
-    console.log("FINAL USER ID: ", canvasUserId);
+    log.info("FINAL USER ID: ", canvasUserId);
     const canvasUserInfoEntryToInsert = new CanvasUserApiModel({
       canvasUserId: canvasUserId,
       canvasUserApiKey: canvasUserApiKey,
