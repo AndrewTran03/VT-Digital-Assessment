@@ -245,19 +245,18 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
     });
 
     const canvasUserInfoEntryFindResult = await CanvasUserApiModel.findOne({ canvasUserId: canvasUserId });
-    if (!canvasUserInfoEntryFindResult) {
+    const isNewUser = !canvasUserInfoEntryFindResult;
+    if (isNewUser) {
       const canvasUserInfoEntryInsertResult = await canvasUserInfoEntryToInsert.save();
       log.info("Inserted the specified user information successfully! Congratulations!");
-      await loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId);
-      return res.status(201).send(JSON.stringify({ UserId: canvasUserId })); // 201 = Successful Resource Creation
     } else {
       canvasUserInfoEntryFindResult.canvasUsername = canvasUsername;
       canvasUserInfoEntryFindResult.canvasUserApiKey = canvasUserApiKey;
       const canvasQuizEntryUpdateResult = await canvasUserInfoEntryFindResult.save();
-      await loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId);
       log.info("Updated the specified Canvas user information successfully! Congratulations!");
-      return res.status(200).send(JSON.stringify({ UserId: canvasUserId }));
     }
+    await loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId);
+    return res.status(isNewUser ? 201 : 200).send(JSON.stringify({ UserId: canvasUserId })); // 201 = Successful Resource Creation
   } catch (err) {
     log.error("Error in storing Canvas user information in MongoDB database! Please try again!");
     const resErrBody: APIErrorResponse = {
