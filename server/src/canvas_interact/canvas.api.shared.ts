@@ -1,15 +1,6 @@
 import axios, { AxiosError } from "axios";
 import log from "../utils/logger";
-import {
-  canvasUrl,
-  CanvasCourse,
-  CanvasQuiz,
-  CanvasQuizQuestion,
-  CanvasQuizQuestionGroup,
-  CanvasCourseInfo,
-  CanvasQuizInfo,
-  AxiosAuthHeaders
-} from "../shared/types";
+import { canvasUrl, AxiosAuthHeaders } from "../shared/types";
 
 async function fetchCanvasUserInfoAdmin(
   axiosHeaders: AxiosAuthHeaders,
