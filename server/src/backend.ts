@@ -34,17 +34,17 @@ app.use((_, res, next: NextFunction) => {
   next();
 });
 
-const backendServerPort = config.get<number>("backendServerPort");
-const backendServerUrl = config.get<string>("backendServerUrl");
-
 // Socket.io Setup (Server):
 const server = http.createServer(app);
 const ioSocket = new Server(server, {
   cors: {
     origin: ["http://localhost:5173"],
-    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"]
+    methods: ["GET, POST, PUT, PATCH, DELETE, HEAD, TRACE, OPTIONS"]
   }
 });
+
+const backendServerPort = config.get<number>("backendServerPort");
+const backendServerUrl = config.get<string>("backendServerUrl");
 
 // Tracks incoming connections to SocketIO server connection
 ioSocket.on("connection", (socket) => {
