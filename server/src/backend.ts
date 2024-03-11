@@ -58,7 +58,7 @@ ioSocket.on("connection", (socket) => {
   });
 });
 
-server.listen(backendServerPort, async () => {
+app.listen(backendServerPort, async () => {
   log.info(`Server started on ${backendServerUrl}`);
   await ensureConnectionToCanvasApi();
   await ensureConnectionToMongoDatabase();
