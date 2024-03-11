@@ -540,6 +540,8 @@ type CanvasAssignmentWithRubricStatisticsResultObj = {
   perRubricCriteriaAnswerFrequencies: CanvasCourseAssignmentRubricCategoryAnswerStatistic[];
 };
 
+type CanvasAssignmentPaginationLinkHeaders = "current" | "next" | "prev" | "first" | "last";
+
 export {
   canvasUrl,
   EXPECTATIONS,
@@ -588,5 +590,6 @@ export {
   CanvasCourseAssignmentRubricCategorySubmissionScore,
   CanvasCourseAssignmentRubricCategoryAnswerStatistic,
   RubricRatingSubmissionScore,
-  CanvasAssignmentWithRubricStatisticsResultObj
+  CanvasAssignmentWithRubricStatisticsResultObj,
+  CanvasAssignmentPaginationLinkHeaders
 };

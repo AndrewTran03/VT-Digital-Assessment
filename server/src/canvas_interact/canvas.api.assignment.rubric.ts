@@ -15,7 +15,8 @@ import {
   CanvasLinkPaginationHeaders,
   CanvasAssignmentSubmissionWorkflowState,
   CanvasCourseAssignmentRubricSubmissionMongoDBEntry,
-  CanvasCourseAssignmentRubricCategorySubmissionScore
+  CanvasCourseAssignmentRubricCategorySubmissionScore,
+  CanvasAssignmentPaginationLinkHeaders
 } from "../shared/types";
 import fs from "fs/promises";
 
@@ -66,7 +67,7 @@ async function fetchCanvasUserAssignmentData(
         });
       }
     });
-    log.warn(`Assignment Index ${j}: ---------------------------------`);
+    log.warn(`Finished Assignment Parsing Index ${j}: ---------------------------------`);
   }
   return assignmentsWithRubricsArr;
 }
@@ -75,7 +76,6 @@ async function fetchCanvasUserAssignmentRubricData(
   axiosHeaders: AxiosAuthHeaders,
   assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricBase[]
 ) {
-  // log.info("LENGTH" + assignmentsWithRubricsArr.length);
   for (const assignmentEntry of assignmentsWithRubricsArr) {
     const {
       canvasCourseInternalId,
@@ -145,7 +145,7 @@ async function fetchCanvasUserAssignmentRubricData(
     assignmentEntry.canvasCourseAssignmentRubricObjArr = assignmentEntry.canvasCourseAssignmentRubricObjArr.filter(
       (entry) => entry.rubricData.length !== 0
     );
-    console.assert(assignmentEntry.canvasCourseAssignmentRubricObjArr.length === 1, "Length is not 1");
+    console.assert(assignmentEntry.canvasCourseAssignmentRubricObjArr.length === 1);
 
     // Write the fetched data to a JSON file
     try {
@@ -202,9 +202,7 @@ async function fetchCanvasUserAssignmentSubmissionData(
 
         // Check if there is a next page
         if (submissionRes.headers["link"]) {
-          // log.warn(submissionRes.headers["link"]);
           const links = parseLinkHeaderHelper(submissionRes.headers["link"]);
-          // console.log(JSON.stringify(links, null, 2));
           if (Object.keys(links).includes("next")) {
             nextPageUrl = links["next"];
           } else {
@@ -219,10 +217,8 @@ async function fetchCanvasUserAssignmentSubmissionData(
       }
     }
     log.warn(`${canvasCourseInternalId}_${canvasCourseAssignmentId}`);
-    const len = assignmentEntry.canvasCourseAssignmentRubricSubmissionArr.length;
-    log.info(len);
-    if (len === 0) {
-      log.error("Careful! Empty here!");
+    if (assignmentEntry.canvasCourseAssignmentRubricSubmissionArr.length === 0) {
+      log.error("Warning: No submission data yet for this assignment");
     }
 
     // Write the fetched data to a JSON file
@@ -238,7 +234,7 @@ async function fetchCanvasUserAssignmentSubmissionData(
   }
 }
 
-// Helper Function to parse the Link header and extract relevant URLs
+// Helper function to parse the Link header and extract relevant URLs
 function parseLinkHeaderHelper(header: string) {
   const links: CanvasLinkPaginationHeaders = {
     current: "",
@@ -252,8 +248,8 @@ function parseLinkHeaderHelper(header: string) {
     const [url, rel] = link.split(";").map((s) => s.trim());
     const relMatch = rel.match(/rel="([^"]+)"/);
     if (relMatch) {
-      const relValue = relMatch[1].toLowerCase() as "current" | "next" | "prev" | "first" | "last";
-      links[relValue] = url.slice(1, -1); // Remove < and >
+      const relValue = relMatch[1].toLowerCase() as CanvasAssignmentPaginationLinkHeaders;
+      links[relValue] = url.slice(1, -1); // Remove "<" and ">" from link header
     }
   });
   return links;
