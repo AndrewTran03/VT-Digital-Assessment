@@ -50,4 +50,4 @@ router.post("/api/statistics/quiz/:canvasUserId/:canvasCourseInternalId/:canvasQ
   }
 });
 
-export { router as quizStatsRouter };
+export { router as quizStatsRouter }; 
