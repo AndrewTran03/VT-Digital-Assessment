@@ -3,7 +3,6 @@ import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import log from "../utils/logger";
 import {
-  MongoDBItem,
   QuestionTypeValues,
   APIErrorResponse,
   CanvasCourseMCQAnswerMongoDBEntry,
@@ -12,7 +11,9 @@ import {
   CanvasQuizQuestionGroup,
   QuestionTypeEnumValues,
   CanvasCourseInfo,
-  AxiosAuthHeaders
+  AxiosAuthHeaders,
+  CanvasUserAssignmentWithRubricBase,
+  CanvasCourseAssignmentRubricObjBase
 } from "../shared/types";
 import { fetchCanvasUserInfoRegUser, fetchCanvasUserInfoAdmin } from "../canvas_interact/canvas.api.shared";
 import { fetchCanvasUserCourseData } from "../canvas_interact/canvas.api.course";
@@ -20,6 +21,12 @@ import { fetchCanvasUserQuizData } from "../canvas_interact/canvas.api.quiz";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 import { CanvasUserApiModel } from "../models/canvas.user.api.model";
 import { getCanvasApiAuthHeaders } from "../utils/canvas.connection";
+import {
+  fetchCanvasUserAssignmentData,
+  fetchCanvasUserAssignmentRubricData,
+  fetchCanvasUserAssignmentSubmissionData
+} from "../canvas_interact/canvas.api.assignment.rubric";
+import { CanvasCourseAssignmentRubricObjModel } from "../models/canvas.assignment.rubric.model";
 
 const router = express.Router();
 
@@ -32,7 +39,7 @@ const canvasQuizQuestionSchema = z.object({
     .array(
       z.object({
         questionType: z.enum(QuestionTypeValues),
-        questionText: z.string().min(0),
+        questionText: z.string().min(1),
         answers: z.array(
           z.object({
             weight: z.number().gte(0).optional(),
@@ -46,14 +53,57 @@ const canvasQuizQuestionSchema = z.object({
     .default([])
 });
 
+const canvasAssignmentRubricSchema = z.object({
+  canvasUserId: z.number().gte(0),
+  canvasDeptAbbrev: z.string().min(1),
+  canvasCourseNum: z.number().gte(0),
+  canvasCourseName: z.string().min(1),
+  canvasCourseInternalId: z.number().gte(0),
+  canvasRubricId: z.number().gte(0),
+  title: z.string().min(1),
+  maxPoints: z.number().gte(0),
+  data: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        maxCategoryPoints: z.number().gte(0),
+        description: z.string().min(1),
+        ratings: z
+          .array(
+            z.object({
+              description: z.string().min(1),
+              ratingPoints: z.number().gte(0)
+            })
+          )
+          .default([])
+      })
+    )
+    .default([]),
+  canvasMatchedLearningObjectivesArr: z.array(z.string()).default([]),
+  recentSubmissionData: z
+    .array(
+      z.object({
+        canvasAssignmentScore: z.number().gte(0),
+        rubricCategoryScores: z.array(
+          z.object({
+            id: z.string().min(1),
+            points: z.number().gte(0).default(0)
+          })
+        )
+      })
+    )
+    .default([])
+    .optional()
+});
+
 async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) {
   const axiosHeaders = await getCanvasApiAuthHeaders(canvasUserId);
   const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
   const canvasQuizMap = await fetchCanvasUserQuizData(axiosHeaders, canvasUserCourseIds);
   const canvasQuizMapTransformedToArray = convertCanvasQuizMapToArray(canvasUserId, canvasQuizMap);
 
-  // Checks for valid schema creation
-  log.info("LENGTH: " + canvasQuizMapTransformedToArray.length);
+  // Checks for valid Quiz schema creation
+  log.info("QUIZ LENGTH: " + canvasQuizMapTransformedToArray.length);
   canvasQuizMapTransformedToArray.forEach((currEntry, idx) => {
     const validResult = canvasQuizQuestionSchema.safeParse(currEntry);
     if (validResult.success) {
@@ -64,9 +114,8 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
     }
   });
 
-  log.info(canvasQuizMapTransformedToArray.length);
   for (let i = 0; i < canvasQuizMapTransformedToArray.length; i++) {
-    log.info(`INDEX ${i} STARTED ------------------------------------- \n`);
+    log.info(`QUIZ INDEX ${i} STARTED ------------------------------------- \n`);
     try {
       const currEntry = canvasQuizMapTransformedToArray[i];
 
@@ -77,33 +126,110 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
       }
 
       const canvasQuizItemToInsert = new CanvasCourseQuizModel(currEntry);
-      // Check for existence of entry check (to avoid potential duplicates to be added)
-      const newEntryFound = await checkCanvasQuizQuestionExistence(canvasQuizItemToInsert);
-      if (!newEntryFound) {
-        log.error("Did NOT insert...something already (exactly) matches this");
-        continue;
-      }
 
       // Delete "older" Canvas quiz entries (if they exist)
-      const deleteOlderCanvasQuizItemResult = await CanvasCourseQuizModel.findOneAndDelete({
+      const olderCanvasQuizItemToDelete = await CanvasCourseQuizModel.findOne({
         canvasUserId: canvasQuizItemToInsert.canvasUserId,
         quizId: canvasQuizItemToInsert.quizId
       });
-      if (deleteOlderCanvasQuizItemResult) {
+      if (olderCanvasQuizItemToDelete) {
         log.warn(
           `Older Canvas quiz entry with index ${i} detected...deleting older one and inserting new one into MongoDB database...`
         );
+
+        // Save the old learning objectives to new/updated set of questions
+        canvasQuizItemToInsert.canvasMatchedLearningObjectivesArr =
+          olderCanvasQuizItemToDelete.canvasMatchedLearningObjectivesArr;
+
+        // Delete the older quiz entry from MongoDB database
+        const deleteOlderCanvasQuizItemResult = await CanvasCourseQuizModel.findOneAndDelete({
+          canvasUserId: canvasQuizItemToInsert.canvasUserId,
+          quizId: canvasQuizItemToInsert.quizId
+        });
+        console.assert(deleteOlderCanvasQuizItemResult, "Error! The older quiz item did not get deleted properly!");
       }
 
       const canvasQuizItemInsertResult = await canvasQuizItemToInsert.save();
-      log.info("Inserted the specified course objectives successfully! Congratulations!");
+      log.info("Inserted the specified quiz entry successfully! Congratulations!");
     } catch (err) {
       log.error("Error with interacting the Canvas API! Please try again!");
       process.exit(1);
     }
-    log.info(`INDEX ${i} COMPLETED ------------------------------------- \n`);
+    log.info(`QUIZ INDEX ${i} COMPLETED ------------------------------------- \n`);
   }
-  log.info("Inserted ALL of the specified course objectives successfully! Congratulations!");
+  log.info("Inserted ALL of the specified quiz entries successfully! Congratulations!");
+
+  const assignmentRubricResultsArr = await fetchCanvasUserAssignmentData(
+    canvasUserId,
+    axiosHeaders,
+    canvasUserCourseIds
+  );
+  await fetchCanvasUserAssignmentRubricData(axiosHeaders, assignmentRubricResultsArr);
+  await fetchCanvasUserAssignmentSubmissionData(axiosHeaders, assignmentRubricResultsArr);
+  const parsedAssignmentRubricResultsArr =
+    convertAssignmentWithRubricArrToBeMongoDBCompliant(assignmentRubricResultsArr);
+
+  // Checks for valid Assignment with Rubric schema creation
+  log.info("ASSIGNMENTS WITH RUBRICS LENGTH: " + parsedAssignmentRubricResultsArr.length);
+  parsedAssignmentRubricResultsArr.forEach((currEntry, idx) => {
+    const validResult = canvasAssignmentRubricSchema.safeParse(currEntry);
+    if (validResult.success) {
+      log.info(`The following assignment with rubric object array (at index ${idx}) is of the proper schema`);
+    } else {
+      // log.warn(currEntry.recentSubmissionData);
+      log.warn(idx);
+      log.warn(currEntry.canvasRubricId);
+      log.error(fromZodError(validResult.error));
+      process.exit(1);
+    }
+  });
+
+  for (let j = 0; j < parsedAssignmentRubricResultsArr.length; j++) {
+    log.info(`ASSIGNMENT WITH RUBRIC INDEX ${j} STARTED ------------------------------------- \n`);
+    try {
+      const currEntry = parsedAssignmentRubricResultsArr[j];
+
+      const canvasAssignmentRubricItemToInsert = new CanvasCourseAssignmentRubricObjModel(currEntry);
+
+      // Delete "older" Canvas assignment with rubric entries (if they exist)
+      const olderCanvasAssignmentRubricItemToDelete = await CanvasCourseAssignmentRubricObjModel.findOne({
+        canvasUserId: canvasAssignmentRubricItemToInsert.canvasUserId,
+        canvasCourseInternalId: canvasAssignmentRubricItemToInsert.canvasCourseInternalId,
+        canvasRubricId: canvasAssignmentRubricItemToInsert.canvasRubricId
+      });
+      if (olderCanvasAssignmentRubricItemToDelete) {
+        log.warn(
+          `Older Canvas assignment with rubric entry with index ${j} detected...deleting older one and inserting new one into MongoDB database...`
+        );
+
+        // Save the old learning objectives to new/updated set of assignment rubrics
+        canvasAssignmentRubricItemToInsert.canvasMatchedLearningObjectivesArr =
+          olderCanvasAssignmentRubricItemToDelete.canvasMatchedLearningObjectivesArr;
+
+        // Delete the older assignment rubric entry from MongoDB database
+        const deleteOlderCanvasAssignmentRubricItemResult = await CanvasCourseAssignmentRubricObjModel.findOneAndDelete(
+          {
+            canvasUserId: canvasAssignmentRubricItemToInsert.canvasUserId,
+            canvasCourseInternalId: canvasAssignmentRubricItemToInsert.canvasCourseInternalId,
+            canvasRubricId: canvasAssignmentRubricItemToInsert.canvasRubricId
+          }
+        );
+        console.assert(
+          deleteOlderCanvasAssignmentRubricItemResult,
+          "Error! The older assignment with rubric item did not get deleted properly!"
+        );
+      }
+
+      const canvasAssignmentRubricItemInsertResult = await canvasAssignmentRubricItemToInsert.save();
+      log.info("Inserted the specified assignment with rubric entry successfully! Congratulations!");
+    } catch (err) {
+      log.error((err as Error).stack);
+      log.error("Error with interacting the Canvas API! Please try again!");
+      process.exit(1);
+    }
+    log.info(`ASSIGNMENT WITH RUBRIC INDEX ${j} COMPLETED ------------------------------------- \n`);
+  }
+  log.info("Inserted ALL of the specified assignment with rubric entries successfully! Congratulations!");
 
   return true;
 }
@@ -116,7 +242,6 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
     questionGroups.forEach((questionGroup) => {
       const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
       const { quizId, quizName } = questionGroup;
-      const canvasMatchedLearningObjectivesArr: string[] = [];
       questionGroup.questions.forEach((question) => {
         const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
           questionType: question.question_type! as QuestionTypeEnumValues,
@@ -136,7 +261,6 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
         }
         newQuizQuestionEntry.answers = answers;
         quizEntries.push(newQuizQuestionEntry);
-        canvasMatchedLearningObjectivesArr.push("");
       });
       const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
         canvasUserId: userId,
@@ -146,7 +270,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
         canvasCourseNum: courseNum,
         quizId: quizId,
         quizName: quizName,
-        canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr, // Empty for now: Will be resolved later in front-end React Matching Component
+        canvasMatchedLearningObjectivesArr: new Array(quizEntries.length).fill("") as string[], // Empty for now: Will be resolved later in front-end React Matching Component
         canvasQuizEntries: quizEntries
       };
       resultArray.push(newQuizEntry);
@@ -156,61 +280,32 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
   return resultArray;
 }
 
-async function checkCanvasQuizQuestionExistence(currEntry: MongoDBItem<CanvasCourseQuizMongoDBEntry>) {
-  for (let i = 0; i < currEntry.canvasQuizEntries.length; i++) {
-    if (currEntry.canvasQuizEntries[i].answers !== undefined && currEntry.canvasQuizEntries[i].answers!.length > 0) {
-      for (let j = 0; j < currEntry.canvasQuizEntries[i].answers!.length; j++) {
-        const findObjWithAnswers = {
-          canvasUserId: currEntry.canvasUserId,
-          canvasCourseInternalId: currEntry.canvasCourseInternalId,
-          canvasCourseName: currEntry.canvasCourseName,
-          quizId: currEntry.quizId,
-          quizName: currEntry.quizName,
-          canvasQuizEntries: {
-            $elemMatch: {
-              questionType: currEntry.canvasQuizEntries[i].questionType,
-              questionText: currEntry.canvasQuizEntries[i].questionText,
-              answers: {
-                $elemMatch: {
-                  weight: currEntry.canvasQuizEntries[i].answers![j].weight,
-                  migration_id: currEntry.canvasQuizEntries[i].answers![j].migration_id,
-                  id: currEntry.canvasQuizEntries[i].answers![j].id,
-                  text: currEntry.canvasQuizEntries[i].answers![j].text
-                }
-              }
-            }
-          }
-        };
-        const findResult = await CanvasCourseQuizModel.find<CanvasCourseQuizMongoDBEntry>(findObjWithAnswers);
-        // A new (unique) entry (or an update to an existing entry) exists (no need to further check this object to insert/update)
-        if (findResult.length === 0) {
-          log.info("[WITHOUT ANSWERS] Did not find this entry in the MongoDB database...considered new!");
-          return true;
-        }
-      }
-    } else {
-      const findObjWithoutAnswers = {
-        canvasUserId: currEntry.canvasUserId,
-        canvasCourseInternalId: currEntry.canvasCourseInternalId,
-        canvasCourseName: currEntry.canvasCourseName,
-        quizId: currEntry.quizId,
-        quizName: currEntry.quizName,
-        canvasQuizEntries: {
-          $elemMatch: {
-            questionType: currEntry.canvasQuizEntries[i].questionType,
-            questionText: currEntry.canvasQuizEntries[i].questionText
-          }
-        }
-      };
-      const findResult = await CanvasCourseQuizModel.find<CanvasCourseQuizMongoDBEntry>(findObjWithoutAnswers);
-      // A new (unique) entry (or an update to an existing entry) exists (no need to further check this object to insert/update)
-      if (findResult.length === 0) {
-        log.warn("[WITH ANSWERS] Did not find this entry in the MongoDB database...considered new!");
-        return true;
-      }
-    }
-  }
-  return false;
+function convertAssignmentWithRubricArrToBeMongoDBCompliant(
+  assignmentRubricResultsArr: CanvasUserAssignmentWithRubricBase[]
+): CanvasCourseAssignmentRubricObjBase[] {
+  const newAssignmentRubricResultsArr: CanvasCourseAssignmentRubricObjBase[] = [];
+
+  assignmentRubricResultsArr.forEach((assignmentRubricResult) => {
+    console.assert(assignmentRubricResult.canvasCourseAssignmentRubricObjArr.length === 1);
+    const assignmentRubricObjArrEntry = assignmentRubricResult.canvasCourseAssignmentRubricObjArr[0];
+
+    const newAssignmentRubricResult: CanvasCourseAssignmentRubricObjBase = {
+      canvasUserId: assignmentRubricResult.canvasUserId,
+      canvasCourseInternalId: assignmentRubricResult.canvasCourseInternalId,
+      canvasDeptAbbrev: assignmentRubricResult.canvasDeptAbbrev,
+      canvasCourseNum: assignmentRubricResult.canvasCourseNum,
+      canvasCourseName: assignmentRubricResult.canvasCourseName,
+      canvasRubricId: assignmentRubricResult.canvasCourseAssignmentRubricId,
+      title: assignmentRubricObjArrEntry.title,
+      maxPoints: assignmentRubricObjArrEntry.maxPoints,
+      rubricData: assignmentRubricObjArrEntry.rubricData,
+      canvasMatchedLearningObjectivesArr: new Array(assignmentRubricObjArrEntry.rubricData.length).fill("") as string[],
+      recentSubmissionData: assignmentRubricResult.canvasCourseAssignmentRubricSubmissionArr
+    };
+    newAssignmentRubricResultsArr.push(newAssignmentRubricResult);
+  });
+
+  return newAssignmentRubricResultsArr;
 }
 
 router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", async (req, res) => {

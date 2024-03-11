@@ -8,13 +8,13 @@ import {
   booleanLike,
   AxiosAuthHeaders,
   CanvasCourseInfo,
-  CanvasUserAssignmentWithRubricEntryBase,
-  CanvasCourseAssignmentRubricObjBase,
-  AssignmentRubricCriteriaBase,
-  AssignmentRubricRatingBase,
+  CanvasUserAssignmentWithRubricBase,
+  CanvasCourseAssignmentRubricObjBaseProperties,
+  AssignmentRubricCriteriaMongoDBEntry,
+  AssignmentRubricRatingMongoDBEntry,
   CanvasLinkPaginationHeaders,
   CanvasAssignmentSubmissionWorkflowState,
-  CanvasCourseAssignmentRubricSubmissionEntry,
+  CanvasCourseAssignmentRubricSubmissionMongoDBEntry,
   CanvasCourseAssignmentRubricCategorySubmissionScore
 } from "../shared/types";
 import fs from "fs/promises";
@@ -24,8 +24,8 @@ async function fetchCanvasUserAssignmentData(
   canvasUserId: number,
   axiosHeaders: AxiosAuthHeaders,
   courseArr: readonly CanvasCourseInfo[]
-): Promise<CanvasUserAssignmentWithRubricEntryBase[]> {
-  const assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricEntryBase[] = [];
+): Promise<CanvasUserAssignmentWithRubricBase[]> {
+  const assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricBase[] = [];
   // Get every available Assignment of every Canvas course where the user is a TA or Course Instructor
   for (let j = 0; j < courseArr.length; j++) {
     const { courseId, courseName, courseDept, courseNum } = courseArr[j];
@@ -54,8 +54,8 @@ async function fetchCanvasUserAssignmentData(
 
         assignmentsWithRubricsArr.push({
           canvasUserId: canvasUserId,
-          deptAbbrev: courseDept,
-          courseNum: courseNum,
+          canvasDeptAbbrev: courseDept,
+          canvasCourseNum: courseNum,
           canvasCourseName: courseName,
           canvasCourseInternalId: courseId,
           canvasCourseAssignmentId: assignmentId,
@@ -75,7 +75,7 @@ async function fetchCanvasUserAssignmentData(
 
 async function fetchCanvasUserAssignmentRubricData(
   axiosHeaders: AxiosAuthHeaders,
-  assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricEntryBase[]
+  assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricBase[]
 ) {
   // log.info("LENGTH" + assignmentsWithRubricsArr.length);
   for (const assignmentEntry of assignmentsWithRubricsArr) {
@@ -100,7 +100,7 @@ async function fetchCanvasUserAssignmentRubricData(
       // Only add the current rubric if fit is associated with that respective assignment
       if (canvasCourseAssignmentRubricId === id && canvasCourseAssignmentRubricTitle === descriptionTitle) {
         const maxPoints = assignmentRubricGroup.points_possible as number;
-        const rubricCategoryData: AssignmentRubricCriteriaBase[] = [];
+        const rubricCategoryData: AssignmentRubricCriteriaMongoDBEntry[] = [];
         if (assignmentRubricGroup.data && assignmentRubricGroup.data.length > 0) {
           // log.error("Criteria: -----");
           assignmentRubricGroup.data.forEach((rubric: any) => {
@@ -114,7 +114,7 @@ async function fetchCanvasUserAssignmentRubricData(
             if (canvasCourseAssignmentRubricCategoryIds.includes(categoryId)) {
               const maxCategoryPoints = rubric.points as number;
               const description = `${rubric.description as string}${rubric.long_description ? `: ${extractTextFromHTMLHelper(rubric.long_description as string)}` : ""}`;
-              const rubricRatings: AssignmentRubricRatingBase[] = [];
+              const rubricRatings: AssignmentRubricRatingMongoDBEntry[] = [];
               if (rubric.ratings && rubric.ratings.length > 0) {
                 // log.error("Ratings: -----");
                 rubric.ratings.forEach((rating: any) => {
@@ -124,14 +124,14 @@ async function fetchCanvasUserAssignmentRubricData(
                   // log.error(rating.long_description ?? ("No Rating Long Description" as string));
                   const ratingPoints = rating.points as number;
                   const description = `${rating.description as string}${rating.long_description ? `: ${extractTextFromHTMLHelper(rating.long_description as string)}` : ""}`;
-                  const newRatingEntry: AssignmentRubricRatingBase = {
+                  const newRatingEntry: AssignmentRubricRatingMongoDBEntry = {
                     description: description,
                     ratingPoints: ratingPoints
                   };
                   rubricRatings.push(newRatingEntry);
                 });
               }
-              const newRubricCategoryEntry: AssignmentRubricCriteriaBase = {
+              const newRubricCategoryEntry: AssignmentRubricCriteriaMongoDBEntry = {
                 id: categoryId,
                 maxCategoryPoints: maxCategoryPoints,
                 description: description,
@@ -141,18 +141,18 @@ async function fetchCanvasUserAssignmentRubricData(
             }
           });
         }
-        const newRubricEntry: CanvasCourseAssignmentRubricObjBase = {
-          id: id,
+        const newRubricEntry: CanvasCourseAssignmentRubricObjBaseProperties = {
+          canvasRubricId: id,
           title: descriptionTitle,
           maxPoints: maxPoints,
-          data: rubricCategoryData
+          rubricData: rubricCategoryData
         };
         assignmentEntry.canvasCourseAssignmentRubricObjArr.push(newRubricEntry);
       }
     });
     log.trace(JSON.stringify(assignmentEntry.canvasCourseAssignmentRubricObjArr, null, 2));
     assignmentEntry.canvasCourseAssignmentRubricObjArr = assignmentEntry.canvasCourseAssignmentRubricObjArr.filter(
-      (entry) => entry.data.length !== 0
+      (entry) => entry.rubricData.length !== 0
     );
     console.assert(assignmentEntry.canvasCourseAssignmentRubricObjArr.length === 1, "Length is not 1");
     // Write the fetched data to a JSON file
@@ -161,7 +161,7 @@ async function fetchCanvasUserAssignmentRubricData(
         `./logs/assignments_new_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
         JSON.stringify(assignmentEntry, null, 2)
       );
-      console.log("Data written to data.json");
+      console.log(`Data written to ./logs/assignments_new_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`);
     } catch (error) {
       console.error("Error writing data to file:", error);
     }
@@ -170,28 +170,18 @@ async function fetchCanvasUserAssignmentRubricData(
 
 async function fetchCanvasUserAssignmentSubmissionData(
   axiosHeaders: AxiosAuthHeaders,
-  assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricEntryBase[]
+  assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricBase[]
 ) {
   for (const assignmentEntry of assignmentsWithRubricsArr) {
     const { canvasCourseInternalId, canvasCourseAssignmentId } = assignmentEntry;
     let nextPageUrl = `${canvasUrl}/v1/courses/${canvasCourseInternalId}/assignments/${canvasCourseAssignmentId}/submissions?include[]=rubric_assessment&grouped=true&per_page=100`;
     let hasNextPage = true;
-    const submissionArr: any[] = [];
 
     while (hasNextPage) {
       try {
-        // Fetch data from the current page
         const submissionRes = await axios.get(nextPageUrl, {
-          // Add any necessary headers here
           headers: axiosHeaders
         });
-
-        // Extract the data from the response
-        // const responseData = submissionRes.data;
-
-        // Append the data to the dataSet array
-        // submissionArr.push(...responseData);
-        // log.trace(responseData);
         submissionRes.data.forEach((submission: any) => {
           const workflowState = submission.workflow_state as CanvasAssignmentSubmissionWorkflowState;
           const grade: stringLike = submission.grade ?? null;
@@ -202,14 +192,14 @@ async function fetchCanvasUserAssignmentSubmissionData(
             for (const category in submission.rubric_assessment) {
               const value = submission.rubric_assessment[category];
               const categoryId = category as string;
-              const points = value.points as number;
+              const points = (value.points ?? 0) as number; // Could be undefined (safe to assume 0 points for category)
               const newRubricCategoryScore: CanvasCourseAssignmentRubricCategorySubmissionScore = {
                 id: categoryId,
                 points: points
               };
               rubricCategoryScoreArr.push(newRubricCategoryScore);
             }
-            const newRubricSubmissionEntry: CanvasCourseAssignmentRubricSubmissionEntry = {
+            const newRubricSubmissionEntry: CanvasCourseAssignmentRubricSubmissionMongoDBEntry = {
               canvasAssignmentScore: numericScore,
               rubricCategoryScores: rubricCategoryScoreArr
             };
@@ -246,10 +236,10 @@ async function fetchCanvasUserAssignmentSubmissionData(
     // Write the fetched data to a JSON file
     try {
       await fs.writeFile(
-        `./logs/assignments_new_2_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
+        `./logs/assignments_final_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
         JSON.stringify(assignmentEntry, null, 2)
       );
-      console.log("Data written to data.json");
+      log.info(`Data written to ./logs/assignments_final_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`);
     } catch (error) {
       console.error("Error writing data to file:", error);
     }

@@ -370,10 +370,10 @@ type CanvasQuizQuestionAnswerStatistic = {
   responses: number;
   user_ids: number[];
   user_names: string[];
-  // F| "numerical_question" type questions
+  // For "numerical_question" type questions
   margin: numberLike;
   isRange: booleanLike;
-  // F| (some) "numerical_question" type questions
+  // For (some) "numerical_question" type questions
   value: numberArrLike;
 };
 
@@ -439,35 +439,50 @@ type CanvasUserAPIEntryBase = {
 
 type CanvasUserAPIEntry = MongoDBCombined<CanvasUserAPIEntryBase>;
 
-type CanvasUserAssignmentWithRubricEntryBase = Prettify<
-  Omit<CourseObjectiveBase, "semester" | "year"> & {
-    canvasUserId: number;
-    canvasCourseName: string;
-    canvasCourseAssignmentId: number;
-    canvasCourseAssignmentRubricId: number;
-    canvasCourseAssignmentRubricTitle: string;
-    canvasCourseAssignmentRubricUsedForGrading: boolean;
-    canvasCourseAssignmentRubricCategoryIds: string[];
-    canvasCourseAssignmentRubricObjArr: CanvasCourseAssignmentRubricObjBase[];
-    canvasCourseAssignmentRubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionEntry[];
-  }
->;
-
-type CanvasCourseAssignmentRubricObjBase = {
-  id: number;
-  title: string;
-  maxPoints: number;
-  data: AssignmentRubricCriteriaBase[];
+type CanvasUserAssignmentWithRubricBase = {
+  canvasUserId: number;
+  canvasDeptAbbrev: string;
+  canvasCourseNum: number;
+  canvasCourseName: string;
+  canvasCourseInternalId: number;
+  canvasCourseAssignmentId: number;
+  canvasCourseAssignmentRubricId: number;
+  canvasCourseAssignmentRubricTitle: string;
+  canvasCourseAssignmentRubricUsedForGrading: boolean;
+  canvasCourseAssignmentRubricCategoryIds: string[];
+  canvasCourseAssignmentRubricObjArr: CanvasCourseAssignmentRubricObjBaseProperties[];
+  canvasCourseAssignmentRubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
 };
 
-type AssignmentRubricCriteriaBase = {
+type CanvasCourseAssignmentRubricObjBaseProperties = {
+  canvasRubricId: number;
+  title: string;
+  maxPoints: number;
+  rubricData: AssignmentRubricCriteriaMongoDBEntry[];
+};
+
+type CanvasCourseAssignmentRubricObjExtraProperties = {
+  canvasUserId: number;
+  canvasDeptAbbrev: string;
+  canvasCourseNum: number;
+  canvasCourseName: string;
+  canvasCourseInternalId: number;
+  canvasMatchedLearningObjectivesArr: string[];
+  recentSubmissionData: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
+};
+
+type CanvasCourseAssignmentRubricObjBase = Prettify<
+  CanvasCourseAssignmentRubricObjBaseProperties & CanvasCourseAssignmentRubricObjExtraProperties
+>;
+
+type AssignmentRubricCriteriaMongoDBEntry = {
   id: string;
   maxCategoryPoints: number;
   description: string;
-  ratings: AssignmentRubricRatingBase[];
+  ratings: AssignmentRubricRatingMongoDBEntry[];
 };
 
-type AssignmentRubricRatingBase = {
+type AssignmentRubricRatingMongoDBEntry = {
   description: string;
   ratingPoints: number;
 };
@@ -480,9 +495,16 @@ type CanvasLinkPaginationHeaders = {
   last: string;
 };
 
+enum EXPECTATIONS {
+  EXCEEDS_EXPECTATIONS = 0,
+  MEETS_EXPECTATIONS = 1,
+  BELOW_EXPECTATIONS = 2,
+  NULL = 3
+}
+
 type CanvasAssignmentSubmissionWorkflowState = "graded" | "submitted" | "unsubmitted" | "pending_review";
 
-type CanvasCourseAssignmentRubricSubmissionEntry = {
+type CanvasCourseAssignmentRubricSubmissionMongoDBEntry = {
   canvasAssignmentScore: number;
   rubricCategoryScores: CanvasCourseAssignmentRubricCategorySubmissionScore[];
 };
@@ -492,8 +514,32 @@ type CanvasCourseAssignmentRubricCategorySubmissionScore = {
   points: number;
 };
 
+type CanvasCourseAssignmentRubricCategoryAnswerStatistic = {
+  id: string;
+  description: string;
+  pointsArr: number[];
+  ratingsSubArr: RubricRatingSubmissionScore[];
+};
+
+type RubricRatingSubmissionScore = Prettify<
+  AssignmentRubricRatingMongoDBEntry & {
+    ratingCount: number;
+  }
+>;
+
+type CanvasAssignmentWithRubricStatisticsResultObj = {
+  assignmentAveragePointsEarned: number;
+  assignmentMedianPointsEarned: number;
+  assignmentPercentageCategories: number[];
+  perLearningObjPercentageCategories: Array<[string, number[]]>;
+  perRubricCritieriaAveragePointsEarned: number[];
+  perRubricCritieriaMedianPointsEarned: number[];
+  perRubricCriteriaAnswerFrequencies: CanvasCourseAssignmentRubricCategoryAnswerStatistic[];
+};
+
 export {
   canvasUrl,
+  EXPECTATIONS,
   stringLike,
   numberLike,
   booleanLike,
@@ -528,12 +574,16 @@ export {
   CanvasQuizQuestionAnswerSetFrequencyArrEntry,
   CanvasLearningObjectiveCategories,
   CanvasQuizStatisticsResultObj,
-  CanvasUserAssignmentWithRubricEntryBase,
-  AssignmentRubricRatingBase,
-  AssignmentRubricCriteriaBase,
+  CanvasUserAssignmentWithRubricBase,
+  AssignmentRubricRatingMongoDBEntry,
+  AssignmentRubricCriteriaMongoDBEntry,
   CanvasCourseAssignmentRubricObjBase,
+  CanvasCourseAssignmentRubricObjBaseProperties,
   CanvasLinkPaginationHeaders,
   CanvasAssignmentSubmissionWorkflowState,
-  CanvasCourseAssignmentRubricSubmissionEntry,
-  CanvasCourseAssignmentRubricCategorySubmissionScore
+  CanvasCourseAssignmentRubricSubmissionMongoDBEntry,
+  CanvasCourseAssignmentRubricCategorySubmissionScore,
+  CanvasCourseAssignmentRubricCategoryAnswerStatistic,
+  RubricRatingSubmissionScore,
+  CanvasAssignmentWithRubricStatisticsResultObj
 };
