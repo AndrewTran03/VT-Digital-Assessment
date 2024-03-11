@@ -1,6 +1,6 @@
 import express from "express";
 import log from "../utils/logger";
-import { APIErrorResponse, CanvasQuizStatistic, CanvasQuizStatisticsResultObj } from "../shared/types";
+import { APIErrorResponse, CanvasQuizStatistic } from "../shared/types";
 import { fetchCanvasUserCourseData } from "../canvas_interact/canvas.api.course";
 import { fetchCanvasUserQuizReportData } from "../canvas_interact/canvas.api.quiz.stats";
 import { getCanvasApiAuthHeaders } from "../utils/canvas.connection";
