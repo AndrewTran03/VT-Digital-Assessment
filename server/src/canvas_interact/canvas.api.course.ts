@@ -1,5 +1,4 @@
 import axios from "axios";
-import log from "../utils/logger";
 import { canvasUrl, AxiosAuthHeaders, CanvasCourse, CanvasCourseInfo } from "../shared/types";
 
 // Returns a number[] of the Canvas user's available Course IDs
