@@ -120,7 +120,7 @@ const QuizLearningObjectiveMatcher: React.FC = () => {
     console.assert(matchingEntries.length === 1);
     console.log(`${matchingEntries[0]._id}`);
     await axios
-      .put(`${backendUrlBase}/api/canvas/update_objectives/${matchingEntries[0]._id}`, selectedAnswers)
+      .put(`${backendUrlBase}/api/canvas/quiz/update_objectives/${matchingEntries[0]._id}`, selectedAnswers)
       .then((res) => console.log(res));
     window.localStorage.removeItem("canvasQuizDataArr");
     window.localStorage.removeItem("canvasCourseInternalId");
