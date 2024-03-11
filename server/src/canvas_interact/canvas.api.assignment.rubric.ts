@@ -35,22 +35,19 @@ async function fetchCanvasUserAssignmentData(
 
     assignmentRes.data.forEach((assignmentData: any) => {
       const use_rubric_for_grading: booleanLike = assignmentData.use_rubric_for_grading ?? null;
+      
       if (use_rubric_for_grading !== null) {
-        // log.warn(assignmentData);
         const canvasCourseAssignmentRubricUsedForGrading = use_rubric_for_grading as boolean;
+        const assignmentName = assignmentData.name as string;
         const assignmentId = assignmentData.id as number;
-        // log.warn("USED RUBRIC FOR GRADING");
-        // log.error(assignmentId);
+        const rubricId = assignmentData.rubric_settings.id as number;
+        const rubricTitle = assignmentData.rubric_settings.title as string;
+        
         const rubricCriteriaIdsForAssignment: string[] = [];
         assignmentData.rubric.forEach((rubric: any) => {
           const newRubricId = rubric.id as string;
-          // const description = rubric.description as string;
-          // log.error(`Rubric ${rubricIdsForAssignment.length}: ${newRubricId}`);
-          // log.error(`Description: ${description}`);
           rubricCriteriaIdsForAssignment.push(newRubricId);
         });
-        const rubricId = assignmentData.rubric_settings.id as number;
-        const rubricTitle = assignmentData.rubric_settings.title as string;
 
         assignmentsWithRubricsArr.push({
           canvasUserId: canvasUserId,
@@ -59,6 +56,7 @@ async function fetchCanvasUserAssignmentData(
           canvasCourseName: courseName,
           canvasCourseInternalId: courseId,
           canvasCourseAssignmentId: assignmentId,
+          canvasCourseAssignmentName: assignmentName,
           canvasCourseAssignmentRubricId: rubricId,
           canvasCourseAssignmentRubricTitle: rubricTitle,
           canvasCourseAssignmentRubricUsedForGrading: canvasCourseAssignmentRubricUsedForGrading,
@@ -82,6 +80,7 @@ async function fetchCanvasUserAssignmentRubricData(
     const {
       canvasCourseInternalId,
       canvasCourseAssignmentId,
+      canvasCourseAssignmentName,
       canvasCourseAssignmentRubricId,
       canvasCourseAssignmentRubricTitle,
       canvasCourseAssignmentRubricCategoryIds
@@ -92,36 +91,25 @@ async function fetchCanvasUserAssignmentRubricData(
     });
 
     rubricRes.data.forEach((assignmentRubricGroup: any) => {
-      // log.error(assignmentRubricGroup.id as number);
-      // log.error(assignmentRubricGroup.title as string);
-      // log.error(assignmentRubricGroup.points_possible as number);
       const id = assignmentRubricGroup.id as number;
       const descriptionTitle = assignmentRubricGroup.title as string;
       // Only add the current rubric if fit is associated with that respective assignment
       if (canvasCourseAssignmentRubricId === id && canvasCourseAssignmentRubricTitle === descriptionTitle) {
         const maxPoints = assignmentRubricGroup.points_possible as number;
         const rubricCategoryData: AssignmentRubricCriteriaMongoDBEntry[] = [];
+        
         if (assignmentRubricGroup.data && assignmentRubricGroup.data.length > 0) {
-          // log.error("Criteria: -----");
           assignmentRubricGroup.data.forEach((rubric: any) => {
-            // log.warn("Entry:");
-            // log.error(rubric.id as string);
-            // log.error(rubric.points as number);
-            // log.error(rubric.description as string);
-            // log.error(rubric.long_description ?? ("No Rubric Long Description" as string));
             const categoryId = rubric.id as string;
+            
             // Additional Check with ID: Only add the current rubric if it is associated with that respective assignment
             if (canvasCourseAssignmentRubricCategoryIds.includes(categoryId)) {
               const maxCategoryPoints = rubric.points as number;
               const description = `${rubric.description as string}${rubric.long_description ? `: ${extractTextFromHTMLHelper(rubric.long_description as string)}` : ""}`;
+              
               const rubricRatings: AssignmentRubricRatingMongoDBEntry[] = [];
               if (rubric.ratings && rubric.ratings.length > 0) {
-                // log.error("Ratings: -----");
                 rubric.ratings.forEach((rating: any) => {
-                  // log.warn("Inner Entry:");
-                  // log.error(rating.points as number);
-                  // log.error(rating.description as string);
-                  // log.error(rating.long_description ?? ("No Rating Long Description" as string));
                   const ratingPoints = rating.points as number;
                   const description = `${rating.description as string}${rating.long_description ? `: ${extractTextFromHTMLHelper(rating.long_description as string)}` : ""}`;
                   const newRatingEntry: AssignmentRubricRatingMongoDBEntry = {
@@ -131,6 +119,7 @@ async function fetchCanvasUserAssignmentRubricData(
                   rubricRatings.push(newRatingEntry);
                 });
               }
+
               const newRubricCategoryEntry: AssignmentRubricCriteriaMongoDBEntry = {
                 id: categoryId,
                 maxCategoryPoints: maxCategoryPoints,
@@ -142,6 +131,8 @@ async function fetchCanvasUserAssignmentRubricData(
           });
         }
         const newRubricEntry: CanvasCourseAssignmentRubricObjBaseProperties = {
+          canvasAssignmentId: canvasCourseAssignmentId,
+          canvasAssignmentName: canvasCourseAssignmentName,
           canvasRubricId: id,
           title: descriptionTitle,
           maxPoints: maxPoints,
@@ -150,11 +141,12 @@ async function fetchCanvasUserAssignmentRubricData(
         assignmentEntry.canvasCourseAssignmentRubricObjArr.push(newRubricEntry);
       }
     });
-    log.trace(JSON.stringify(assignmentEntry.canvasCourseAssignmentRubricObjArr, null, 2));
+
     assignmentEntry.canvasCourseAssignmentRubricObjArr = assignmentEntry.canvasCourseAssignmentRubricObjArr.filter(
       (entry) => entry.rubricData.length !== 0
     );
     console.assert(assignmentEntry.canvasCourseAssignmentRubricObjArr.length === 1, "Length is not 1");
+    
     // Write the fetched data to a JSON file
     try {
       await fs.writeFile(

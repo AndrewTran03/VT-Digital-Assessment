@@ -446,6 +446,7 @@ type CanvasUserAssignmentWithRubricBase = {
   canvasCourseName: string;
   canvasCourseInternalId: number;
   canvasCourseAssignmentId: number;
+  canvasCourseAssignmentName: string;
   canvasCourseAssignmentRubricId: number;
   canvasCourseAssignmentRubricTitle: string;
   canvasCourseAssignmentRubricUsedForGrading: boolean;
@@ -455,6 +456,8 @@ type CanvasUserAssignmentWithRubricBase = {
 };
 
 type CanvasCourseAssignmentRubricObjBaseProperties = {
+  canvasAssignmentId: number;
+  canvasAssignmentName: string;
   canvasRubricId: number;
   title: string;
   maxPoints: number;
