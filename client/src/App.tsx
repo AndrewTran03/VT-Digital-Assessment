@@ -7,21 +7,22 @@ import {
   CanvasCourseAssociations,
   CanvasUserInfoObj,
   CanvasQuizStatistic,
-  CanvasCourseAssignmentRubricObjMongoDBEntry
+  CanvasCourseAssignmentRubricObjMongoDBEntry,
+  LearningObjectiveAssignmentWithRubricData
 } from "./shared/types";
 import {
   CanvasQuizQuestionContext,
-  LearningObjectiveContext,
+  QuizLearningObjectiveContext,
   CanvasUserInfoContext,
   CanvasUserCourseNamesArrContext,
-  CanvasQuizStatisticContext
+  CanvasQuizStatisticContext,
+  CanvasAssignmentWithRubricContext,
+  AssignmentWithRubricLearningObjectiveContext
 } from "./shared/contexts";
-import CanvasAssignmentWithRubricContext from "./shared/contexts/CanvasAssignmentWithRubricContext";
-
 const App: React.FC = () => {
   // Initial States of Each React-Context's Shared Data
   const [canvasQuizDataArr, setCanvasQuizDataArr] = useState<CanvasCourseQuizMongoDBEntry[]>([]);
-  const [canvasLearningObjectiveData, setCanvasLearningObjectiveData] = useState<LearningObjectiveQuizData>({
+  const [canvasQuizLearningObjectiveData, setCanvasQuizLearningObjectiveData] = useState<LearningObjectiveQuizData>({
     canvasCourseInternalId: 0,
     quizId: 0
   });
@@ -35,10 +36,17 @@ const App: React.FC = () => {
   const [assignmentWithRubricDataArr, setAssignmentWithRubricDataArr] = useState<
     CanvasCourseAssignmentRubricObjMongoDBEntry[]
   >([]);
+  const [canvasAssignmentWithRubricLearningObjectiveData, setCanvasAssignmentWithRubricLearningObjectiveData] =
+    useState<LearningObjectiveAssignmentWithRubricData>({
+      canvasCourseInternalId: 0,
+      rubricId: 0
+    });
 
   return (
     <CanvasQuizQuestionContext.Provider value={{ canvasQuizDataArr, setCanvasQuizDataArr }}>
-      <LearningObjectiveContext.Provider value={{ canvasLearningObjectiveData, setCanvasLearningObjectiveData }}>
+      <QuizLearningObjectiveContext.Provider
+        value={{ canvasQuizLearningObjectiveData, setCanvasQuizLearningObjectiveData }}
+      >
         <CanvasUserInfoContext.Provider value={{ canvasUserInfo, setCanvasUserInfo }}>
           <CanvasUserCourseNamesArrContext.Provider value={{ canvasUserCourseNamesArr, setCanvasUserCourseNamesArr }}>
             <CanvasQuizStatisticContext.Provider
@@ -47,12 +55,18 @@ const App: React.FC = () => {
               <CanvasAssignmentWithRubricContext.Provider
                 value={{ assignmentWithRubricDataArr, setAssignmentWithRubricDataArr }}
               >
+                <AssignmentWithRubricLearningObjectiveContext.Provider
+                  value={{
+                    canvasAssignmentWithRubricLearningObjectiveData,
+                    setCanvasAssignmentWithRubricLearningObjectiveData
+                  }}
+                ></AssignmentWithRubricLearningObjectiveContext.Provider>
                 <AppRouter />
               </CanvasAssignmentWithRubricContext.Provider>
             </CanvasQuizStatisticContext.Provider>
           </CanvasUserCourseNamesArrContext.Provider>
         </CanvasUserInfoContext.Provider>
-      </LearningObjectiveContext.Provider>
+      </QuizLearningObjectiveContext.Provider>
     </CanvasQuizQuestionContext.Provider>
   );
 };
