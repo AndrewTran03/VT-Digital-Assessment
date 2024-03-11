@@ -10,15 +10,8 @@ import fs from "fs/promises";
 import { Server } from "socket.io";
 import log from "./utils/logger";
 import router from "./routes";
-import { ensureConnectionToCanvasApi, getCanvasApiAuthHeaders } from "./utils/canvas.connection";
+import { ensureConnectionToCanvasApi } from "./utils/canvas.connection";
 import { ensureConnectionToMongoDatabase } from "./utils/mongo.connection";
-import { fetchCanvasUserCourseData } from "./canvas_interact/canvas.api.course";
-import {
-  fetchCanvasUserAssignmentData,
-  fetchCanvasUserAssignmentRubricData,
-  fetchCanvasUserAssignmentSubmissionData
-} from "./canvas_interact/canvas.api.assignment.rubric";
-import { CanvasAssignmentWithRubricStats } from "./canvas_stats/canvas.assignment.rubric.stats";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
