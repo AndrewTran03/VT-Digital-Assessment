@@ -16,7 +16,7 @@ router.get("/api/statistics/quiz/:canvasUserId", async (req, res) => {
   const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
   const canvasQuizStatisticArr = await fetchCanvasUserQuizReportData(axiosHeaders, canvasUserId, canvasUserCourseIds);
   index++;
-  log.info(`END OF STATS GET REQUEST #${index} ---------------------`);
+  log.info(`END OF QUIZ STATS GET REQUEST #${index} ---------------------`);
   return res.status(200).send(JSON.stringify(canvasQuizStatisticArr, null, 2));
 });
 
@@ -38,7 +38,7 @@ router.post("/api/statistics/quiz/:canvasUserId/:canvasCourseInternalId/:canvasQ
     const stats = new CanvasQuizStats(currStatEntry, learningObjectiveArr);
     const quizStatResults = stats.computeQuizStats();
     log.warn(quizStatResults);
-    log.info("STATUS: GOT HERE STAT -----------");
+    log.info("STATUS: GOT HERE QUIZ STAT -----------");
     return res.status(200).send(JSON.stringify(quizStatResults, null, 2));
   } catch (err) {
     log.error("Error with interacting with the MongoDB database! Please try again!");
