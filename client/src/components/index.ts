@@ -1,6 +1,6 @@
 import FileImport from "./FileImport";
 import QuizLearningObjectiveMatcher from "./QuizLearningObjectiveMatcher";
-import AssignmentRubricLearningObjectiveMatcher from "./AssignmentRubricObjectiveMatcher";
+import AssignmentRubricLearningObjectiveMatcher from "./AssignmentRubricLearningObjectiveMatcher";
 import UserDashboard from "./UserDashboard";
 import QuizStatistics from "./QuizStatistics";
 import AssignmentRubricStatistics from "./AssignmentRubricStatistics";

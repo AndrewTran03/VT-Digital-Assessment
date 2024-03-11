@@ -1,13 +1,20 @@
 import { useEffect, useContext, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { CanvasCourseAssociations, CanvasQuizStatistic, backendUrlBase } from "../shared/types";
+import {
+  CanvasCourseAssignmentRubricObjMongoDBEntry,
+  CanvasCourseAssociations,
+  CanvasQuizStatistic,
+  backendUrlBase
+} from "../shared/types";
 import {
   CanvasQuizQuestionContext,
-  LearningObjectiveContext,
+  QuizLearningObjectiveContext,
   CanvasUserInfoContext,
   CanvasUserCourseNamesArrContext,
-  CanvasQuizStatisticContext
+  CanvasQuizStatisticContext,
+  CanvasAssignmentWithRubricContext,
+  AssignmentWithRubricLearningObjectiveContext
 } from "../shared/contexts";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
 import {
@@ -27,7 +34,7 @@ import "../styles/TableCellStyles.css";
 
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
-  const { setCanvasLearningObjectiveData } = useContext(LearningObjectiveContext);
+  const { setCanvasQuizLearningObjectiveData } = useContext(QuizLearningObjectiveContext);
   const { canvasUserInfo } = useContext(CanvasUserInfoContext);
   const [canvasUserId] = useState(
     canvasUserInfo.canvasUserId || parseInt(window.localStorage.getItem("canvasUserId") ?? "0")
@@ -35,15 +42,25 @@ const UserDashboard: React.FC = () => {
   const { setCanvasUserCourseNamesArr } = useContext(CanvasUserCourseNamesArrContext);
   const { canvasQuizQuestionStatisticDataArr, setCanvasQuizQuestionStatisticDataArr } =
     useContext(CanvasQuizStatisticContext);
+  const { assignmentWithRubricDataArr, setAssignmentWithRubricDataArr } = useContext(CanvasAssignmentWithRubricContext);
+  const { setCanvasAssignmentWithRubricLearningObjectiveData } = useContext(
+    AssignmentWithRubricLearningObjectiveContext
+  );
   const canvasQuizDataArrGroupBy = Object.groupBy(canvasQuizDataArr, (entry) => entry.canvasCourseInternalId);
+  const assignmentWithRubricDataArrGroupBy = Object.groupBy(
+    assignmentWithRubricDataArr,
+    (entry) => entry.canvasCourseInternalId
+  );
   const navigate = useNavigate();
   const [coursesLoading, setCoursesLoading] = useState(false);
-  const [statsLoading, setStatsLoading] = useState(false);
+  const [quizStatsLoading, setQuizStatsLoading] = useState(false);
+  const [assignmentWithRubricDataLoading, setAssignmentWithRubricDataLoading] = useState(false);
 
   async function fetchData() {
     console.clear();
     await fetchCanvasQuizData();
-    await fetchCanvasStatisticsData();
+    await fetchCanvasQuizStatisticsData();
+    await fetchCanvasAssignmentsWithRubricsData();
   }
 
   useEffect(() => {
@@ -58,6 +75,10 @@ const UserDashboard: React.FC = () => {
     console.log(canvasQuizDataArrGroupBy);
   }, [canvasQuizDataArrGroupBy]);
 
+  useEffect(() => {
+    console.log(assignmentWithRubricDataArrGroupBy);
+  }, [assignmentWithRubricDataArrGroupBy]);
+
   async function fetchCanvasQuizData() {
     setCoursesLoading(true);
     await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`).then((res) => {
@@ -68,20 +89,31 @@ const UserDashboard: React.FC = () => {
     setCoursesLoading(false);
   }
 
-  async function fetchCanvasStatisticsData() {
-    setStatsLoading(true);
+  async function fetchCanvasQuizStatisticsData() {
+    setQuizStatsLoading(true);
     await axios.get(`${backendUrlBase}/api/statistics/quiz/${canvasUserId}`).then((res) => {
       console.log(res.data);
       setCanvasQuizQuestionStatisticDataArr(res.data as CanvasQuizStatistic[]);
     });
-    setStatsLoading(false);
+    setQuizStatsLoading(false);
+  }
+
+  async function fetchCanvasAssignmentsWithRubricsData() {
+    setAssignmentWithRubricDataLoading(true);
+    await axios.get(`${backendUrlBase}/api/statistics/assignment_rubric/${canvasUserId}`).then((res) => {
+      console.log("ASSIGNMENT WITH RUBRIC DATA:");
+      console.log(res.data);
+      setAssignmentWithRubricDataArr(res.data as CanvasCourseAssignmentRubricObjMongoDBEntry[]);
+    });
+    setAssignmentWithRubricDataLoading(false);
   }
 
   async function handleApiRefreshButtonClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
     await fetchCanvasQuizData();
-    await fetchCanvasStatisticsData();
+    await fetchCanvasQuizStatisticsData();
+    await fetchCanvasAssignmentsWithRubricsData();
   }
 
   function handleClickToObjectives(e: FormEvent<HTMLButtonElement>) {
@@ -111,27 +143,31 @@ const UserDashboard: React.FC = () => {
     navigate("/file_import");
   }
 
-  function handleClickToMatcher(e: FormEvent<HTMLButtonElement>, courseInternalId: number, specifiedQuizId: number) {
+  function handleClickToMatcherQuiz(
+    e: FormEvent<HTMLButtonElement>,
+    courseInternalId: number,
+    specifiedQuizId: number
+  ) {
     e.preventDefault();
     console.clear();
-    setCanvasLearningObjectiveData({
+    setCanvasQuizLearningObjectiveData({
       canvasCourseInternalId: courseInternalId,
       quizId: specifiedQuizId
     });
     window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
-    navigate("/learning_obj_match");
+    navigate("/quiz_learning_obj_match");
   }
 
-  function handleClickToStatistics(
+  function handleClickToStatisticsQuiz(
     e: FormEvent<HTMLButtonElement>,
     specifiedCourseInternalId: number,
     specifiedQuizId: number
   ) {
     e.preventDefault();
     console.clear();
-    setCanvasLearningObjectiveData({
+    setCanvasQuizLearningObjectiveData({
       canvasCourseInternalId: specifiedCourseInternalId,
       quizId: specifiedQuizId
     });
@@ -139,11 +175,45 @@ const UserDashboard: React.FC = () => {
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
     window.localStorage.setItem("canvasStatsArr", JSON.stringify(canvasQuizQuestionStatisticDataArr));
-    navigate("/statistics");
+    navigate("/quiz_statistics");
+  }
+
+  function handleClicktoMatcherAssignmentWithRubric(
+    e: FormEvent<HTMLButtonElement>,
+    specifiedCourseInternalId: number,
+    specifiedRubricId: number
+  ) {
+    e.preventDefault();
+    console.clear();
+    setCanvasAssignmentWithRubricLearningObjectiveData({
+      canvasCourseInternalId: specifiedCourseInternalId,
+      rubricId: specifiedRubricId
+    });
+    window.localStorage.setItem("canvasCourseInternalId", specifiedCourseInternalId.toString());
+    window.localStorage.setItem("canvasRubricId", specifiedRubricId.toString());
+    window.localStorage.setItem("assignmentWithRubricArr", JSON.stringify(assignmentWithRubricDataArr));
+    navigate("/assignment_with_rubric_learning_obj_match");
+  }
+
+  function handleClicktoStatisticsAssignmentWithRubric(
+    e: FormEvent<HTMLButtonElement>,
+    specifiedCourseInternalId: number,
+    specifiedRubricId: number
+  ) {
+    e.preventDefault();
+    console.clear();
+    setCanvasAssignmentWithRubricLearningObjectiveData({
+      canvasCourseInternalId: specifiedCourseInternalId,
+      rubricId: specifiedRubricId
+    });
+    window.localStorage.setItem("canvasCourseInternalId", specifiedCourseInternalId.toString());
+    window.localStorage.setItem("canvasRubricId", specifiedRubricId.toString());
+    window.localStorage.setItem("assignmentWithRubricArr", JSON.stringify(assignmentWithRubricDataArr));
+    navigate("/assignment_with_rubric_statistics");
   }
 
   // Edge-Case: Handles if No Statistics Available for that Quiz (Students have NOT taken quiz yet)
-  function checkValidStatsEntryToDisplay(specifiedCourseInternalId: number, specifiedQuizId: number) {
+  function checkValidQuizStatsEntryToDisplay(specifiedCourseInternalId: number, specifiedQuizId: number) {
     const specifiedQuizToNavigate = canvasQuizQuestionStatisticDataArr.filter(
       (entry) =>
         entry.url.includes(specifiedCourseInternalId.toString()) && entry.url.includes(specifiedQuizId.toString())
@@ -163,6 +233,25 @@ const UserDashboard: React.FC = () => {
     return false;
   }
 
+  // Edge-Case: Handles if No Statistics Available for that Quiz (Students have NOT taken quiz yet)
+  function checkValidAssignmentWithRubricStatsEntryToDisplay(
+    specifiedCourseInternalId: number,
+    specifiedRubricId: number
+  ) {
+    const specifiedAssignmentWithRubricToNavigate = assignmentWithRubricDataArr.filter(
+      (entry) =>
+        entry.canvasCourseInternalId === specifiedCourseInternalId && entry.canvasRubricId === specifiedRubricId
+    );
+    if (
+      specifiedAssignmentWithRubricToNavigate &&
+      specifiedAssignmentWithRubricToNavigate.length === 1 &&
+      specifiedAssignmentWithRubricToNavigate[0].recentSubmissionData.length === 0
+    ) {
+      return true; // Disable that "Statistics" button
+    }
+    return false;
+  }
+
   function handleLogout(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
@@ -174,12 +263,12 @@ const UserDashboard: React.FC = () => {
       <Typography fontSize={24}>
         <b>Canvas Course Dashboard</b>
       </Typography>
-      <button type="button" onClick={handleClickToObjectives} disabled={coursesLoading || statsLoading}>
+      <button type="button" onClick={handleClickToObjectives} disabled={coursesLoading || quizStatsLoading}>
         <Typography>
           <b>+ Add Learning Objectives for Your Course</b>
         </Typography>
       </button>
-      <button type="submit" onClick={handleApiRefreshButtonClick} disabled={coursesLoading || statsLoading}>
+      <button type="submit" onClick={handleApiRefreshButtonClick} disabled={coursesLoading || quizStatsLoading}>
         <Typography>
           <b>Refresh</b>
         </Typography>
@@ -196,13 +285,17 @@ const UserDashboard: React.FC = () => {
           <CircularProgress />
         </>
       )}
-      {statsLoading && (
+      {quizStatsLoading && (
         <>
           <br />
           <Typography>Course Quiz Statistics Loading...</Typography>
           <CircularProgress />
         </>
       )}
+
+      <Typography fontSize={20}>
+        <b>Your Canvas Course Quiz Entries</b>
+      </Typography>
       {canvasQuizDataArrGroupBy &&
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
         Object.entries(canvasQuizDataArrGroupBy).map((value, key) => (
@@ -265,7 +358,7 @@ const UserDashboard: React.FC = () => {
                           <Typography>
                             <button
                               type="submit"
-                              onClick={(e) => handleClickToMatcher(e, entry.canvasCourseInternalId, entry.quizId)}
+                              onClick={(e) => handleClickToMatcherQuiz(e, entry.canvasCourseInternalId, entry.quizId)}
                               disabled={coursesLoading}
                             >
                               Click to Assign Learning Objectives
@@ -276,10 +369,138 @@ const UserDashboard: React.FC = () => {
                           <Typography>
                             <button
                               type="submit"
-                              onClick={(e) => handleClickToStatistics(e, entry.canvasCourseInternalId, entry.quizId)}
+                              onClick={(e) =>
+                                handleClickToStatisticsQuiz(e, entry.canvasCourseInternalId, entry.quizId)
+                              }
                               disabled={
-                                statsLoading ||
-                                checkValidStatsEntryToDisplay(entry.canvasCourseInternalId, entry.quizId)
+                                quizStatsLoading ||
+                                checkValidQuizStatsEntryToDisplay(entry.canvasCourseInternalId, entry.quizId)
+                              }
+                            >
+                              Click to View Statistics
+                            </button>
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  ))}
+                </Table>
+              </div>
+            )}
+          </Paper>
+        ))}
+
+      <Typography fontSize={20}>
+        <b>Your Canvas Course Assignment Entries (With Rubrics)</b>
+      </Typography>
+      {assignmentWithRubricDataArrGroupBy &&
+        Object.entries(assignmentWithRubricDataArrGroupBy).length > 0 &&
+        Object.entries(assignmentWithRubricDataArrGroupBy).map((value, key) => (
+          <Paper key={key} style={{ margin: "20px 0", borderRadius: 20, overflow: "hidden" }}>
+            {value[1] && value[1].length > 0 && (
+              <div key={value[1][0].canvasCourseName}>
+                <div
+                  style={{
+                    border: "1px solid lightgray"
+                  }}
+                >
+                  <TableTitle
+                    variant="h6"
+                    text={`${value[1][0].canvasCourseName} (${value[1][0].canvasCourseInternalId})`}
+                  />
+                </div>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell className="table-cell" style={{ width: "15%" }}>
+                        <Typography>
+                          <b>Assignment Id</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "30%" }}>
+                        <Typography>
+                          <b>Assignment Name</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "15%" }}>
+                        <Typography>
+                          <b>Rubric Id</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "30%" }}>
+                        <Typography>
+                          <b>Rubric Name</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "15%" }}>
+                        <Typography>
+                          <b>Number of Rubric Criterion</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                        <Typography>
+                          <b>Assign Learning Objectives</b>
+                        </Typography>
+                      </TableCell>
+                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                        <Typography>
+                          <b>View Statistics</b>
+                        </Typography>
+                      </TableCell>
+                    </TableRow>
+                  </TableHead>
+                  {value[1].map((entry) => (
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="table-cell" style={{ width: "15%" }}>
+                          <Typography>{entry.canvasAssignmentId}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "30%" }}>
+                          <Typography>{entry.canvasAssignmentName}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "15%" }}>
+                          <Typography>{entry.canvasRubricId}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "30%" }}>
+                          <Typography>{entry.title}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "15%" }}>
+                          <Typography>{entry.canvasMatchedLearningObjectivesArr.length}</Typography>
+                        </TableCell>
+                        <TableCell className="table-cell" style={{ width: "20%" }}>
+                          <Typography>
+                            <button
+                              type="submit"
+                              onClick={(e) =>
+                                handleClicktoMatcherAssignmentWithRubric(
+                                  e,
+                                  entry.canvasCourseInternalId,
+                                  entry.canvasRubricId
+                                )
+                              }
+                              disabled={assignmentWithRubricDataLoading}
+                            >
+                              Click to Assign Learning Objectives
+                            </button>
+                          </Typography>
+                        </TableCell>
+                        <TableCell style={{ width: "20%" }}>
+                          <Typography>
+                            <button
+                              type="submit"
+                              onClick={(e) =>
+                                handleClicktoStatisticsAssignmentWithRubric(
+                                  e,
+                                  entry.canvasCourseInternalId,
+                                  entry.canvasRubricId
+                                )
+                              }
+                              disabled={
+                                assignmentWithRubricDataLoading ||
+                                checkValidAssignmentWithRubricStatsEntryToDisplay(
+                                  entry.canvasCourseInternalId,
+                                  entry.canvasRubricId
+                                )
                               }
                             >
                               Click to View Statistics

@@ -318,6 +318,58 @@ type CanvasQuizQuestionAnswerSetFrequencyArrEntry = {
   answer_frequencies: CanvasQuizQuestionAnswerFrequencyArrEntry[];
 };
 
+type CanvasCourseAssignmentRubricObjBaseProperties = {
+  canvasAssignmentId: number;
+  canvasAssignmentName: string;
+  canvasRubricId: number;
+  title: string;
+  maxPoints: number;
+  rubricData: AssignmentRubricCriteriaMongoDBEntry[];
+};
+
+type AssignmentRubricCriteriaMongoDBEntry = {
+  id: string;
+  maxCategoryPoints: number;
+  description: string;
+  ratings: AssignmentRubricRatingMongoDBEntry[];
+};
+
+type AssignmentRubricRatingMongoDBEntry = {
+  description: string;
+  ratingPoints: number;
+};
+
+type CanvasCourseAssignmentRubricObjExtraProperties = {
+  canvasUserId: number;
+  canvasDeptAbbrev: string;
+  canvasCourseNum: number;
+  canvasCourseName: string;
+  canvasCourseInternalId: number;
+  canvasMatchedLearningObjectivesArr: string[];
+  recentSubmissionData: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
+};
+
+type CanvasCourseAssignmentRubricSubmissionMongoDBEntry = {
+  canvasAssignmentScore: number;
+  rubricCategoryScores: CanvasCourseAssignmentRubricCategorySubmissionScore[];
+};
+
+type CanvasCourseAssignmentRubricCategorySubmissionScore = {
+  id: string;
+  points: number;
+};
+
+type CanvasCourseAssignmentRubricObjBase = Prettify<
+  CanvasCourseAssignmentRubricObjBaseProperties & CanvasCourseAssignmentRubricObjExtraProperties
+>;
+
+type CanvasCourseAssignmentRubricObjMongoDBEntry = MongoDBCombined<CanvasCourseAssignmentRubricObjBase>;
+
+type LearningObjectiveAssignmentWithRubricData = {
+  canvasCourseInternalId: number;
+  rubricId: number;
+};
+
 export {
   backendUrlBase,
   MongoDBWithId,
@@ -340,5 +392,7 @@ export {
   CanvasQuizStatistic,
   CanvasQuizStatisticsResultObj,
   CanvasQuizQuestionAnswerFrequencyArrEntry,
-  CanvasQuizQuestionAnswerSetFrequencyArrEntry
+  CanvasQuizQuestionAnswerSetFrequencyArrEntry,
+  CanvasCourseAssignmentRubricObjMongoDBEntry,
+  LearningObjectiveAssignmentWithRubricData
 };
