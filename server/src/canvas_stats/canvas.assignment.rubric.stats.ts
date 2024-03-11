@@ -1,16 +1,16 @@
 import {
   numberLike,
   EXPECTATIONS,
-  CanvasCourseAssignmentRubricObjBase,
   CanvasCourseAssignmentRubricSubmissionMongoDBEntry,
   CanvasLearningObjectiveCategories,
   CanvasCourseAssignmentRubricCategoryAnswerStatistic,
   RubricRatingSubmissionScore,
-  CanvasAssignmentWithRubricStatisticsResultObj
+  CanvasAssignmentWithRubricStatisticsResultObj,
+  AssignmentRubricCriteriaMongoDBEntry
 } from "../shared/types";
 
 export class CanvasAssignmentWithRubricStats {
-  private assignmentRubricObj: CanvasCourseAssignmentRubricObjBase;
+  private assignmentRubricObj: AssignmentRubricCriteriaMongoDBEntry[];
   private assignmentRubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
   private assignmentRubricExpectationCategories: CanvasLearningObjectiveCategories[] = [];
   private assignmentRubricLearningObjectivesArr: string[] = [];
@@ -21,9 +21,9 @@ export class CanvasAssignmentWithRubricStats {
   private static readonly BELOW_EXPECTATIONS = 0; // from here up to but not including Meets Score
 
   constructor(
-    rubricObj: CanvasCourseAssignmentRubricObjBase,
+    rubricObj: AssignmentRubricCriteriaMongoDBEntry[],
     rubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[],
-    learningObjectiveArr: string[] = []
+    learningObjectiveArr: string[]
   ) {
     this.assignmentRubricObj = rubricObj;
     this.assignmentRubricSubmissionArr = rubricSubmissionArr;
@@ -142,7 +142,7 @@ export class CanvasAssignmentWithRubricStats {
       }
     }
 
-    console.assert(this.assignmentRubricObj.rubricData.length === this.assignmentRubricLearningObjectivesArr.length);
+    console.assert(this.assignmentRubricObj.length === this.assignmentRubricLearningObjectivesArr.length);
     for (let i = 0; i < this.assignmentRubricLearningObjectivesArr.length; i++) {
       if (this.assignmentRubricLearningObjectivesArr[i].length === 0) {
         continue;
@@ -188,7 +188,8 @@ export class CanvasAssignmentWithRubricStats {
   private get assignmentRubricCategoryFinalScoresHelper() {
     const assignmentRubricCategoryScores: CanvasCourseAssignmentRubricCategoryAnswerStatistic[] = [];
 
-    for (const rCriteria of this.assignmentRubricObj.rubricData) {
+    for (const rCriteria of this.assignmentRubricObj) {
+      rCriteria.maxCategoryPoints;
       const ratingsSubArr: RubricRatingSubmissionScore[] = [];
       for (const rating of rCriteria.ratings) {
         const newRating: RubricRatingSubmissionScore = {
@@ -235,7 +236,7 @@ export class CanvasAssignmentWithRubricStats {
       currPointsArr.sort((a, b) => a - b);
 
       // Convert to a floating-point number and divide by number of entries
-      const standardizedPointsArr = currPointsArr.map((entry) => entry / (1.0 * currPointsArr.length));
+      const standardizedPointsArr = currPointsArr.map((entry) => entry / parseFloat("" + currPointsArr.length));
 
       const totalAssignmentRubricCriteriaPoints = standardizedPointsArr.reduce((acc, curr) => acc + curr, 0);
       const newRubricCategoryAvg = totalAssignmentRubricCriteriaPoints / currPointsArr.length;
@@ -254,7 +255,7 @@ export class CanvasAssignmentWithRubricStats {
       currPointsArr.sort((a, b) => a - b);
 
       // Convert to a floating-point number and divide by number of entries
-      const standardizedPointsArr = currPointsArr.map((entry) => entry / (1.0 * currPointsArr.length));
+      const standardizedPointsArr = currPointsArr.map((entry) => entry / parseFloat("" + currPointsArr.length));
 
       const medianIndex = Math.floor(standardizedPointsArr.length / 2);
       const newRubricCategoryMedian =
@@ -267,11 +268,7 @@ export class CanvasAssignmentWithRubricStats {
   }
 
   // Uses the "Builder" software design pattern
-  public computeAssignmentWithRubricStats(): CanvasAssignmentWithRubricStatisticsResultObj | {} {
-    if (this.assignmentRubricSubmissionArr.length === 0) {
-      return {};
-    }
-
+  public computeAssignmentWithRubricStats(): CanvasAssignmentWithRubricStatisticsResultObj {
     const assignmentWithRubricStatsResultObj: CanvasAssignmentWithRubricStatisticsResultObj = {
       assignmentAveragePointsEarned: this.computeAssignmentWithRubricAveragePointsEarned,
       assignmentMedianPointsEarned: this.computeAssignmentWithRubricMedianPointsEarned,
