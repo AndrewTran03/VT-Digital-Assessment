@@ -1,5 +1,14 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import { FileImport, LearningObjectiveMatcher, UserDashboard, QuizStatistics, NotFound, UserLogin } from "./components";
+import {
+  FileImport,
+  QuizLearningObjectiveMatcher,
+  UserDashboard,
+  QuizStatistics,
+  NotFound,
+  UserLogin,
+  AssignmentRubricStatistics,
+  AssignmentRubricLearningObjectiveMatcher
+} from "./components";
 import { useCookies } from "react-cookie";
 
 const AppRouter: React.FC = () => {
@@ -13,10 +22,18 @@ const AppRouter: React.FC = () => {
           <Route path="/dashboard" element={cookies.Authenticated ? <UserDashboard /> : <Navigate to="/" />} />
           <Route path="/file_import" element={cookies.Authenticated ? <FileImport /> : <Navigate to="/" />} />
           <Route
-            path="/learning_obj_match"
-            element={cookies.Authenticated ? <LearningObjectiveMatcher /> : <Navigate to="/" />}
+            path="/quiz_learning_obj_match"
+            element={cookies.Authenticated ? <QuizLearningObjectiveMatcher /> : <Navigate to="/" />}
           />
-          <Route path="/statistics" element={cookies.Authenticated ? <QuizStatistics /> : <Navigate to="/" />} />
+          <Route
+            path="/assignment_with_rubric_learning_obj_match"
+            element={cookies.Authenticated ? <AssignmentRubricLearningObjectiveMatcher /> : <Navigate to="/" />}
+          />
+          <Route path="/quiz_statistics" element={cookies.Authenticated ? <QuizStatistics /> : <Navigate to="/" />} />
+          <Route
+            path="/assignment_with_rubric_statistics"
+            element={cookies.Authenticated ? <AssignmentRubricStatistics /> : <Navigate to="/" />}
+          />
           {/* Catch-All Route */}
           <Route path="*" element={<NotFound />} />
         </Routes>
