@@ -26,14 +26,14 @@ import {
   CanvasQuizQuestionContext,
   CanvasQuizStatisticContext,
   CanvasUserInfoContext,
-  LearningObjectiveContext
+  QuizLearningObjectiveContext
 } from "../shared/contexts";
 import "../styles/TableCellStyles.css";
 
 const QuizStatistics: React.FC = () => {
   const PERCENTAGE_CATEGORIES = ["Exceeds", "Meets", "Below", "None"] as const;
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
-  const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
+  const { canvasQuizLearningObjectiveData } = useContext(QuizLearningObjectiveContext);
   const { canvasUserInfo } = useContext(CanvasUserInfoContext);
   const { canvasQuizQuestionStatisticDataArr } = useContext(CanvasQuizStatisticContext);
   const canvasQuizData: CanvasCourseQuizMongoDBEntry[] =
@@ -41,11 +41,11 @@ const QuizStatistics: React.FC = () => {
       ? JSON.parse(window.localStorage.getItem("canvasQuizDataArr") ?? "[]")
       : canvasQuizDataArr;
   const [canvasCourseInternalId] = useState(
-    canvasLearningObjectiveData.canvasCourseInternalId ||
+    canvasQuizLearningObjectiveData.canvasCourseInternalId ||
       parseInt(window.localStorage.getItem("canvasCourseInternalId") ?? "0")
   );
   const [canvasQuizId] = useState(
-    canvasLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
+    canvasQuizLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
   );
   const [canvasUserId] = useState(
     canvasUserInfo.canvasUserId || parseInt(window.localStorage.getItem("canvasUserId") ?? "0")
