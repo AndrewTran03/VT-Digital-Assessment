@@ -386,7 +386,7 @@ router.get("/api/canvas/:canvasUserId", async (req, res) => {
   }
 });
 
-router.put("/api/canvas/update_objectives/:canvasQuizEntryId", async (req, res) => {
+router.put("/api/canvas/quiz/update_objectives/:canvasQuizEntryId", async (req, res) => {
   const canvasQuizEntryToUpdateId = req.params.canvasQuizEntryId;
 
   const learningObjectiveArrToUpdate = req.body as string[];
@@ -395,14 +395,44 @@ router.put("/api/canvas/update_objectives/:canvasQuizEntryId", async (req, res) 
     const canvasQuizEntryToUpdate = await CanvasCourseQuizModel.findById(canvasQuizEntryToUpdateId);
     // Error check to avoid working with an invalid MongoDB "_id" passed to the database query
     if (!canvasQuizEntryToUpdate) {
-      throw new Error("The specified Canvas quiz question does not exist in the MongoDB database");
+      throw new Error("The specified Canvas quiz questions do not exist in the MongoDB database");
     }
     canvasQuizEntryToUpdate.canvasMatchedLearningObjectivesArr = learningObjectiveArrToUpdate;
     const canvasQuizEntryUpdateResult = await canvasQuizEntryToUpdate.save();
-    log.info("Updated the specified Canvas quiz question successfully! Congratulations!");
+    log.info(
+      "Updated the specified Canvas quiz questions successfully with the following learning objectives! Congratulations!"
+    );
     return res.status(200).json(canvasQuizEntryUpdateResult);
   } catch (err) {
-    log.error("Could not update the specified Canvas quiz question! Please try again!");
+    log.error("Could not update the specified Canvas quiz questions! Please try again!");
+    const resErrBody: APIErrorResponse = {
+      errorLoc: "PUT",
+      errorMsg: "Failed to update the MongoDB database"
+    };
+    return res.status(400).send(JSON.stringify(resErrBody));
+  }
+});
+
+router.put("/api/canvas/assignment_rubric/update_objectives/:canvasQuizEntryId", async (req, res) => {
+  const canvasQuizEntryToUpdateId = req.params.canvasQuizEntryId;
+
+  const learningObjectiveArrToUpdate = req.body as string[];
+
+  try {
+    const canvasCourseAssignmentRubricObjEntryToUpdate =
+      await CanvasCourseAssignmentRubricObjModel.findById(canvasQuizEntryToUpdateId);
+    // Error check to avoid working with an invalid MongoDB "_id" passed to the database query
+    if (!canvasCourseAssignmentRubricObjEntryToUpdate) {
+      throw new Error("The specified Canvas assignment (with rubric) does not exist in the MongoDB database");
+    }
+    canvasCourseAssignmentRubricObjEntryToUpdate.canvasMatchedLearningObjectivesArr = learningObjectiveArrToUpdate;
+    const canvasCourseAssignmentRubricObjEntryUpdateResult = await canvasCourseAssignmentRubricObjEntryToUpdate.save();
+    log.info(
+      "Updated the specified Canvas assignment (with rubric) successfully with the following learning objectives! Congratulations!"
+    );
+    return res.status(200).json(canvasCourseAssignmentRubricObjEntryUpdateResult);
+  } catch (err) {
+    log.error("Could not update the specified Canvas assignment (with rubric)! Please try again!");
     const resErrBody: APIErrorResponse = {
       errorLoc: "PUT",
       errorMsg: "Failed to update the MongoDB database"
