@@ -34,11 +34,14 @@ app.use((_, res, next: NextFunction) => {
   next();
 });
 
+const frontendClientPort = config.get<number>("frontendClientPort");
+const frontendClientUrl = config.get<string>("frontendClientUrl");
+
 // Socket.io Setup (Server):
 const server = http.createServer(app);
 const ioSocket = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173"],
+    origin: [frontendClientUrl],
     methods: ["GET, POST, PUT, PATCH, DELETE, HEAD, TRACE, OPTIONS"]
   }
 });

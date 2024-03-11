@@ -5,7 +5,8 @@ import { fromZodError } from "zod-validation-error";
 // Include secret enviornment variables here
 const processEnvSchema = z
   .object({
-    BACKEND_PORT: z.number().gte(3000),
+    FRONTEND_PORT: z.number().gte(1000),
+    BACKEND_PORT: z.number().gte(1000),
     CANVAS_PUBLIC_API_TOKEN: z.string().min(1),
     USERNAME: z.string().min(1),
     PASSWORD: z.string().min(1),
