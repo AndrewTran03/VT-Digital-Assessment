@@ -24,22 +24,22 @@ import {
   CanvasCourseQuizMongoDBEntry
 } from "../shared/types";
 import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
-import { CanvasQuizQuestionContext, LearningObjectiveContext } from "../shared/contexts";
+import { CanvasQuizQuestionContext, QuizLearningObjectiveContext } from "../shared/contexts";
 import "../styles/TableCellStyles.css";
 
-const LearningObjectiveMatcher: React.FC = () => {
+const QuizLearningObjectiveMatcher: React.FC = () => {
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
-  const { canvasLearningObjectiveData } = useContext(LearningObjectiveContext);
+  const { canvasQuizLearningObjectiveData } = useContext(QuizLearningObjectiveContext);
   const canvasQuizData: CanvasCourseQuizMongoDBEntry[] =
     canvasQuizDataArr.length === 0
       ? JSON.parse(window.localStorage.getItem("canvasQuizDataArr") ?? "[]")
       : canvasQuizDataArr;
   const [canvasCourseInternalId] = useState(
-    canvasLearningObjectiveData.canvasCourseInternalId ||
+    canvasQuizLearningObjectiveData.canvasCourseInternalId ||
       parseInt(window.localStorage.getItem("canvasCourseInternalId") ?? "0")
   );
   const [canvasQuizId] = useState(
-    canvasLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
+    canvasQuizLearningObjectiveData.quizId || parseInt(window.localStorage.getItem("canvasQuizId") ?? "0")
   );
   const navigate = useNavigate();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -303,4 +303,4 @@ const LearningObjectiveMatcher: React.FC = () => {
   );
 };
 
-export default LearningObjectiveMatcher;
+export default QuizLearningObjectiveMatcher;
