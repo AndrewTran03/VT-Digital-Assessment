@@ -60,6 +60,8 @@ const canvasAssignmentRubricSchema = z.object({
   canvasCourseName: z.string().min(1),
   canvasCourseInternalId: z.number().gte(0),
   canvasRubricId: z.number().gte(0),
+  canvasAssignmentId: z.number().gte(0),
+  canvasAssignmentName: z.string().min(1),
   title: z.string().min(1),
   maxPoints: z.number().gte(0),
   data: z
@@ -296,6 +298,8 @@ function convertAssignmentWithRubricArrToBeMongoDBCompliant(
       canvasCourseNum: assignmentRubricResult.canvasCourseNum,
       canvasCourseName: assignmentRubricResult.canvasCourseName,
       canvasRubricId: assignmentRubricResult.canvasCourseAssignmentRubricId,
+      canvasAssignmentId: assignmentRubricResult.canvasCourseAssignmentId,
+      canvasAssignmentName: assignmentRubricResult.canvasCourseAssignmentName,
       title: assignmentRubricObjArrEntry.title,
       maxPoints: assignmentRubricObjArrEntry.maxPoints,
       rubricData: assignmentRubricObjArrEntry.rubricData,
