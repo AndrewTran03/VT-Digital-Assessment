@@ -103,7 +103,7 @@ const CanvasCourseAssignmentRubricObjSchema = new mongoose.Schema<CanvasCourseAs
     },
     canvasAssignmentName: {
       type: String,
-      required: true,
+      required: true
     },
     title: {
       type: String,

@@ -35,14 +35,14 @@ async function fetchCanvasUserAssignmentData(
 
     assignmentRes.data.forEach((assignmentData: any) => {
       const use_rubric_for_grading: booleanLike = assignmentData.use_rubric_for_grading ?? null;
-      
+
       if (use_rubric_for_grading !== null) {
         const canvasCourseAssignmentRubricUsedForGrading = use_rubric_for_grading as boolean;
         const assignmentName = assignmentData.name as string;
         const assignmentId = assignmentData.id as number;
         const rubricId = assignmentData.rubric_settings.id as number;
         const rubricTitle = assignmentData.rubric_settings.title as string;
-        
+
         const rubricCriteriaIdsForAssignment: string[] = [];
         assignmentData.rubric.forEach((rubric: any) => {
           const newRubricId = rubric.id as string;
@@ -97,16 +97,16 @@ async function fetchCanvasUserAssignmentRubricData(
       if (canvasCourseAssignmentRubricId === id && canvasCourseAssignmentRubricTitle === descriptionTitle) {
         const maxPoints = assignmentRubricGroup.points_possible as number;
         const rubricCategoryData: AssignmentRubricCriteriaMongoDBEntry[] = [];
-        
+
         if (assignmentRubricGroup.data && assignmentRubricGroup.data.length > 0) {
           assignmentRubricGroup.data.forEach((rubric: any) => {
             const categoryId = rubric.id as string;
-            
+
             // Additional Check with ID: Only add the current rubric if it is associated with that respective assignment
             if (canvasCourseAssignmentRubricCategoryIds.includes(categoryId)) {
               const maxCategoryPoints = rubric.points as number;
               const description = `${rubric.description as string}${rubric.long_description ? `: ${extractTextFromHTMLHelper(rubric.long_description as string)}` : ""}`;
-              
+
               const rubricRatings: AssignmentRubricRatingMongoDBEntry[] = [];
               if (rubric.ratings && rubric.ratings.length > 0) {
                 rubric.ratings.forEach((rating: any) => {
@@ -146,7 +146,7 @@ async function fetchCanvasUserAssignmentRubricData(
       (entry) => entry.rubricData.length !== 0
     );
     console.assert(assignmentEntry.canvasCourseAssignmentRubricObjArr.length === 1, "Length is not 1");
-    
+
     // Write the fetched data to a JSON file
     try {
       await fs.writeFile(
