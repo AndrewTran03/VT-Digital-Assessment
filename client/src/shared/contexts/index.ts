@@ -1,13 +1,17 @@
 import CanvasQuizQuestionContext from "./CanvasQuizQuestionContext";
-import LearningObjectiveContext from "./LearningObjectiveContext";
+import QuizLearningObjectiveContext from "./QuizLearningObjectiveContext";
 import CanvasUserInfoContext from "./CanvasUserInfoContext";
 import CanvasUserCourseNamesArrContext from "./CanvasUserCourseNamesContext";
 import CanvasQuizStatisticContext from "./CanvasQuizStatisticContext";
+import CanvasAssignmentWithRubricContext from "./CanvasAssignmentWithRubricContext";
+import AssignmentWithRubricLearningObjectiveContext from "./AssignmentWithRubricLearningObjectiveContext";
 
 export {
   CanvasQuizQuestionContext,
-  LearningObjectiveContext,
+  QuizLearningObjectiveContext,
   CanvasUserInfoContext,
   CanvasUserCourseNamesArrContext,
-  CanvasQuizStatisticContext
+  CanvasQuizStatisticContext,
+  CanvasAssignmentWithRubricContext,
+  AssignmentWithRubricLearningObjectiveContext
 };
