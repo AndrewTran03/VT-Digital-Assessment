@@ -43,7 +43,7 @@ export class CanvasAssignmentWithRubricStats {
   private get computeAssignmentWithRubricAveragePointsEarned() {
     const assignmentScores = this.assignmentFinalScoresHelper;
     // To perform floating-point division rather than integer division
-    return assignmentScores.reduce((acc, curr) => acc + curr, 0) / parseFloat("" + assignmentScores.length);
+    return assignmentScores.reduce((acc, curr) => acc + curr, 0) / parseFloat("" + assignmentScores.length) / 100;
   }
 
   private get computeAssignmentWithRubricMedianPointsEarned() {
