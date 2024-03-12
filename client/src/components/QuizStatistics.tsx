@@ -163,7 +163,7 @@ const QuizStatistics: React.FC = () => {
         Back
       </button>
       <button type="submit" onClick={handleCourseStatisticsAPIButtonClick} disabled={statsLoading}>
-        Get Course Statistics Data
+        Get Quiz Statistics Data
       </button>
 
       <br />
@@ -335,7 +335,7 @@ const QuizStatistics: React.FC = () => {
               <b>
                 {!isLearningObjStatisticsAccordionOpen
                   ? "Click Here to See This Quiz's Learning-Objective-Based Statistics"
-                  : "Overall Learning-Objective-Based Statistics"}
+                  : "Overall Quiz Learning-Objective-Based Statistics"}
               </b>
             </Typography>
           </div>
