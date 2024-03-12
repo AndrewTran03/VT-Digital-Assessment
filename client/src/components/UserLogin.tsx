@@ -69,7 +69,7 @@ const UserLogin: React.FC = () => {
     e.preventDefault();
     if (canvasUsernameInputRef.current && canvasApiKeyInputRef.current) {
       if (canvasUsernameInputRef.current.value.length <= 0 || canvasApiKeyInputRef.current.value.length <= 0) {
-        alert(
+        window.alert(
           "Either the Canvas Username or Canvas User API Key has been left empty! Please fix that before proceeding further."
         );
         setUserSubmitInfoComplete(false);
@@ -101,6 +101,11 @@ const UserLogin: React.FC = () => {
             const errorConfig = err.response?.data as APIErrorResponse;
             const error = new APIRequestError("Failed to retrieve Canvas User ID", errorConfig);
             console.error(error.toString());
+
+            // Clear invalid user-typed input submissions
+            canvasUsernameInputRef.current!.value = "";
+            canvasApiKeyInputRef.current!.value = "";
+
             // Display "Failure" submission message for only 10 seconds
             setError(true);
             setTimeout(() => {
