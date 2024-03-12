@@ -31,12 +31,6 @@ export class CanvasAssignmentWithRubricStats {
   }
 
   private get assignmentFinalScoresHelper() {
-    const assignmentScores: number[] = [];
-
-    for (const assignmentSubmission of this.assignmentRubricSubmissionArr) {
-      assignmentScores.push(assignmentSubmission.canvasAssignmentScore);
-    }
-
     return this.assignmentRubricSubmissionArr.map((entry) => entry.canvasAssignmentScore);
   }
 
