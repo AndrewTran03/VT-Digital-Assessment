@@ -291,6 +291,15 @@ const UserDashboard: React.FC = () => {
           <CircularProgress />
         </>
       )}
+      {assignmentWithRubricDataLoading && (
+        <>
+          <br />
+          <Typography>
+            Course Assignment With Rubric Submissions, Learning Objective, and Statistics Loading...
+          </Typography>
+          <CircularProgress />
+        </>
+      )}
 
       <Typography fontSize={20}>
         <b>Your Canvas Course Quiz Entries</b>
