@@ -40,23 +40,38 @@ export class CanvasAssignmentWithRubricStats {
     return assignmentScores;
   }
 
+  private get calculateMaxAssignmentPointsHelper() {
+    return this.assignmentRubricObj.reduce((acc, curr) => acc + curr.maxCategoryPoints, 0);
+  }
+
   private get computeAssignmentWithRubricAveragePointsEarned() {
     const assignmentScores = this.assignmentFinalScoresHelper;
+    const maxAssignmentPoints = this.calculateMaxAssignmentPointsHelper;
+
+    // Convert to a floating-point number and divide by number of entries
+    const standardizedAssignmentScoresArr = assignmentScores.map((entry) => entry / maxAssignmentPoints);
+
     // To perform floating-point division rather than integer division
-    return assignmentScores.reduce((acc, curr) => acc + curr, 0) / parseFloat("" + assignmentScores.length) / 100;
+    return (
+      standardizedAssignmentScoresArr.reduce((acc, curr) => acc + curr, 0) / parseFloat("" + assignmentScores.length)
+    );
   }
 
   private get computeAssignmentWithRubricMedianPointsEarned() {
     const assignmentScores = this.assignmentFinalScoresHelper;
+    console.warn(assignmentScores);
+    const maxAssignmentPoints = this.calculateMaxAssignmentPointsHelper;
 
     assignmentScores.sort((a, b) => a - b);
 
-    const medianIndex = Math.floor(assignmentScores.length / 2);
-    return (
-      (assignmentScores.length % 2 === 0
-        ? (assignmentScores[medianIndex - 1] + assignmentScores[medianIndex]) / 2
-        : assignmentScores[medianIndex]) / 100
-    );
+    // Convert to a floating-point number and divide by number of entries
+    const standardizedAssignmentScoresArr = assignmentScores.map((entry) => entry / maxAssignmentPoints);
+    console.warn(standardizedAssignmentScoresArr);
+
+    const medianIndex = Math.floor(standardizedAssignmentScoresArr.length / 2);
+    return standardizedAssignmentScoresArr.length % 2 === 0
+      ? (standardizedAssignmentScoresArr[medianIndex - 1] + standardizedAssignmentScoresArr[medianIndex]) / 2
+      : standardizedAssignmentScoresArr[medianIndex];
   }
 
   private get computeAssignmentWithRubricPercentageCategories() {
@@ -119,7 +134,7 @@ export class CanvasAssignmentWithRubricStats {
   }
 
   // TODO: To be implemented - NOT APPLICABLE
-  private get computePerQuestionAnswerFrequencies() {
+  private get computePerQuestionAnswerFrequencies(): number[] {
     return [];
   }
 
@@ -235,10 +250,7 @@ export class CanvasAssignmentWithRubricStats {
 
       currPointsArr.sort((a, b) => a - b);
 
-      // Convert to a floating-point number and divide by number of entries
-      const standardizedPointsArr = currPointsArr.map((entry) => entry / parseFloat("" + currPointsArr.length));
-
-      const totalAssignmentRubricCriteriaPoints = standardizedPointsArr.reduce((acc, curr) => acc + curr, 0);
+      const totalAssignmentRubricCriteriaPoints = currPointsArr.reduce((acc, curr) => acc + curr, 0);
       const newRubricCategoryAvg = totalAssignmentRubricCriteriaPoints / currPointsArr.length;
       rubricCategoryAverageArr.push(newRubricCategoryAvg);
     }
@@ -254,14 +266,11 @@ export class CanvasAssignmentWithRubricStats {
 
       currPointsArr.sort((a, b) => a - b);
 
-      // Convert to a floating-point number and divide by number of entries
-      const standardizedPointsArr = currPointsArr.map((entry) => entry / parseFloat("" + currPointsArr.length));
-
-      const medianIndex = Math.floor(standardizedPointsArr.length / 2);
+      const medianIndex = Math.floor(currPointsArr.length / 2);
       const newRubricCategoryMedian =
-        standardizedPointsArr.length % 2 === 0
-          ? (standardizedPointsArr[medianIndex - 1] + standardizedPointsArr[medianIndex]) / 2
-          : standardizedPointsArr[medianIndex];
+        currPointsArr.length % 2 === 0
+          ? (currPointsArr[medianIndex - 1] + currPointsArr[medianIndex]) / 2
+          : currPointsArr[medianIndex];
       rubricCategoryMedianArr.push(newRubricCategoryMedian);
     }
     return rubricCategoryMedianArr;
