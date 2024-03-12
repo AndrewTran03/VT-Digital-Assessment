@@ -205,7 +205,7 @@ const QuizStatistics: React.FC = () => {
                     }}
                   >
                     <Typography>
-                      <b>Quiz Average:</b> {quizStatsResultsObj.quizAveragePointsEarned ?? "Quiz Average Not Defined"}
+                      <b>Quiz Average:</b> {quizStatsResultsObj.quizAveragePointsEarned ? quizStatsResultsObj.quizAveragePointsEarned.toFixed(3) : "Quiz Average Not Defined"}
                     </Typography>
                   </TableCell>
                   {quizStatsResultsObj.quizAveragePointsEarned && (
@@ -241,7 +241,7 @@ const QuizStatistics: React.FC = () => {
                     }}
                   >
                     <Typography>
-                      <b>Quiz Median:</b> {quizStatsResultsObj.quizMedianPointsEarned ?? "Quiz Median Not Defined"}
+                      <b>Quiz Median:</b> {quizStatsResultsObj.quizMedianPointsEarned ? quizStatsResultsObj.quizMedianPointsEarned.toFixed(3) : "Quiz Median Not Defined"}
                     </Typography>
                   </TableCell>
                   {quizStatsResultsObj.quizMedianPointsEarned && (
@@ -283,7 +283,7 @@ const QuizStatistics: React.FC = () => {
                           quizStatsResultsObj.quizPercentageCategories.length > 0 &&
                           quizStatsResultsObj.quizPercentageCategories.map((percentageCategory, idx: number) => (
                             <li>
-                              {PERCENTAGE_CATEGORIES[idx]}: {percentageCategory.toString()}
+                              {PERCENTAGE_CATEGORIES[idx]}: {percentageCategory.toFixed(3).toString()}
                             </li>
                           ))}
                       </ul>
