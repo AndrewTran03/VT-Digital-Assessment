@@ -59,14 +59,12 @@ export class CanvasAssignmentWithRubricStats {
 
   private get computeAssignmentWithRubricMedianPointsEarned() {
     const assignmentScores = this.assignmentFinalScoresHelper;
-    console.warn(assignmentScores);
     const maxAssignmentPoints = this.calculateMaxAssignmentPointsHelper;
 
     assignmentScores.sort((a, b) => a - b);
 
     // Convert to a floating-point number and divide by number of entries
     const standardizedAssignmentScoresArr = assignmentScores.map((entry) => entry / maxAssignmentPoints);
-    console.warn(standardizedAssignmentScoresArr);
 
     const medianIndex = Math.floor(standardizedAssignmentScoresArr.length / 2);
     return standardizedAssignmentScoresArr.length % 2 === 0
