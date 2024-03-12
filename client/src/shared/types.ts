@@ -370,6 +370,29 @@ type LearningObjectiveAssignmentWithRubricData = {
   rubricId: number;
 };
 
+type CanvasAssignmentWithRubricStatisticsResultObj = {
+  assignmentAveragePointsEarned: number;
+  assignmentMedianPointsEarned: number;
+  assignmentPercentageCategories: number[];
+  perLearningObjPercentageCategories: Array<[string, number[]]>;
+  perRubricCritieriaAveragePointsEarned: number[];
+  perRubricCritieriaMedianPointsEarned: number[];
+  perRubricCriteriaAnswerFrequencies: CanvasCourseAssignmentRubricCategoryAnswerStatistic[];
+};
+
+type CanvasCourseAssignmentRubricCategoryAnswerStatistic = {
+  id: string;
+  description: string;
+  pointsArr: number[];
+  ratingsSubArr: RubricRatingSubmissionScore[];
+};
+
+type RubricRatingSubmissionScore = Prettify<
+  AssignmentRubricRatingMongoDBEntry & {
+    ratingCount: number;
+  }
+>;
+
 export {
   backendUrlBase,
   MongoDBWithId,
@@ -394,5 +417,8 @@ export {
   CanvasQuizQuestionAnswerFrequencyArrEntry,
   CanvasQuizQuestionAnswerSetFrequencyArrEntry,
   CanvasCourseAssignmentRubricObjMongoDBEntry,
-  LearningObjectiveAssignmentWithRubricData
+  LearningObjectiveAssignmentWithRubricData,
+  CanvasAssignmentWithRubricStatisticsResultObj,
+  CanvasCourseAssignmentRubricCategoryAnswerStatistic,
+  RubricRatingSubmissionScore
 };
