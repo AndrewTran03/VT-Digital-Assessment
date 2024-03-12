@@ -354,12 +354,12 @@ type CanvasQuizQuestionStatistic = {
   difficulty_index: numberLike;
   alpha: numberLike;
   point_biserials: CanvasQuizQuestionPointBiserial[];
-  // F| "numerical_question" type questions
+  // For "numerical_question" type questions
   full_credit: numberLike;
   incorrect: numberLike;
-  // F| "numerical_question, short_answer, and multiple_dropdowns" type questions
+  // For "numerical_question, short_answer, and multiple_dropdowns" type questions
   correct: numberLike;
-  // F| "multiple_dropdowns" type questions
+  // For "multiple_dropdowns" type questions
   partially_correct: numberLike;
 };
 
