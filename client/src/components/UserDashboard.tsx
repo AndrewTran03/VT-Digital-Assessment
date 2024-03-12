@@ -59,8 +59,8 @@ const UserDashboard: React.FC = () => {
   async function fetchData() {
     console.clear();
     await fetchCanvasQuizData();
-    await fetchCanvasQuizStatisticsData();
     await fetchCanvasAssignmentsWithRubricsData();
+    await fetchCanvasQuizStatisticsData();
   }
 
   useEffect(() => {
@@ -111,8 +111,8 @@ const UserDashboard: React.FC = () => {
     e.preventDefault();
     console.clear();
     await fetchCanvasQuizData();
-    await fetchCanvasQuizStatisticsData();
     await fetchCanvasAssignmentsWithRubricsData();
+    await fetchCanvasQuizStatisticsData();
   }
 
   function handleClickToObjectives(e: FormEvent<HTMLButtonElement>) {
