@@ -205,7 +205,10 @@ const QuizStatistics: React.FC = () => {
                     }}
                   >
                     <Typography>
-                      <b>Quiz Average:</b> {quizStatsResultsObj.quizAveragePointsEarned ? quizStatsResultsObj.quizAveragePointsEarned.toFixed(3) : "Quiz Average Not Defined"}
+                      <b>Quiz Average:</b>{" "}
+                      {quizStatsResultsObj.quizAveragePointsEarned
+                        ? quizStatsResultsObj.quizAveragePointsEarned.toFixed(3)
+                        : "Quiz Average Not Defined"}
                     </Typography>
                   </TableCell>
                   {quizStatsResultsObj.quizAveragePointsEarned && (
@@ -241,7 +244,10 @@ const QuizStatistics: React.FC = () => {
                     }}
                   >
                     <Typography>
-                      <b>Quiz Median:</b> {quizStatsResultsObj.quizMedianPointsEarned ? quizStatsResultsObj.quizMedianPointsEarned.toFixed(3) : "Quiz Median Not Defined"}
+                      <b>Quiz Median:</b>{" "}
+                      {quizStatsResultsObj.quizMedianPointsEarned
+                        ? quizStatsResultsObj.quizMedianPointsEarned.toFixed(3)
+                        : "Quiz Median Not Defined"}
                     </Typography>
                   </TableCell>
                   {quizStatsResultsObj.quizMedianPointsEarned && (
