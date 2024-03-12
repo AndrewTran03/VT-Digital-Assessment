@@ -101,7 +101,6 @@ const UserDashboard: React.FC = () => {
   async function fetchCanvasAssignmentsWithRubricsData() {
     setAssignmentWithRubricDataLoading(true);
     await axios.get(`${backendUrlBase}/api/statistics/assignment_rubric/${canvasUserId}`).then((res) => {
-      console.log("ASSIGNMENT WITH RUBRIC DATA:");
       console.log(res.data);
       setAssignmentWithRubricDataArr(res.data as CanvasCourseAssignmentRubricObjMongoDBEntry[]);
     });
