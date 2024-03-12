@@ -18,7 +18,6 @@ import {
   CanvasCourseAssignmentRubricCategorySubmissionScore,
   CanvasAssignmentPaginationLinkHeaders
 } from "../shared/types";
-import fs from "fs/promises";
 
 // Returns a Map (described below) of the Canvas user's available Quiz IDs
 async function fetchCanvasUserAssignmentData(
@@ -146,17 +145,6 @@ async function fetchCanvasUserAssignmentRubricData(
       (entry) => entry.rubricData.length !== 0
     );
     console.assert(assignmentEntry.canvasCourseAssignmentRubricObjArr.length === 1);
-
-    // Write the fetched data to a JSON file
-    try {
-      await fs.writeFile(
-        `./logs/assignments_new_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
-        JSON.stringify(assignmentEntry, null, 2)
-      );
-      console.log(`Data written to ./logs/assignments_new_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`);
-    } catch (error) {
-      console.error("Error writing data to file:", error);
-    }
   }
 }
 
@@ -216,20 +204,8 @@ async function fetchCanvasUserAssignmentSubmissionData(
         hasNextPage = false; // Stop pagination on error
       }
     }
-    log.warn(`${canvasCourseInternalId}_${canvasCourseAssignmentId}`);
     if (assignmentEntry.canvasCourseAssignmentRubricSubmissionArr.length === 0) {
       log.error("Warning: No submission data yet for this assignment");
-    }
-
-    // Write the fetched data to a JSON file
-    try {
-      await fs.writeFile(
-        `./logs/assignments_final_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`,
-        JSON.stringify(assignmentEntry, null, 2)
-      );
-      log.info(`Data written to ./logs/assignments_final_${canvasCourseInternalId}_${canvasCourseAssignmentId}.json`);
-    } catch (error) {
-      console.error("Error writing data to file:", error);
     }
   }
 }
