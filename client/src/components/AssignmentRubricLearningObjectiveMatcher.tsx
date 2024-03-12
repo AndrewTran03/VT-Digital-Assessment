@@ -160,12 +160,30 @@ const AssignmentRubricLearningObjectiveMatcher: React.FC = () => {
                     <Typography style={{ maxWidth: "100%" }}>
                       <b>Criteria {idx + 1}:</b> {rubricCategory.description}
                     </Typography>
-                    <Table>
+                    <Table
+                      style={{
+                        border: "1px solid lightgray",
+                        maxHeight: "300px",
+                        overflow: "auto"
+                      }}
+                    >
                       <TableHead>
-                        <TableCell>
+                        <TableCell
+                          style={{
+                            border: "1px solid lightgray",
+                            maxHeight: "300px",
+                            overflow: "auto"
+                          }}
+                        >
                           <Typography>Description</Typography>
                         </TableCell>
-                        <TableCell>
+                        <TableCell
+                          style={{
+                            border: "1px solid lightgray",
+                            maxHeight: "300px",
+                            overflow: "auto"
+                          }}
+                        >
                           <Typography>Category Rating Points</Typography>
                         </TableCell>
                       </TableHead>
@@ -173,10 +191,22 @@ const AssignmentRubricLearningObjectiveMatcher: React.FC = () => {
                         rubricCategory.ratings.length > 0 &&
                         rubricCategory.ratings.map((rating) => (
                           <TableBody>
-                            <TableCell>
+                            <TableCell
+                              style={{
+                                border: "1px solid lightgray",
+                                maxHeight: "300px",
+                                overflow: "auto"
+                              }}
+                            >
                               <Typography>{rating.description}</Typography>
                             </TableCell>
-                            <TableCell>
+                            <TableCell
+                              style={{
+                                border: "1px solid lightgray",
+                                maxHeight: "300px",
+                                overflow: "auto"
+                              }}
+                            >
                               <Typography>{rating.ratingPoints}</Typography>
                             </TableCell>
                           </TableBody>
