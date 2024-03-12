@@ -45,10 +45,7 @@ export class CanvasAssignmentWithRubricStats {
     // Convert to a floating-point number and divide by number of entries
     const standardizedAssignmentScoresArr = assignmentScores.map((entry) => entry / maxAssignmentPoints);
 
-    // To perform floating-point division rather than integer division
-    return (
-      standardizedAssignmentScoresArr.reduce((acc, curr) => acc + curr, 0) / parseFloat("" + assignmentScores.length)
-    );
+    return standardizedAssignmentScoresArr.reduce((acc, curr) => acc + curr, 0) / assignmentScores.length;
   }
 
   private get computeAssignmentWithRubricMedianPointsEarned() {
