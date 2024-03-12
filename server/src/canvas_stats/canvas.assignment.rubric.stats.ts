@@ -37,7 +37,7 @@ export class CanvasAssignmentWithRubricStats {
       assignmentScores.push(assignmentSubmission.canvasAssignmentScore);
     }
 
-    return assignmentScores;
+    return this.assignmentRubricSubmissionArr.map((entry) => entry.canvasAssignmentScore);
   }
 
   private get calculateMaxAssignmentPointsHelper() {
@@ -202,7 +202,6 @@ export class CanvasAssignmentWithRubricStats {
     const assignmentRubricCategoryScores: CanvasCourseAssignmentRubricCategoryAnswerStatistic[] = [];
 
     for (const rCriteria of this.assignmentRubricObj) {
-      rCriteria.maxCategoryPoints;
       const ratingsSubArr: RubricRatingSubmissionScore[] = [];
       for (const rating of rCriteria.ratings) {
         const newRating: RubricRatingSubmissionScore = {
