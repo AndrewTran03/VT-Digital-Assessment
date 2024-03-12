@@ -512,7 +512,7 @@ const AssignmentRubricStatistics: React.FC = () => {
                               <TableCell>
                                 <Typography>
                                   <b>Average Points Earned for Rubric Criteria:</b>{" "}
-                                  {`${assignmentWithRubricStatsResultsObj.perRubricCritieriaAveragePointsEarned[idx].toFixed(3)} / 1.000`}
+                                  {assignmentWithRubricStatsResultsObj.perRubricCritieriaAveragePointsEarned[idx].toFixed(3)}
                                 </Typography>
                               </TableCell>
                             </TableRow>
@@ -520,7 +520,7 @@ const AssignmentRubricStatistics: React.FC = () => {
                               <TableCell>
                                 <Typography>
                                   <b>Median Points Earned for Rubric Criteria:</b>{" "}
-                                  {`${assignmentWithRubricStatsResultsObj.perRubricCritieriaMedianPointsEarned[idx].toFixed(3)} / 1.000`}
+                                  {assignmentWithRubricStatsResultsObj.perRubricCritieriaMedianPointsEarned[idx].toFixed(3)}
                                 </Typography>
                               </TableCell>
                             </TableRow>
