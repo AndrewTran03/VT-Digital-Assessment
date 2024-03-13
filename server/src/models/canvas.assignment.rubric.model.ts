@@ -36,7 +36,7 @@ const CanvasCourseAssignmentRubricSubmissionSchema =
       required: true
     },
     rubricCategoryScores: {
-      type: [],
+      type: [CanvasCourseAssignmentRubricCategorySubmissionScoreSchema],
       required: true
     }
   });
