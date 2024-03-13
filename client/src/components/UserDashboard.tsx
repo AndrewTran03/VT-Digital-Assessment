@@ -325,7 +325,7 @@ const UserDashboard: React.FC = () => {
                     <TableRow>
                       <TableCell className="table-cell" style={{ width: "15%" }}>
                         <Typography>
-                          <b>Canvas Quiz Id</b>
+                          <b>Canvas Quiz ID</b>
                         </Typography>
                       </TableCell>
                       <TableCell className="table-cell" style={{ width: "30%" }}>
@@ -422,7 +422,7 @@ const UserDashboard: React.FC = () => {
                     <TableRow>
                       <TableCell className="table-cell" style={{ width: "15%" }}>
                         <Typography>
-                          <b>Assignment Id</b>
+                          <b>Canvas Assignment ID</b>
                         </Typography>
                       </TableCell>
                       <TableCell className="table-cell" style={{ width: "30%" }}>
@@ -432,7 +432,7 @@ const UserDashboard: React.FC = () => {
                       </TableCell>
                       <TableCell className="table-cell" style={{ width: "15%" }}>
                         <Typography>
-                          <b>Rubric Id</b>
+                          <b>Canvas Rubric ID</b>
                         </Typography>
                       </TableCell>
                       <TableCell className="table-cell" style={{ width: "30%" }}>
