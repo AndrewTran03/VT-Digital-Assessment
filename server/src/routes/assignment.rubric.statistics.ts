@@ -22,10 +22,10 @@ router.post("/api/statistics/assignment_rubric", async (req, res) => {
     currStatEntry.recentSubmissionData,
     currStatEntry.canvasMatchedLearningObjectivesArr
   );
-  const quizStatResults = stats.computeAssignmentWithRubricStats();
-  log.warn(quizStatResults);
+  const assignmentWithRubricStatResults = stats.computeAssignmentWithRubricStats();
+  log.warn(assignmentWithRubricStatResults);
   log.info("STATUS: GOT HERE ASSIGNMENT WITH RUBRIC STAT -----------");
-  return res.status(200).send(JSON.stringify(quizStatResults, null, 2));
+  return res.status(200).send(JSON.stringify(assignmentWithRubricStatResults, null, 2));
 });
 
 export { router as assignmentRubricStatsRouter };
