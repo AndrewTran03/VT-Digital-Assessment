@@ -45,6 +45,7 @@ const CanvasCourseQuizQuestionSchema = new mongoose.Schema<CanvasCourseQuizQuest
   },
   answers: {
     type: [CanvasCourseMCQAnswerSchema],
+    default: [],
     required: true
   }
 });
