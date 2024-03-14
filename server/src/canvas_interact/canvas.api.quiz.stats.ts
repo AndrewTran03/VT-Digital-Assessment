@@ -29,14 +29,11 @@ async function fetchCanvasUserQuizReportData(
   const quizStatsResponses: CanvasQuizStatistic[] = [];
 
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
-  for (let j = 0; j < courseArr.length; j++) {
-    const { courseId } = courseArr[j];
-
+  for (const { courseId } of courseArr) {
     const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes?per_page=100`, {
       headers: axiosHeaders
     });
 
-    let canvasQuizzesArr: CanvasQuiz[] = [];
     // Assigns each CanvasQuiz object to proper array index, then drops it (keeps object)
     // PREV: JSON - 0: { ...object... } => TS: arr[0] = ...object...
     const canvasQuizzesTemp: Record<number, CanvasCourse> = {};
@@ -60,7 +57,7 @@ async function fetchCanvasUserQuizReportData(
 
       canvasQuizzesTemp[idx] = quiz;
     });
-    canvasQuizzesArr = Object.values(canvasQuizzesTemp);
+    const canvasQuizzesArr = Object.values(canvasQuizzesTemp) as CanvasQuiz[];
 
     // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
@@ -80,9 +77,7 @@ async function fetchCanvasUserQuizAnswerReportData(
   quizStatsResponses: CanvasQuizStatistic[]
 ) {
   // Get every QUIZ QUESTION (W/ ANSWERS) REPORT for every available quiz of every Canvas course where the user is a TA or Course Instructor
-  for (let k = 0; k < quizArr.length; k++) {
-    const { quizId } = quizArr[k];
-
+  for (const { quizId } of quizArr) {
     const quizQuestionsRes = await axios.get(
       `${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/statistics?per_page=100`,
       {

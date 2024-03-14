@@ -187,8 +187,8 @@ const FileImport: React.FC = () => {
           setAllowedToSubmit(false);
         } else {
           setLearningObjArr((prevArr) => {
-            for (let i = 0; i < prevArr.length; i++) {
-              if (prevArr[i].canvasObjective == newLearningObjective.canvasObjective) {
+            for (const currEntry of prevArr) {
+              if (currEntry.canvasObjective == newLearningObjective.canvasObjective) {
                 console.info("Duplicate entry found. Not adding it to current Learning Objective array.");
                 return prevArr;
               }

@@ -16,9 +16,7 @@ async function fetchCanvasUserQuizData(axiosHeaders: AxiosAuthHeaders, courseArr
   const canvasQuizAssociations = new Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>();
 
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
-  for (let j = 0; j < courseArr.length; j++) {
-    const { courseId, courseName, courseDept, courseNum } = courseArr[j];
-
+  for (const { courseId, courseName, courseDept, courseNum } of courseArr) {
     const quizRes = await axios.get(`${canvasUrl}/v1/courses/${courseId}/quizzes?per_page=100`, {
       headers: axiosHeaders
     });
@@ -78,9 +76,7 @@ async function fetchCanvasUserQuizQuestionData(
 ) {
   console.clear();
   // Get every QUESTION for every available quiz of every Canvas course where the user is a TA or Course Instructor
-  for (let k = 0; k < quizArr.length; k++) {
-    const { quizId, quizName } = quizArr[k];
-
+  for (const { quizId, quizName } of quizArr) {
     const quizQuestionsRes = await axios.get(
       `${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/questions?per_page=100`,
       {

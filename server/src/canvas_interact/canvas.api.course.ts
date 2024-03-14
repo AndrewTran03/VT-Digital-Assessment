@@ -5,16 +5,14 @@ import { canvasUrl, AxiosAuthHeaders, CanvasCourse, CanvasCourseInfo } from "../
 async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
   let canvasCoursesArr: CanvasCourse[] = [];
 
-  const enrollmentTypeRoles = ["teacher", "ta"];
+  const enrollmentTypeRoles = ["teacher", "ta"] as const;
   // Get every available COURSE where the user is a TA or Course Instructor of the Canvas course
-  for (let i = 0; i < enrollmentTypeRoles.length; i++) {
-    const role = enrollmentTypeRoles[i];
-
+  for (const role of enrollmentTypeRoles) {
     const courseParams = {
       enrollment_type: role,
       enrollment_state: "active",
       state: ["available"]
-    };
+    } as const;
     const courseRes = await axios.get(`${canvasUrl}/v1/courses?per_page=100`, {
       params: courseParams,
       headers: axiosHeaders

@@ -12,7 +12,7 @@ async function fetchCanvasUserInfoAdmin(
       headers: axiosHeaders
     })
     .then((res) => {
-      console.log(res.config.url);
+      log.warn(res.config.url);
       const canvasUserId = res.data[0].id as number;
       log.info(`Canvas User ID: ${canvasUserId}`);
       return canvasUserId;

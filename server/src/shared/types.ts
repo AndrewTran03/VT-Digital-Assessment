@@ -217,25 +217,6 @@ type CanvasQuizQuestion = {
 
 type CanvasQuizAnswer = CanvasCourseMCQAnswerMongoDBEntry;
 
-// type CanvasQuizAnswer = {
-//   id?: number;
-//   answer_text: string;
-//   answer_weight: number;
-//   answer_comments?: string;
-//   text_after_answers?: string;
-//   answer_match_left?: string;
-//   answer_match_right?: string;
-//   matching_answer_incorrect_matches?: string;
-//   numerical_answer_type?: "exact_answer" | "range_answer" | "precision_answer";
-//   exact?: number;
-//   margin?: number;
-//   approximate?: number;
-//   precision?: number;
-//   start?: number;
-//   end?: number;
-//   blank_id?: number;
-// };
-
 type CanvasQuizQuestionGroup = {
   quizId: number;
   quizName: string;

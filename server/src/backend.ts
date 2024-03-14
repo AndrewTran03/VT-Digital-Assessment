@@ -6,7 +6,6 @@ import bodyParser from "body-parser";
 import config from "config";
 import cors from "cors";
 import http from "http";
-import fs from "fs/promises";
 import { Server } from "socket.io";
 import log from "./utils/logger";
 import router from "./routes";
