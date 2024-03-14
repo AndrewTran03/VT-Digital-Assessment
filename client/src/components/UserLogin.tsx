@@ -2,10 +2,10 @@ import { Box, CircularProgress, Table, TableBody, TableCell, TableRow, Typograph
 import axios, { AxiosError } from "axios";
 import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
+import { useNavigate } from "react-router-dom";
 import { APIErrorResponse, backendUrlBase } from "../shared/types";
 import { APIRequestError } from "../shared/APIRequestError";
 import { CanvasUserInfoContext } from "../shared/contexts";
-import { useNavigate } from "react-router-dom";
 import "../styles/UserLoginMessage.css";
 
 const TRANSITION_TIMER_COUNT = 10;

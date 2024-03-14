@@ -2,6 +2,19 @@ import { useEffect, useContext, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
+  CircularProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  Typography,
+  TypographyPropsVariantOverrides
+} from "@mui/material";
+import { OverridableStringUnion } from "@mui/types";
+import { Variant } from "@mui/material/styles/createTypography";
+import {
   CanvasCourseAssignmentRubricObjMongoDBEntry,
   CanvasCourseAssociations,
   CanvasQuizStatistic,
@@ -17,19 +30,6 @@ import {
   AssignmentWithRubricLearningObjectiveContext
 } from "../shared/contexts";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
-import {
-  CircularProgress,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-  TypographyPropsVariantOverrides
-} from "@mui/material";
-import { OverridableStringUnion } from "@mui/types";
-import { Variant } from "@mui/material/styles/createTypography";
 import "../styles/TableCellStyles.css";
 
 const UserDashboard: React.FC = () => {
