@@ -102,8 +102,8 @@ export class CanvasQuizStats {
   private get computePerQuestionItemDifficulty() {
     const questionItemDifficulties: numberLike[] = [];
 
-    for (const question_statistic of this.canvasQuizStatistic.question_statistics) {
-      questionItemDifficulties.push(question_statistic.difficulty_index ? question_statistic.difficulty_index : null);
+    for (const { difficulty_index } of this.canvasQuizStatistic.question_statistics) {
+      questionItemDifficulties.push(difficulty_index ? difficulty_index : null);
     }
     return questionItemDifficulties;
   }

@@ -192,9 +192,9 @@ export class CanvasAssignmentWithRubricStats {
   private get assignmentRubricCategoryFinalScoresHelper() {
     const assignmentRubricCategoryScores: CanvasCourseAssignmentRubricCategoryAnswerStatistic[] = [];
 
-    for (const rCriteria of this.assignmentRubricObj) {
+    for (const { id, description, ratings } of this.assignmentRubricObj) {
       const ratingsSubArr: RubricRatingSubmissionScore[] = [];
-      for (const rating of rCriteria.ratings) {
+      for (const rating of ratings) {
         const newRating: RubricRatingSubmissionScore = {
           description: rating.description,
           ratingPoints: rating.ratingPoints,
@@ -203,16 +203,16 @@ export class CanvasAssignmentWithRubricStats {
         ratingsSubArr.push(newRating);
       }
       const newCategoryScore: CanvasCourseAssignmentRubricCategoryAnswerStatistic = {
-        id: rCriteria.id,
-        description: rCriteria.description,
+        id: id,
+        description: description,
         pointsArr: [],
         ratingsSubArr: ratingsSubArr
       };
       assignmentRubricCategoryScores.push(newCategoryScore);
     }
 
-    for (const assignmentSubmission of this.assignmentRubricSubmissionArr) {
-      for (const { id, points } of assignmentSubmission.rubricCategoryScores) {
+    for (const { rubricCategoryScores } of this.assignmentRubricSubmissionArr) {
+      for (const { id, points } of rubricCategoryScores) {
         for (const rubricCategory of assignmentRubricCategoryScores) {
           if (rubricCategory.id === id) {
             rubricCategory.pointsArr.push(points);
@@ -233,8 +233,8 @@ export class CanvasAssignmentWithRubricStats {
     const assignmentRubricCategoryScores = this.assignmentRubricCategoryFinalScoresHelper;
     const rubricCategoryAverageArr: number[] = [];
 
-    for (const rubricScore of assignmentRubricCategoryScores) {
-      const currPointsArr = rubricScore.pointsArr;
+    for (const { pointsArr } of assignmentRubricCategoryScores) {
+      const currPointsArr = pointsArr;
 
       currPointsArr.sort((a, b) => a - b);
 
@@ -249,8 +249,8 @@ export class CanvasAssignmentWithRubricStats {
     const assignmentRubricCategoryScores = this.assignmentRubricCategoryFinalScoresHelper;
     const rubricCategoryMedianArr: number[] = [];
 
-    for (const rubricScore of assignmentRubricCategoryScores) {
-      const currPointsArr = rubricScore.pointsArr;
+    for (const { pointsArr } of assignmentRubricCategoryScores) {
+      const currPointsArr = pointsArr;
 
       currPointsArr.sort((a, b) => a - b);
 
