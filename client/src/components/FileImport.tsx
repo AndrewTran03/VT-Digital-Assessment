@@ -122,7 +122,7 @@ const FileImport: React.FC = () => {
       // (If Any...) Pre-populate with existing Canvas Learning Objectives
       if (lines.length > 1 && potentialMatchingCourseLearningObj.length === 1) {
         const entries = lines[1].split(","); // Since this is a CSV file
-        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasCourseInternalIdStr, ...rest] = entries;
+        const [deptAbbrev, courseNumStr, semesterStr, yearStr, canvasCourseInternalIdStr] = entries;
 
         const courseNum = parseInt(courseNumStr);
         const semester = semesterStr as SeasonEnumValues;
