@@ -17,7 +17,4 @@ export default defineConfig({
     },
     chunkSizeWarningLimit: 1500 // Set the chunk size warning limit to 1500 kB
   },
-  resolve: {
-    extensions: ["*.ts*"]
-  }
 });
