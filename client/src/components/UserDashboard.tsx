@@ -321,7 +321,7 @@ const UserDashboard: React.FC = () => {
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
         Object.entries(canvasQuizDataArrGroupBy).map((value, key) => (
           <Paper key={key} style={{ margin: "20px 0", borderRadius: 20, overflow: "hidden" }}>
-            {value[1] && Array.isArray(value[1]) && value[1].length > 0 && (
+            {value[1] && value[1].length > 0 && (
               <>
                 <div
                   style={{
@@ -363,7 +363,7 @@ const UserDashboard: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   </TableHead>
-                  {(value[1] as CanvasCourseQuizMongoDBEntry[]).map((entry) => (
+                  {value[1].map((entry) => (
                     <TableBody>
                       <TableRow>
                         <TableCell className="table-cell" style={{ width: "15%" }}>
@@ -418,7 +418,7 @@ const UserDashboard: React.FC = () => {
         Object.entries(assignmentWithRubricDataArrGroupBy).length > 0 &&
         Object.entries(assignmentWithRubricDataArrGroupBy).map((value, key) => (
           <Paper key={key} style={{ margin: "20px 0", borderRadius: 20, overflow: "hidden" }}>
-            {value[1] && Array.isArray(value[1]) && value[1]!.length > 0 && (
+            {value[1] && value[1].length > 0 && (
               <>
                 <div
                   style={{
@@ -470,7 +470,7 @@ const UserDashboard: React.FC = () => {
                       </TableCell>
                     </TableRow>
                   </TableHead>
-                  {(value[1] as CanvasCourseAssignmentRubricObjMongoDBEntry[]).map((entry) => (
+                  {value[1].map((entry) => (
                     <TableBody>
                       <TableRow>
                         <TableCell className="table-cell" style={{ width: "15%" }}>
