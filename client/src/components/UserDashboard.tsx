@@ -14,6 +14,7 @@ import {
 } from "@mui/material";
 import { OverridableStringUnion } from "@mui/types";
 import { Variant } from "@mui/material/styles/createTypography";
+import _ from "lodash";
 import {
   CanvasCourseAssignmentRubricObjMongoDBEntry,
   CanvasCourseAssociations,
@@ -47,11 +48,19 @@ const UserDashboard: React.FC = () => {
   const { setCanvasAssignmentWithRubricLearningObjectiveData } = useContext(
     AssignmentWithRubricLearningObjectiveContext
   );
-  const canvasQuizDataArrGroupBy = Object.groupBy<any, CanvasCourseQuizMongoDBEntry>(
+  // const canvasQuizDataArrGroupBy = Object.groupBy<any, CanvasCourseQuizMongoDBEntry>(
+  //   canvasQuizDataArr,
+  //   (entry: CanvasCourseQuizMongoDBEntry) => entry.canvasCourseInternalId
+  // );
+  // const assignmentWithRubricDataArrGroupBy = Object.groupBy<any, CanvasCourseAssignmentRubricObjMongoDBEntry>(
+  //   assignmentWithRubricDataArr,
+  //   (entry: CanvasCourseAssignmentRubricObjMongoDBEntry) => entry.canvasCourseInternalId
+  // );
+  const canvasQuizDataArrGroupBy = _.groupBy(
     canvasQuizDataArr,
     (entry: CanvasCourseQuizMongoDBEntry) => entry.canvasCourseInternalId
   );
-  const assignmentWithRubricDataArrGroupBy = Object.groupBy<any, CanvasCourseAssignmentRubricObjMongoDBEntry>(
+  const assignmentWithRubricDataArrGroupBy = _.groupBy(
     assignmentWithRubricDataArr,
     (entry: CanvasCourseAssignmentRubricObjMongoDBEntry) => entry.canvasCourseInternalId
   );
