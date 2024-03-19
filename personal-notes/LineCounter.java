@@ -6,23 +6,23 @@ public class LineCounter {
     public static void countLinesInFiles(String directory, List<String> fileExtensions, List<String> excludeDirs, int[] totalLines, int arrIdx) {
         try {
             Files.walk(Paths.get(directory))
-                    .filter(path -> Files.isRegularFile(path) && !isExcluded(path, excludeDirs))
-                    .filter(path -> {
-                        for (String extension: fileExtensions) {
-                            if (path.toString().endsWith("." + extension)) {
-                                return true;
-                            }
+                .filter(path -> Files.isRegularFile(path) && !isExcluded(path, excludeDirs))
+                .filter(path -> {
+                    for (String extension: fileExtensions) {
+                        if (path.toString().endsWith("." + extension)) {
+                            return true;
                         }
-                        return false;
-                    })
-                    .forEach(file -> {
-                        try (BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))) {
-                            while (reader.readLine() != null) {
-                                totalLines[arrIdx]++; // Modify the totalLines array
-                            }
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    }
+                    return false;
+                })
+                .forEach(file -> {
+                    try (BufferedReader reader = new BufferedReader(new FileReader(file.toFile()))) {
+                        while (reader.readLine() != null) {
+                            totalLines[arrIdx]++; // Modify the totalLines array
                         }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     });
         } catch (IOException e) {
             e.printStackTrace();
