@@ -19,6 +19,7 @@ import {
   CanvasAssignmentWithRubricContext,
   AssignmentWithRubricLearningObjectiveContext
 } from "./shared/contexts";
+
 const App: React.FC = () => {
   // Initial States of Each React-Context's Shared Data
   const [canvasQuizDataArr, setCanvasQuizDataArr] = useState<CanvasCourseQuizMongoDBEntry[]>([]);
