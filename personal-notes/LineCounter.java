@@ -41,7 +41,7 @@ public class LineCounter {
         int[] totalLines = new int[directories.length]; // Using an array to store totalLines
         for (int i = 0; i < directories.length; i++) {
             List<String> fileExtensions = List.of("ts", "tsx", "js", "jsx", "html", "css"); // Add or remove file extensions as needed
-            List<String> excludeDirs = List.of("node_modules"); // Add any directories you want to exclude
+            List<String> excludeDirs = List.of("node_modules", "dist"); // Add any directories you want to exclude
 
             countLinesInFiles(directories[i], fileExtensions, excludeDirs, totalLines, i);
             System.out.println("Total lines in specified directory (" + directories[i] + "): " + totalLines[i]);
