@@ -9,7 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node-dev --respawn --transpile-only src/backend.ts",
-    "format": "prettier --write '**/*.ts' '**/*.js'"
+    "format": "prettier --write '**/*.ts' '**/*.js'",
+    "build": "tsc && node dist/src/backend.js"
   },
   "devDependencies": {
     "@typegoose/typegoose": "^12.1.0",
