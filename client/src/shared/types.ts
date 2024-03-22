@@ -3,13 +3,13 @@
 // Reference: https://www.totaltypescript.com/concepts/the-prettify-helper
 type Prettify<T> = {
   [K in keyof T]: T[K];
-} & {};
+} & unknown;
 
 type numberLike = number | null;
 type booleanLike = boolean | null;
 type numberArrLike = number[] | null;
 
-const backendUrlBase = "http://localhost:3000";
+const backendUrlBase = `http://${window.location.hostname}:3000`;
 
 // Required with All MongoDB Entries:
 type MongoDBId = {
