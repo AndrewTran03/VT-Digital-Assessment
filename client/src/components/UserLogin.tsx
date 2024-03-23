@@ -17,7 +17,7 @@ const UserLogin: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const [userSubmitInfoComplete, setUserSubmitInfoComplete] = useState(false);
-  const [countdown, setCountdown] = useState(LOADING_TIMER_COUNT);
+  const [countdown, setCountdown] = useState(TRANSITION_TIMER_COUNT);
   const canvasUsernameInputRef = useRef<HTMLInputElement>(null);
   const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
   const [canvasApiKeyEncrpytedState, setCanvasApiKeyEncryptedState] = useState(true);
@@ -93,7 +93,7 @@ const UserLogin: React.FC = () => {
               setTimeout(() => {
                 setUserSubmitInfoComplete(false);
                 navigate("/dashboard");
-              }, TRANSITION_TIMER_COUNT * 1000);
+              }, LOADING_TIMER_COUNT * 1000);
             }
           })
           .catch((err: AxiosError) => {
