@@ -10,8 +10,9 @@
     "build": "tsc && vite build --debug --mode production --target esNext --clearScreen",
     "format": "prettier --write '**/*.ts*' '**/*.js*' '**/*.css' '**/*.html'",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "preview": "vite preview"
+    "preview": "vite preview --port 4000"
   },
+  "proxy": "http://server-backend:3000",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
