@@ -1,0 +1,29 @@
+version: "3"
+
+services:
+  vt-digital-assessment-frontend:
+    build: ./client
+    container_name: client-frontend
+    restart: always
+    stdin_open: true
+    tty: true
+    ports:
+      - "4000:4000"
+    depends_on:
+      - vt-digital-assessment-backend
+    networks:
+      - vt_digital_assessment_network
+  
+  vt-digital-assessment-backend:
+    build: ./server
+    container_name: server-backend
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - vt_digital_assessment_network
+  
+networks:
+  vt_digital_assessment_network:
+    name: shared_network
+    driver: bridge
