@@ -415,7 +415,7 @@ const UserDashboard: React.FC = () => {
                                 .canvasMatchedLearningObjectivesArr.some((learningObj) => learningObj === "") && (
                                 <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
                                   <AccordionSummary>
-                                    <Typography>View CQuiz Question's Canvas Learning Objectives</Typography>
+                                    <Typography>View Quiz Question's Canvas Learning Objectives</Typography>
                                   </AccordionSummary>
                                   {canvasQuizDataArr
                                     .filter(
