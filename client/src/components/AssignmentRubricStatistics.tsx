@@ -134,7 +134,7 @@ const AssignmentRubricStatistics: React.FC = () => {
         Back
       </button>
       <button type="submit" onClick={handleCourseStatisticsAPIButtonClick} disabled={statsLoading}>
-        Get Assignment Statistics Data
+        Update Assignment Statistics Data
       </button>
 
       <br />
@@ -153,7 +153,7 @@ const AssignmentRubricStatistics: React.FC = () => {
             <Typography>
               <b>
                 {!isOverallAssignmentWithRubricStatisticsAccordionOpen
-                  ? "Click Here to See Overall Assignment Statistics"
+                  ? "View Overall Assignment Statistics"
                   : "Overall Canvas Assignment Statistics"}
               </b>
             </Typography>
@@ -317,7 +317,7 @@ const AssignmentRubricStatistics: React.FC = () => {
             <Typography>
               <b>
                 {!isLearningObjStatisticsAccordionOpen
-                  ? "Click Here to See This Assignment's Learning-Objective-Based Statistics"
+                  ? "View This Assignment's Learning-Objective-Based Statistics"
                   : "Overall Assignment Learning-Objective-Based Statistics"}
               </b>
             </Typography>
@@ -596,7 +596,7 @@ const AssignmentRubricStatistics: React.FC = () => {
         </Table>
       </Paper>
       <button type="reset" onClick={handleBackButtonClick}>
-        Click Here to Go Back
+        Return to Canvas User Dashboard
       </button>
     </>
   );

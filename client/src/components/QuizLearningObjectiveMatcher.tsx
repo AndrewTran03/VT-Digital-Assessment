@@ -142,7 +142,7 @@ const QuizLearningObjectiveMatcher: React.FC = () => {
         Back
       </button>
       <button type="submit" onClick={handleAPIButtonClick} disabled={coursesLoading}>
-        Get Course Objective Data
+        Update Course Objective Data
       </button>
       <Paper style={{ borderRadius: 20, overflow: "hidden" }}>
         <Table>
@@ -258,11 +258,16 @@ const QuizLearningObjectiveMatcher: React.FC = () => {
                   <TableCell style={{ border: "2px solid lightgray" }}>
                     <FormLabel id="demo-radio-buttons-group-label" style={{ marginBottom: "10px" }}>
                       Current Selected Learning-Objective:
-                      {!selectedAnswers[idx] ? " No answer selected yet" : ` ${selectedAnswers[idx]}`}
+                      {!selectedAnswers[idx] || selectedAnswers[idx] === ""
+                        ? " No answer selected yet"
+                        : ` ${selectedAnswers[idx]}`}
                     </FormLabel>
                     <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
                       <AccordionSummary>
-                        <Typography>Click Here to Select Additional Learning Objectives</Typography>
+                        <Typography>
+                          Select {!selectedAnswers[idx] || selectedAnswers[idx] === "" ? "" : "Additional"} Learning
+                          Objectives
+                        </Typography>
                       </AccordionSummary>
                       <FormControl>
                         <RadioGroup

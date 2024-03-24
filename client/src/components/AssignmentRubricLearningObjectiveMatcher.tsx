@@ -133,7 +133,7 @@ const AssignmentRubricLearningObjectiveMatcher: React.FC = () => {
         Back
       </button>
       <button type="submit" onClick={handleAPIButtonClick} disabled={coursesLoading}>
-        Get Course Objective Data
+        Update Course Objective Data
       </button>
       <Paper style={{ borderRadius: 20, overflow: "hidden" }}>
         <Table>
@@ -160,67 +160,77 @@ const AssignmentRubricLearningObjectiveMatcher: React.FC = () => {
                     <Typography style={{ maxWidth: "100%" }}>
                       <b>Criteria {idx + 1}:</b> {rubricCategory.description}
                     </Typography>
-                    <Table
-                      style={{
-                        border: "1px solid lightgray",
-                        maxHeight: "300px",
-                        overflow: "auto"
-                      }}
-                    >
-                      <TableHead>
-                        <TableCell
-                          style={{
-                            border: "1px solid lightgray",
-                            maxHeight: "300px",
-                            overflow: "auto"
-                          }}
-                        >
-                          <Typography>Description</Typography>
-                        </TableCell>
-                        <TableCell
-                          style={{
-                            border: "1px solid lightgray",
-                            maxHeight: "300px",
-                            overflow: "auto"
-                          }}
-                        >
-                          <Typography>Category Rating Points</Typography>
-                        </TableCell>
-                      </TableHead>
-                      {rubricCategory.ratings &&
-                        rubricCategory.ratings.length > 0 &&
-                        rubricCategory.ratings.map((rating) => (
-                          <TableBody>
-                            <TableCell
-                              style={{
-                                border: "1px solid lightgray",
-                                maxHeight: "300px",
-                                overflow: "auto"
-                              }}
-                            >
-                              <Typography>{rating.description}</Typography>
-                            </TableCell>
-                            <TableCell
-                              style={{
-                                border: "1px solid lightgray",
-                                maxHeight: "300px",
-                                overflow: "auto"
-                              }}
-                            >
-                              <Typography>{rating.ratingPoints}</Typography>
-                            </TableCell>
-                          </TableBody>
-                        ))}
-                    </Table>
+                    <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
+                      <AccordionSummary>
+                        <Typography>View Criteria {idx + 1}'s Rubric</Typography>
+                      </AccordionSummary>
+                      <Table
+                        style={{
+                          border: "1px solid lightgray",
+                          maxHeight: "300px",
+                          overflow: "auto"
+                        }}
+                      >
+                        <TableHead>
+                          <TableCell
+                            style={{
+                              border: "1px solid lightgray",
+                              maxHeight: "300px",
+                              overflow: "auto"
+                            }}
+                          >
+                            <Typography>Description</Typography>
+                          </TableCell>
+                          <TableCell
+                            style={{
+                              border: "1px solid lightgray",
+                              maxHeight: "300px",
+                              overflow: "auto"
+                            }}
+                          >
+                            <Typography>Category Rating Points</Typography>
+                          </TableCell>
+                        </TableHead>
+                        {rubricCategory.ratings &&
+                          rubricCategory.ratings.length > 0 &&
+                          rubricCategory.ratings.map((rating) => (
+                            <TableBody>
+                              <TableCell
+                                style={{
+                                  border: "1px solid lightgray",
+                                  maxHeight: "300px",
+                                  overflow: "auto"
+                                }}
+                              >
+                                <Typography>{rating.description}</Typography>
+                              </TableCell>
+                              <TableCell
+                                style={{
+                                  border: "1px solid lightgray",
+                                  maxHeight: "300px",
+                                  overflow: "auto"
+                                }}
+                              >
+                                <Typography>{rating.ratingPoints}</Typography>
+                              </TableCell>
+                            </TableBody>
+                          ))}
+                      </Table>
+                    </Accordion>
                   </TableCell>
                   <TableCell style={{ border: "2px solid lightgray" }}>
                     <FormLabel id="demo-radio-buttons-group-label" style={{ marginBottom: "10px" }}>
                       Current Selected Learning-Objective:
-                      {!selectedAnswers[idx] ? " No answer selected yet" : ` ${selectedAnswers[idx]}`}
+                      {!selectedAnswers[idx] || selectedAnswers[idx] === ""
+                        ? " No answer selected yet"
+                        : ` ${selectedAnswers[idx]}`}
                     </FormLabel>
                     <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
                       <AccordionSummary>
-                        <Typography>Click Here to Select Additional Learning Objectives</Typography>
+                        <Typography>
+                          {!selectedAnswers[idx] || selectedAnswers[idx] === "" ? "Add" : "Select Additional"} Learning
+                          Objectives
+                        </Typography>
                       </AccordionSummary>
                       <FormControl>
                         <RadioGroup

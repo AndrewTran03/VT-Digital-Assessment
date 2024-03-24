@@ -163,7 +163,7 @@ const QuizStatistics: React.FC = () => {
         Back
       </button>
       <button type="submit" onClick={handleCourseStatisticsAPIButtonClick} disabled={statsLoading}>
-        Get Quiz Statistics Data
+        Update Quiz Statistics Data
       </button>
 
       <br />
@@ -182,7 +182,7 @@ const QuizStatistics: React.FC = () => {
             <Typography>
               <b>
                 {!isOverallQuizStatisticsAccordionOpen
-                  ? "Click Here to See Overall Quiz Statistics"
+                  ? "View Overall Quiz Statistics"
                   : "Overall Canvas Quiz Statistics"}
               </b>
             </Typography>
@@ -340,7 +340,7 @@ const QuizStatistics: React.FC = () => {
             <Typography>
               <b>
                 {!isLearningObjStatisticsAccordionOpen
-                  ? "Click Here to See This Quiz's Learning-Objective-Based Statistics"
+                  ? "View This Quiz's Learning-Objective-Based Statistics"
                   : "Overall Quiz Learning-Objective-Based Statistics"}
               </b>
             </Typography>
@@ -719,7 +719,7 @@ const QuizStatistics: React.FC = () => {
         </Table>
       </Paper>
       <button type="reset" onClick={handleBackButtonClick}>
-        Click Here to Go Back
+        Return to Canvas User Dashboard
       </button>
     </>
   );

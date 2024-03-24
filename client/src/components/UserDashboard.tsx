@@ -2,6 +2,8 @@ import { useEffect, useContext, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
+  Accordion,
+  AccordionSummary,
   CircularProgress,
   Paper,
   Table,
@@ -282,7 +284,7 @@ const UserDashboard: React.FC = () => {
       </button>
       <button type="submit" onClick={handleApiRefreshButtonClick} disabled={coursesLoading || quizStatsLoading}>
         <Typography>
-          <b>Refresh</b>
+          <b>Refresh User Dashboard</b>
         </Typography>
       </button>
       <button type="submit" onClick={handleLogout}>
@@ -351,14 +353,14 @@ const UserDashboard: React.FC = () => {
                           <b>Number of Quiz Questions</b>
                         </Typography>
                       </TableCell>
-                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                      <TableCell className="table-cell" style={{ width: "25%" }}>
                         <Typography>
-                          <b>Assign Learning Objectives</b>
+                          <b>Learning Objectives</b>
                         </Typography>
                       </TableCell>
-                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                      <TableCell className="table-cell" style={{ width: "15%" }}>
                         <Typography>
-                          <b>View Statistics</b>
+                          <b>Statistics</b>
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -382,8 +384,53 @@ const UserDashboard: React.FC = () => {
                               onClick={(e) => handleClickToMatcherQuiz(e, entry.canvasCourseInternalId, entry.quizId)}
                               disabled={coursesLoading}
                             >
-                              Click to Assign Learning Objectives
+                              {canvasQuizDataArr.filter(
+                                (currEntry) =>
+                                  currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                  currEntry.quizId === entry.quizId
+                              ).length === 1 &&
+                              canvasQuizDataArr
+                                .filter(
+                                  (currEntry) =>
+                                    currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                    currEntry.quizId === entry.quizId
+                                )[0]
+                                .canvasMatchedLearningObjectivesArr.some((learningObj) => learningObj === "")
+                                ? "Assign "
+                                : "Change "}
+                              Learning Objectives
                             </button>
+                            <br />
+                            {canvasQuizDataArr.filter(
+                              (currEntry) =>
+                                currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                currEntry.quizId === entry.quizId
+                            ).length === 1 &&
+                              !canvasQuizDataArr
+                                .filter(
+                                  (currEntry) =>
+                                    currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                    currEntry.quizId === entry.quizId
+                                )[0]
+                                .canvasMatchedLearningObjectivesArr.some((learningObj) => learningObj === "") && (
+                                <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
+                                  <AccordionSummary>
+                                    <Typography>View CQuiz Question's Canvas Learning Objectives</Typography>
+                                  </AccordionSummary>
+                                  {canvasQuizDataArr
+                                    .filter(
+                                      (currEntry) =>
+                                        currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                        currEntry.quizId === entry.quizId
+                                    )[0]
+                                    .canvasMatchedLearningObjectivesArr.map((learningObj, learningObjIdx) => (
+                                      <Typography>
+                                        <b>{`Ques. ${learningObjIdx + 1}: `}</b>
+                                        {learningObj}
+                                      </Typography>
+                                    ))}
+                                </Accordion>
+                              )}
                           </Typography>
                         </TableCell>
                         <TableCell style={{ width: "20%" }}>
@@ -398,7 +445,7 @@ const UserDashboard: React.FC = () => {
                                 checkValidQuizStatsEntryToDisplay(entry.canvasCourseInternalId, entry.quizId)
                               }
                             >
-                              Click to View Statistics
+                              Show Statistics
                             </button>
                           </Typography>
                         </TableCell>
@@ -458,14 +505,14 @@ const UserDashboard: React.FC = () => {
                           <b>Number of Rubric Criterion</b>
                         </Typography>
                       </TableCell>
-                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                      <TableCell className="table-cell" style={{ width: "25%" }}>
                         <Typography>
-                          <b>Assign Learning Objectives</b>
+                          <b>Learning Objectives</b>
                         </Typography>
                       </TableCell>
-                      <TableCell className="table-cell" style={{ width: "20%" }}>
+                      <TableCell className="table-cell" style={{ width: "15%" }}>
                         <Typography>
-                          <b>View Statistics</b>
+                          <b>Statistics</b>
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -501,8 +548,53 @@ const UserDashboard: React.FC = () => {
                               }
                               disabled={assignmentWithRubricDataLoading}
                             >
-                              Click to Assign Learning Objectives
+                              {assignmentWithRubricDataArr.filter(
+                                (currEntry) =>
+                                  currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                  currEntry.canvasRubricId === entry.canvasRubricId
+                              ).length === 1 &&
+                              assignmentWithRubricDataArr
+                                .filter(
+                                  (currEntry) =>
+                                    currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                    currEntry.canvasRubricId === entry.canvasRubricId
+                                )[0]
+                                .canvasMatchedLearningObjectivesArr.some((learningObj) => learningObj === "")
+                                ? "Assign "
+                                : "Change "}
+                              Learning Objectives
                             </button>
+                            <br />
+                            {assignmentWithRubricDataArr.filter(
+                              (currEntry) =>
+                                currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                currEntry.canvasRubricId === entry.canvasRubricId
+                            ).length === 1 &&
+                              !assignmentWithRubricDataArr
+                                .filter(
+                                  (currEntry) =>
+                                    currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                    currEntry.canvasRubricId === entry.canvasRubricId
+                                )[0]
+                                .canvasMatchedLearningObjectivesArr.some((learningObj) => learningObj === "") && (
+                                <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
+                                  <AccordionSummary>
+                                    <Typography>View Assign's Canvas Learning Objectives</Typography>
+                                  </AccordionSummary>
+                                  {assignmentWithRubricDataArr
+                                    .filter(
+                                      (currEntry) =>
+                                        currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
+                                        currEntry.canvasRubricId === entry.canvasRubricId
+                                    )[0]
+                                    .canvasMatchedLearningObjectivesArr.map((learningObj, learningObjIdx) => (
+                                      <Typography>
+                                        <b>{`Criteria ${learningObjIdx + 1}: `}</b>
+                                        {learningObj}
+                                      </Typography>
+                                    ))}
+                                </Accordion>
+                              )}
                           </Typography>
                         </TableCell>
                         <TableCell style={{ width: "20%" }}>
@@ -524,7 +616,7 @@ const UserDashboard: React.FC = () => {
                                 )
                               }
                             >
-                              Click to View Statistics
+                              Show Statistics
                             </button>
                           </Typography>
                         </TableCell>
