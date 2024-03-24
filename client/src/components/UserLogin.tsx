@@ -45,13 +45,19 @@ const UserLogin: React.FC = () => {
 
   useEffect(() => {
     if (userSubmitInfoComplete) {
-      const intervalId = window.setInterval(() => {
+      const intervalId = setInterval(() => {
         setCountdown((prevCount) => prevCount - 1);
+      }, 1000); // Countdown every second
+
+      // Clear countdown and navigate to dashboard after 3 seconds
+      setTimeout(() => {
+        setUserSubmitInfoComplete(false);
+        navigate("/dashboard");
       }, LOADING_TIMER_COUNT * 1000);
 
       return () => clearInterval(intervalId);
     }
-  }, [userSubmitInfoComplete]);
+  }, [userSubmitInfoComplete, navigate]);
 
   function handleCanvasUserInputChange(e: FormEvent<HTMLInputElement>) {
     e.preventDefault();
@@ -89,11 +95,6 @@ const UserLogin: React.FC = () => {
               setCanvasUserInfo({ canvasUserId: parseInt(res.data.UserId) });
               window.localStorage.setItem("canvasUserId", res.data.UserId as string);
               setAuthCookie("Authenticated", true);
-              // Display "Success" submission message for only 3 seconds
-              setTimeout(() => {
-                setUserSubmitInfoComplete(false);
-                navigate("/dashboard");
-              }, LOADING_TIMER_COUNT * 1000);
             }
           })
           .catch((err: AxiosError) => {
