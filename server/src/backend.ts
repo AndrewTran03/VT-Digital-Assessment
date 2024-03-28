@@ -41,6 +41,14 @@ const ioSocket = new Server(server, {
 const backendServerPort = config.get<number>("backendServerPort");
 const backendServerUrl = config.get<string>("backendServerUrl");
 
+// Check if backend port has been properly identified before starting Express backend server
+// Quit starting the server if not properly defined (AKA "undefined")
+if (!backendServerPort || backendServerPort.toString() === "undefined" || !parseInt(backendServerPort.toString())) {
+  log.error(`BACKEND SERVER PORT is not defined: ${backendServerPort}`);
+  process.exit(1);
+}
+log.warn(`BACKEND SERVER PORT is...${backendServerPort}`);
+
 // Tracks incoming connections to SocketIO server connection
 ioSocket.on("connection", (socket) => {
   log.debug(`User sucessfully connected to Socket.io!\nSERVER-SIDE #ID: ${socket.id}`);
@@ -50,7 +58,7 @@ ioSocket.on("connection", (socket) => {
   });
 });
 
-app.listen(backendServerPort, async () => {
+server.listen(backendServerPort, async () => {
   log.info(`Server started on ${backendServerUrl}`);
   await ensureConnectionToCanvasApi();
   await ensureConnectionToMongoDatabase();
