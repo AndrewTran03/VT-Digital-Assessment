@@ -379,7 +379,7 @@ const QuizStatistics: React.FC = () => {
                           <ul>
                             {learningObjectiveArr[1].map((category: number, innerIdx: number) => (
                               <li>
-                                {PERCENTAGE_CATEGORIES[innerIdx]}: {category.toFixed(3).toString()}
+                                {PERCENTAGE_CATEGORIES[innerIdx]}: {category ? category.toFixed(3).toString() : 0}
                               </li>
                             ))}
                           </ul>
@@ -407,7 +407,7 @@ const QuizStatistics: React.FC = () => {
                           <HorizontalBarSeries
                             data={learningObjectiveArr[1].map((category: number, innerIdx: number) => ({
                               y: innerIdx,
-                              x: category
+                              x: category ?? 0
                             }))}
                             barWidth={0.1}
                           />
