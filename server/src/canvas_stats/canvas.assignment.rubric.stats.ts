@@ -13,7 +13,8 @@ export class CanvasAssignmentWithRubricStats {
   private assignmentRubricObj: AssignmentRubricCriteriaMongoDBEntry[];
   private assignmentRubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
   private assignmentRubricExpectationCategories: CanvasLearningObjectiveCategories[] = [];
-  private assignmentRubricLearningObjectivesArr: string[] = [];
+  private canvasCourseObjectivesArr: string[];
+  private assignmentRubricLearningObjectivesArr: string[][] = [];
 
   // Categories
   private static readonly EXCEEDS_EXPECTATIONS = 0.87; // or higher
@@ -23,11 +24,13 @@ export class CanvasAssignmentWithRubricStats {
   constructor(
     rubricObj: AssignmentRubricCriteriaMongoDBEntry[],
     rubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[],
-    learningObjectiveArr: string[]
+    learningObjectiveArr: string[][],
+    canvasCourseObjArr: string[]
   ) {
     this.assignmentRubricObj = rubricObj;
     this.assignmentRubricSubmissionArr = rubricSubmissionArr;
     this.assignmentRubricLearningObjectivesArr = learningObjectiveArr;
+    this.canvasCourseObjectivesArr = canvasCourseObjArr;
   }
 
   private get assignmentFinalScoresHelper() {
@@ -132,47 +135,45 @@ export class CanvasAssignmentWithRubricStats {
       return [];
     }
 
-    const hasNonEmptyStrInStringArr = this.assignmentRubricLearningObjectivesArr.some(
-      (entry) => entry.trim().length > 0
-    );
+    const hasNonEmptyStrInStringArr = this.assignmentRubricLearningObjectivesArr.some((entry) => entry.length > 0);
     if (!hasNonEmptyStrInStringArr) {
       return [];
     }
 
     const learningObjectiveMapFrequences = new Map<string, number[]>();
-    for (const canvasLearningObj of this.assignmentRubricLearningObjectivesArr) {
-      if (canvasLearningObj.length > 0) {
-        learningObjectiveMapFrequences.set(canvasLearningObj, new Array(4).fill(0) as number[]);
-      }
-    }
+    this.canvasCourseObjectivesArr.forEach((canvasLearningObj) => {
+      learningObjectiveMapFrequences.set(canvasLearningObj, new Array(4).fill(0) as number[]);
+    });
 
     console.assert(this.assignmentRubricObj.length === this.assignmentRubricLearningObjectivesArr.length);
     for (let i = 0; i < this.assignmentRubricLearningObjectivesArr.length; i++) {
-      if (this.assignmentRubricLearningObjectivesArr[i].length === 0) {
+      const currAssignmentRubricCategoryLearningObj = this.assignmentRubricLearningObjectivesArr[i];
+      if (currAssignmentRubricCategoryLearningObj.length === 0) {
         continue;
       }
 
-      const currRubricCategoryLearningObj = this.assignmentRubricLearningObjectivesArr[i];
-      const numberArr = learningObjectiveMapFrequences.get(currRubricCategoryLearningObj)!;
-      switch (this.assignmentRubricExpectationCategories[i]) {
-        case "EXCEEDS":
-          numberArr[EXPECTATIONS.EXCEEDS_EXPECTATIONS]++;
-          break;
-        case "MEETS":
-          numberArr[EXPECTATIONS.MEETS_EXPECTATIONS]++;
-          break;
-        case "BELOW":
-          numberArr[EXPECTATIONS.BELOW_EXPECTATIONS]++;
-          break;
-        default: // "null" case
-          numberArr[EXPECTATIONS.NULL]++;
-          break;
+      for (const currAssignmentRubricLearningObj of currAssignmentRubricCategoryLearningObj) {
+        const numberArr = learningObjectiveMapFrequences.get(currAssignmentRubricLearningObj)!;
+        switch (this.assignmentRubricExpectationCategories[i]) {
+          case "EXCEEDS":
+            numberArr[EXPECTATIONS.EXCEEDS_EXPECTATIONS]++;
+            break;
+          case "MEETS":
+            numberArr[EXPECTATIONS.MEETS_EXPECTATIONS]++;
+            break;
+          case "BELOW":
+            numberArr[EXPECTATIONS.BELOW_EXPECTATIONS]++;
+            break;
+          default: // "null" case
+            numberArr[EXPECTATIONS.NULL]++;
+            break;
+        }
+        learningObjectiveMapFrequences.set(currAssignmentRubricLearningObj, numberArr);
       }
-      learningObjectiveMapFrequences.set(currRubricCategoryLearningObj, numberArr);
     }
 
     const percentageLearningObjectiveMapFrequences = new Map<string, number[]>();
-    for (const canvasLearningObj of this.assignmentRubricLearningObjectivesArr) {
+    for (const canvasLearningObj of this.canvasCourseObjectivesArr) {
       if (canvasLearningObj.length === 0) {
         continue;
       }

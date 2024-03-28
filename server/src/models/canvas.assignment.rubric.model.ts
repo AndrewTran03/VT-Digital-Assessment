@@ -118,7 +118,7 @@ const CanvasCourseAssignmentRubricObjSchema = new mongoose.Schema<CanvasCourseAs
       required: true
     },
     canvasMatchedLearningObjectivesArr: {
-      type: [String],
+      type: [[String]],
       required: true
     },
     recentSubmissionData: {

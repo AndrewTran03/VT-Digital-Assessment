@@ -345,7 +345,7 @@ type CanvasCourseAssignmentRubricObjExtraProperties = {
   canvasCourseNum: number;
   canvasCourseName: string;
   canvasCourseInternalId: number;
-  canvasMatchedLearningObjectivesArr: string[];
+  canvasMatchedLearningObjectivesArr: string[][];
   recentSubmissionData: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
 };
 

@@ -565,7 +565,9 @@ const UserDashboard: React.FC = () => {
                                     currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
                                     currEntry.canvasRubricId === entry.canvasRubricId
                                 )[0]
-                                .canvasMatchedLearningObjectivesArr.some((learningObj) => learningObj === "")
+                                .canvasMatchedLearningObjectivesArr.some(
+                                  (learningObj) => JSON.stringify(learningObj) === "[]"
+                                )
                                 ? "Assign "
                                 : "Change "}
                               Learning Objectives
@@ -582,7 +584,9 @@ const UserDashboard: React.FC = () => {
                                     currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
                                     currEntry.canvasRubricId === entry.canvasRubricId
                                 )[0]
-                                .canvasMatchedLearningObjectivesArr.some((learningObj) => learningObj === "") && (
+                                .canvasMatchedLearningObjectivesArr.some(
+                                  (learningObj) => JSON.stringify(learningObj) === "[]"
+                                ) && (
                                 <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
                                   <AccordionSummary>
                                     <Typography>View Assign's Canvas Learning Objectives</Typography>
@@ -593,10 +597,12 @@ const UserDashboard: React.FC = () => {
                                         currEntry.canvasCourseInternalId === entry.canvasCourseInternalId &&
                                         currEntry.canvasRubricId === entry.canvasRubricId
                                     )[0]
-                                    .canvasMatchedLearningObjectivesArr.map((learningObj, learningObjIdx) => (
+                                    .canvasMatchedLearningObjectivesArr.map((learningObjArr, learningObjIdx) => (
                                       <Typography>
                                         <b>{`Criteria ${learningObjIdx + 1}: `}</b>
-                                        {learningObj}
+                                        {learningObjArr.map((learningObj) => (
+                                          <li>{learningObj}</li>
+                                        ))}
                                       </Typography>
                                     ))}
                                 </Accordion>
