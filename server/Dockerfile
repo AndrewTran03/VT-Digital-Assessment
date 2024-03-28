@@ -14,8 +14,11 @@ RUN npm install
 COPY . .
 # Convert "config" file from "development" to "production" mode
 RUN mv config/development.ts config/production.ts
+# Integrate "production" .env file into deployment ecosystem in the backend
+RUN mv .env.production .env
+
 # Expose backend Node/Express.js app on port
-EXPOSE 3000
+EXPOSE 3001
 # Build the "production" version of the backend app
 RUN npm run build
 # Run the backend app
