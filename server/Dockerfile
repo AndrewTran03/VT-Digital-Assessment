@@ -12,6 +12,8 @@ RUN npm install
 
 # Add backend source code
 COPY . .
+# Convert "config" file from "development" to "production" mode
+RUN mv config/development.ts config/production.ts
 # Expose backend Node/Express.js app on port
 EXPOSE 3000
 # Build the "production" version of the backend app
