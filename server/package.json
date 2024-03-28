@@ -8,10 +8,10 @@
   "license": "ISC",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "ts-node-dev --respawn --transpile-only src/backend.ts",
+    "start": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/backend.ts",
     "format": "prettier --write '**/*.ts' '**/*.js'",
     "build": "tsc",
-    "production": "NODE_ENV=production node dist/src/backend.js" 
+    "production": "NODE_ENV=production node dist/src/backend.js"
   },
   "devDependencies": {
     "@typegoose/typegoose": "^12.1.0",
