@@ -24,7 +24,6 @@ import {
   TableRow,
   Typography
 } from "@mui/material";
-import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import "../styles/DragDropFileImport.css";
 
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
@@ -65,11 +64,11 @@ const FileImport: React.FC = () => {
 
   async function fetchAllCanvasUserLearningObjectiveData() {
     const allCourseObjectiveData: CanvasLearningObjectives[] = [];
-    const result = await axios.get(`${backendUrlBase}/api/objective`);
-    for (let j = 0; j < result.data.length; j++) {
-      const parsedResult = parseLearningObjectiveMongoDBDCollection(result.data[j]);
-      allCourseObjectiveData.push(parsedResult);
-    }
+    await axios.get(`${backendUrlBase}/api/objective`).then((res) => {
+      (res.data as any[]).forEach((entry) => {
+        allCourseObjectiveData.push(entry as CanvasLearningObjectives);
+      });
+    });
 
     const uniqueCourseObjectiveData = removeDuplicateCanvasUserLearningObjectiveData(allCourseObjectiveData);
     setAllUserLearningCourseObjectiveData(uniqueCourseObjectiveData);
