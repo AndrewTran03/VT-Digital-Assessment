@@ -6,6 +6,7 @@ import { fetchCanvasUserQuizReportData } from "../canvas_interact/canvas.api.qui
 import { getCanvasApiAuthHeaders } from "../utils/canvas.connection";
 import { CanvasQuizStats } from "../canvas_stats/canvas.quiz.stats";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
+import { CourseObjectivesModel } from "../models/canvas.objectives.model";
 
 const router = express.Router();
 
@@ -32,10 +33,21 @@ router.post("/api/statistics/quiz/:canvasUserId/:canvasCourseInternalId/:canvasQ
       quizId: canvasQuizId
     });
     if (!currLearningObjMatchingsToFind) {
-      throw new Error("The specified Canvas course learning objective matches do not exist in the MongoDB database");
+      throw new Error(
+        "The specified Canvas course quiz learning-objective matches do not exist in the MongoDB database"
+      );
     }
-    const learningObjectiveArr = currLearningObjMatchingsToFind.canvasMatchedLearningObjectivesArr;
-    const stats = new CanvasQuizStats(currStatEntry, learningObjectiveArr);
+
+    const listedCourseLearningObjectives = await CourseObjectivesModel.findOne({
+      canvasCourseInternalId: canvasCourseInternalId
+    });
+    if (!listedCourseLearningObjectives) {
+      throw new Error("The specified Canvas learning-objectives for this course do not exist in the MongoDB database");
+    }
+
+    const { canvasMatchedLearningObjectivesArr } = currLearningObjMatchingsToFind;
+    const { canvasObjectives } = listedCourseLearningObjectives;
+    const stats = new CanvasQuizStats(currStatEntry, canvasObjectives, canvasMatchedLearningObjectivesArr);
     const quizStatResults = stats.computeQuizStats();
     log.warn(quizStatResults);
     log.info("STATUS: GOT HERE QUIZ STAT -----------");

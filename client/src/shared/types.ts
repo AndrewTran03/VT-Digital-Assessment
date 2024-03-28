@@ -144,7 +144,7 @@ type CanvasCourseQuizMongoDBEntry = MongoDBCombined<{
   canvasCourseNum: number;
   quizId: number;
   quizName: string;
-  canvasMatchedLearningObjectivesArr: string[];
+  canvasMatchedLearningObjectivesArr: string[][];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 }>;
 

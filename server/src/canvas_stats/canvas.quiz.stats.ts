@@ -13,7 +13,8 @@ import log from "../utils/logger";
 
 export class CanvasQuizStats {
   private canvasQuizStatistic: CanvasQuizStatistic;
-  private canvasQuizQuestionLearningObjectivesArr: string[];
+  private canvasCourseObjectivesArr: string[];
+  private canvasQuizQuestionLearningObjectivesArr: string[][];
   private quesExpectationCategories: CanvasLearningObjectiveCategories[] = [];
 
   // Categories
@@ -21,8 +22,9 @@ export class CanvasQuizStats {
   private static readonly MEETS_EXPECTATIONS = 0.75; // from here up to but not including Exceeds Score
   private static readonly BELOW_EXPECTATIONS = 0; // from here up to but not including Meets Score
 
-  constructor(stats: CanvasQuizStatistic, quesLearningObjArr: string[]) {
+  constructor(stats: CanvasQuizStatistic, canvasCourseObjArr: string[], quesLearningObjArr: string[][]) {
     this.canvasQuizStatistic = stats;
+    this.canvasCourseObjectivesArr = canvasCourseObjArr;
     this.canvasQuizQuestionLearningObjectivesArr = quesLearningObjArr;
   }
 
@@ -396,49 +398,47 @@ export class CanvasQuizStats {
   }
 
   private get computePerLearningObjPercentageCategories() {
-    const hasNonEmptyStrInStringArr = this.canvasQuizQuestionLearningObjectivesArr.some(
-      (entry) => entry.trim().length > 0
-    );
+    const hasNonEmptyStrInStringArr = this.canvasQuizQuestionLearningObjectivesArr.some((entry) => entry.length > 0);
     if (!hasNonEmptyStrInStringArr) {
       return [];
     }
 
     const learningObjectiveMapFrequences = new Map<string, number[]>();
-    for (const canvasLearningObj of this.canvasQuizQuestionLearningObjectivesArr) {
-      if (canvasLearningObj.length > 0) {
-        learningObjectiveMapFrequences.set(canvasLearningObj, new Array(4).fill(0) as number[]);
-      }
-    }
+    this.canvasCourseObjectivesArr.forEach((canvasLearningObj) => {
+      learningObjectiveMapFrequences.set(canvasLearningObj, new Array(4).fill(0) as number[]);
+    });
 
     console.assert(
       this.canvasQuizStatistic.question_statistics.length === this.canvasQuizQuestionLearningObjectivesArr.length
     );
     for (let i = 0; i < this.canvasQuizQuestionLearningObjectivesArr.length; i++) {
-      if (this.canvasQuizQuestionLearningObjectivesArr[i].length === 0) {
+      const currQuesLearningObjEntryArr = this.canvasQuizQuestionLearningObjectivesArr[i];
+      if (currQuesLearningObjEntryArr.length === 0) {
         continue;
       }
 
-      const currQuesLearningObj = this.canvasQuizQuestionLearningObjectivesArr[i];
-      const numberArr = learningObjectiveMapFrequences.get(currQuesLearningObj)!;
-      switch (this.quesExpectationCategories[i]) {
-        case "EXCEEDS":
-          numberArr[EXPECTATIONS.EXCEEDS_EXPECTATIONS]++;
-          break;
-        case "MEETS":
-          numberArr[EXPECTATIONS.MEETS_EXPECTATIONS]++;
-          break;
-        case "BELOW":
-          numberArr[EXPECTATIONS.BELOW_EXPECTATIONS]++;
-          break;
-        default: // "null" case
-          numberArr[EXPECTATIONS.NULL]++;
-          break;
+      for (const currQuesLearningObj of currQuesLearningObjEntryArr) {
+        const numberArr = learningObjectiveMapFrequences.get(currQuesLearningObj)!;
+        switch (this.quesExpectationCategories[i]) {
+          case "EXCEEDS":
+            numberArr[EXPECTATIONS.EXCEEDS_EXPECTATIONS]++;
+            break;
+          case "MEETS":
+            numberArr[EXPECTATIONS.MEETS_EXPECTATIONS]++;
+            break;
+          case "BELOW":
+            numberArr[EXPECTATIONS.BELOW_EXPECTATIONS]++;
+            break;
+          default: // "null" case
+            numberArr[EXPECTATIONS.NULL]++;
+            break;
+        }
+        learningObjectiveMapFrequences.set(currQuesLearningObj, numberArr);
       }
-      learningObjectiveMapFrequences.set(currQuesLearningObj, numberArr);
     }
 
     const percentageLearningObjectiveMapFrequences = new Map<string, number[]>();
-    for (const canvasLearningObj of this.canvasQuizQuestionLearningObjectivesArr) {
+    for (const canvasLearningObj of this.canvasCourseObjectivesArr) {
       if (canvasLearningObj.length === 0) {
         continue;
       }

@@ -272,7 +272,8 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
         canvasCourseNum: courseNum,
         quizId: quizId,
         quizName: quizName,
-        canvasMatchedLearningObjectivesArr: new Array(quizEntries.length).fill("") as string[], // Empty for now: Will be resolved later in front-end React Matching Component
+        // Empty for now: Will be resolved later in front-end React Matching Component
+        canvasMatchedLearningObjectivesArr: new Array<string[]>(quizEntries.length).fill([]) as string[][],
         canvasQuizEntries: quizEntries
       };
       resultArray.push(newQuizEntry);
@@ -389,7 +390,7 @@ router.get("/api/canvas/:canvasUserId", async (req, res) => {
 router.put("/api/canvas/quiz/update_objectives/:canvasQuizEntryId", async (req, res) => {
   const canvasQuizEntryToUpdateId = req.params.canvasQuizEntryId;
 
-  const learningObjectiveArrToUpdate = req.body as string[];
+  const learningObjectiveArrToUpdate = req.body as string[][];
 
   try {
     const canvasQuizEntryToUpdate = await CanvasCourseQuizModel.findById(canvasQuizEntryToUpdateId);

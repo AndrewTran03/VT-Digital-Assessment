@@ -11,11 +11,10 @@ import {
   Accordion,
   AccordionSummary,
   Typography,
-  Radio,
-  RadioGroup,
   FormControlLabel,
   FormLabel,
-  FormControl
+  FormControl,
+  Checkbox
 } from "@mui/material";
 import {
   backendUrlBase,
@@ -23,7 +22,6 @@ import {
   CanvasLearningObjectives,
   CanvasCourseQuizMongoDBEntry
 } from "../shared/types";
-import { parseLearningObjectiveMongoDBDCollection } from "../shared/FrontendParser";
 import { CanvasQuizQuestionContext, QuizLearningObjectiveContext } from "../shared/contexts";
 import "../styles/TableCellStyles.css";
 
@@ -59,7 +57,7 @@ const QuizLearningObjectiveMatcher: React.FC = () => {
     (data: CanvasCourseQuizMongoDBEntry) =>
       data.canvasCourseInternalId === canvasCourseInternalId && data.quizId === canvasQuizId
   );
-  const [selectedAnswers, setSelectedAnswers] = useState<string[]>(
+  const [selectedAnswers, setSelectedAnswers] = useState<string[][]>(
     matchingEntries.length === 1 ? matchingEntries[0].canvasMatchedLearningObjectivesArr : []
   );
   const [coursesLoading, setCoursesLoading] = useState(false);
@@ -85,8 +83,8 @@ const QuizLearningObjectiveMatcher: React.FC = () => {
   async function fetchCanvasLearningObjectiveData() {
     setCoursesLoading(true);
     await axios.get(`${backendUrlBase}/api/objective/${canvasCourseInternalId}`).then((res) => {
-      const parsedResult = parseLearningObjectiveMongoDBDCollection(res.data[0]);
-      setLearningCourseObjectiveData(parsedResult);
+      console.log(res.data[0]);
+      setLearningCourseObjectiveData(res.data[0] as CanvasLearningObjectives);
     });
     setCoursesLoading(false);
   }
@@ -256,43 +254,49 @@ const QuizLearningObjectiveMatcher: React.FC = () => {
                     )}
                   </TableCell>
                   <TableCell style={{ border: "2px solid lightgray" }}>
-                    <FormLabel id="demo-radio-buttons-group-label" style={{ marginBottom: "10px" }}>
-                      Current Selected Learning-Objective:
-                      {!selectedAnswers[idx] || selectedAnswers[idx] === ""
-                        ? " No answer selected yet"
-                        : ` ${selectedAnswers[idx]}`}
+                    <FormLabel id="checkbox-group-label" style={{ marginBottom: "10px" }}>
+                      Current Selected Learning-Objective(s):
+                      {!selectedAnswers[idx] || JSON.stringify(selectedAnswers[idx]) === "[]"
+                        ? " No answers selected yet"
+                        : selectedAnswers[idx].map((selectedAnswer) => <li>{selectedAnswer}</li>)}
                     </FormLabel>
                     <Accordion style={{ borderRadius: 20, overflow: "hidden" }}>
                       <AccordionSummary>
                         <Typography>
-                          Select {!selectedAnswers[idx] || selectedAnswers[idx] === "" ? "" : "Additional"} Learning
-                          Objectives
+                          Select{" "}
+                          {!selectedAnswers[idx] || JSON.stringify(selectedAnswers[idx]) === "[]" ? "" : "Additional"}{" "}
+                          Learning Objectives
                         </Typography>
                       </AccordionSummary>
                       <FormControl>
-                        <RadioGroup
-                          aria-labelledby="demo-radio-buttons-group-label"
-                          name="radio-buttons-group"
-                          defaultValue={selectedAnswers[idx] ? selectedAnswers[idx] : ""}
-                          onChange={(e) => {
-                            const updatedAnswers = [...selectedAnswers];
-                            updatedAnswers[idx] = e.target.value;
-                            setSelectedAnswers(updatedAnswers);
-                          }}
-                        >
-                          {learningCourseObjectiveData && learningCourseObjectiveData.canvasObjectives.length > 0 ? (
-                            learningCourseObjectiveData.canvasObjectives.map((canvasObj) => (
-                              <FormControlLabel
-                                key={canvasObj.toString()}
-                                value={canvasObj.toString()}
-                                control={<Radio style={{ fontSize: "0.8rem" }} />}
-                                label={canvasObj.toString()}
-                              />
-                            ))
-                          ) : (
-                            <p>No items found.</p>
-                          )}
-                        </RadioGroup>
+                        {learningCourseObjectiveData && learningCourseObjectiveData.canvasObjectives.length > 0 ? (
+                          learningCourseObjectiveData.canvasObjectives.map((canvasObj) => (
+                            <FormControlLabel
+                              key={canvasObj.toString()}
+                              control={
+                                <Checkbox
+                                  style={{ fontSize: "0.8rem" }}
+                                  checked={selectedAnswers[idx].includes(canvasObj.toString().trim())}
+                                  onChange={(e) => {
+                                    const updatedAnswers = [...selectedAnswers];
+                                    if (e.target.checked) {
+                                      updatedAnswers[idx] = [...updatedAnswers[idx], canvasObj.toString().trim()];
+                                    } else {
+                                      const index = updatedAnswers[idx].indexOf(canvasObj.toString().trim());
+                                      if (index !== -1) {
+                                        updatedAnswers[idx].splice(index, 1);
+                                      }
+                                    }
+                                    setSelectedAnswers(updatedAnswers);
+                                  }}
+                                />
+                              }
+                              label={canvasObj.toString()}
+                            />
+                          ))
+                        ) : (
+                          <p>No items found.</p>
+                        )}
                       </FormControl>
                     </Accordion>
                   </TableCell>

@@ -3,9 +3,7 @@ import {
   CanvasCourseMCQAnswerMongoDBEntry,
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
-  CanvasLearningObjectives,
-  QuestionTypeEnumValues,
-  SeasonEnumValues
+  QuestionTypeEnumValues
 } from "./types";
 
 function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]): CanvasCourseQuizMongoDBEntry[] {
@@ -22,10 +20,10 @@ function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]): CanvasCours
     const canvasCourseNum = data.canvasCourseNum as number;
     const quizId = data.quizId as number;
     const quizName = data.quizName;
-    const canvasMatchedLearningObjectivesArr: string[] = [];
-    data.canvasMatchedLearningObjectivesArr.forEach((learningObjective: any) => {
-      const currLearningObjective = learningObjective as string;
-      canvasMatchedLearningObjectivesArr.push(currLearningObjective);
+    const canvasMatchedLearningObjectivesArr: string[][] = [];
+    data.canvasMatchedLearningObjectivesArr.forEach((learningObjectiveQuesArr: any) => {
+      const currLearningObjectiveQuesArr = learningObjectiveQuesArr as string[];
+      canvasMatchedLearningObjectivesArr.push(currLearningObjectiveQuesArr);
     });
     const canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
     data.canvasQuizEntries.forEach((canvasQuizEntry: any) => {
@@ -82,36 +80,4 @@ function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]): CanvasCours
   return canvasEntriesArr;
 }
 
-function parseLearningObjectiveMongoDBDCollection(data: any): CanvasLearningObjectives {
-  const _id = data._id;
-  const __v = data.__v as number;
-  const createdDate = data.created_date;
-  const updatedDate = data.updated_date;
-  const deptAbbrev = data.deptAbbrev;
-  const courseNum = data.courseNum as number;
-  const semester = data.semester as SeasonEnumValues;
-  const year = data.year;
-  const canvasCourseInternalId = data.canvasCourseInternalId as number;
-  const canvasObjectives: string[] = [];
-  data.canvasObjectives.forEach((canvasObjective: any) => {
-    const currLearningObjective = canvasObjective as string;
-    canvasObjectives.push(currLearningObjective);
-  });
-
-  const learningObjectives: CanvasLearningObjectives = {
-    _id: _id,
-    __v: __v,
-    createdDate: createdDate,
-    updatedDate: updatedDate,
-    deptAbbrev: deptAbbrev,
-    courseNum: courseNum,
-    semester: semester,
-    year: year,
-    canvasCourseInternalId: canvasCourseInternalId,
-    canvasObjectives: canvasObjectives
-  };
-
-  return learningObjectives;
-}
-
-export { parseCanvasQuizQuestionMongoDBDCollection, parseLearningObjectiveMongoDBDCollection };
+export { parseCanvasQuizQuestionMongoDBDCollection };

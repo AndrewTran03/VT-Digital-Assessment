@@ -379,7 +379,7 @@ const QuizStatistics: React.FC = () => {
                           <ul>
                             {learningObjectiveArr[1].map((category: number, innerIdx: number) => (
                               <li>
-                                {PERCENTAGE_CATEGORIES[innerIdx]}: {category}
+                                {PERCENTAGE_CATEGORIES[innerIdx]}: {category.toFixed(3).toString()}
                               </li>
                             ))}
                           </ul>
