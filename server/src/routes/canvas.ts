@@ -34,7 +34,7 @@ const canvasQuizQuestionSchema = z.object({
   canvasUserId: z.number().gte(0),
   canvasCourseInternalId: z.number().gte(0),
   quizId: z.number().gte(0),
-  canvasMatchedLearningObjectiveArr: z.array(z.string()).default([]),
+  canvasMatchedLearningObjectiveArr: z.array(z.array(z.string())).default([]),
   canvasQuizEntries: z
     .array(
       z.object({
@@ -81,7 +81,7 @@ const canvasAssignmentRubricSchema = z.object({
       })
     )
     .default([]),
-  canvasMatchedLearningObjectivesArr: z.array(z.string()).default([]),
+  canvasMatchedLearningObjectivesArr: z.array(z.array(z.string())).default([]),
   recentSubmissionData: z
     .array(
       z.object({
@@ -304,7 +304,9 @@ function convertAssignmentWithRubricArrToBeMongoDBCompliant(
       title: assignmentRubricObjArrEntry.title,
       maxPoints: assignmentRubricObjArrEntry.maxPoints,
       rubricData: assignmentRubricObjArrEntry.rubricData,
-      canvasMatchedLearningObjectivesArr: new Array(assignmentRubricObjArrEntry.rubricData.length).fill("") as string[],
+      canvasMatchedLearningObjectivesArr: new Array(assignmentRubricObjArrEntry.rubricData.length).fill(
+        []
+      ) as string[][],
       recentSubmissionData: assignmentRubricResult.canvasCourseAssignmentRubricSubmissionArr
     };
     newAssignmentRubricResultsArr.push(newAssignmentRubricResult);
@@ -414,14 +416,15 @@ router.put("/api/canvas/quiz/update_objectives/:canvasQuizEntryId", async (req, 
   }
 });
 
-router.put("/api/canvas/assignment_rubric/update_objectives/:canvasQuizEntryId", async (req, res) => {
-  const canvasQuizEntryToUpdateId = req.params.canvasQuizEntryId;
+router.put("/api/canvas/assignment_rubric/update_objectives/:canvasAssignmentRubricEntryId", async (req, res) => {
+  const canvasAssignmentRubricEntryToUpdateId = req.params.canvasAssignmentRubricEntryId;
 
-  const learningObjectiveArrToUpdate = req.body as string[];
+  const learningObjectiveArrToUpdate = req.body as string[][];
 
   try {
-    const canvasCourseAssignmentRubricObjEntryToUpdate =
-      await CanvasCourseAssignmentRubricObjModel.findById(canvasQuizEntryToUpdateId);
+    const canvasCourseAssignmentRubricObjEntryToUpdate = await CanvasCourseAssignmentRubricObjModel.findById(
+      canvasAssignmentRubricEntryToUpdateId
+    );
     // Error check to avoid working with an invalid MongoDB "_id" passed to the database query
     if (!canvasCourseAssignmentRubricObjEntryToUpdate) {
       throw new Error("The specified Canvas assignment (with rubric) does not exist in the MongoDB database");
