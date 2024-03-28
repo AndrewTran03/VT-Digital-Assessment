@@ -89,10 +89,15 @@ const AssignmentRubricStatistics: React.FC = () => {
 
   async function fetchCanvasStatisticsData() {
     setStatsLoading(true);
-    await axios.post(`${backendUrlBase}/api/statistics/assignment_rubric`, matchingAssignmentEntries[0]).then((res) => {
-      console.log(res.data);
-      setAssignmentWithRubricStatsResultsObj(res.data as CanvasAssignmentWithRubricStatisticsResultObj);
-    });
+    await axios
+      .post(
+        `${backendUrlBase}/api/statistics/assignment_rubric/${canvasCourseInternalId}`,
+        matchingAssignmentEntries[0]
+      )
+      .then((res) => {
+        console.log(res.data);
+        setAssignmentWithRubricStatsResultsObj(res.data as CanvasAssignmentWithRubricStatisticsResultObj);
+      });
     setStatsLoading(false);
   }
 
@@ -357,7 +362,7 @@ const AssignmentRubricStatistics: React.FC = () => {
                             <ul>
                               {learningObjectiveArr[1].map((category: number, innerIdx: number) => (
                                 <li>
-                                  {PERCENTAGE_CATEGORIES[innerIdx]}: {category}
+                                  {PERCENTAGE_CATEGORIES[innerIdx]}: {category ? category.toFixed(3).toString() : 0}
                                 </li>
                               ))}
                             </ul>
@@ -385,7 +390,7 @@ const AssignmentRubricStatistics: React.FC = () => {
                             <HorizontalBarSeries
                               data={learningObjectiveArr[1].map((category: number, innerIdx: number) => ({
                                 y: innerIdx,
-                                x: category
+                                x: category ?? 0
                               }))}
                               barWidth={0.1}
                             />
