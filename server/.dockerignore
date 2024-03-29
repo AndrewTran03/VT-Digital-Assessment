@@ -1,8 +1,13 @@
-dist
-node_modules
-logs
+# Backend directories
+dist/
+node_modules/
+logs/
+
+# Git-related files
 .git
 .gitignore
+
+# Docker-related files
 Dockerfile
 .dockerignore
 
