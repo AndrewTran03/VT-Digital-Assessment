@@ -18,4 +18,5 @@ EXPOSE 5001
 # Build the "production" version of the frontend app
 RUN npm run build
 # Run the frontend app
-CMD ["npm", "run", "preview", "--", "--host"]
+# CMD ["npm", "run", "preview", "--", "--host"]
+CMD ["sh", "./run_frontend.sh", "production"]
