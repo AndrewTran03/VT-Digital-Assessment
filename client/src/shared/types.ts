@@ -9,7 +9,15 @@ type numberLike = number | null;
 type booleanLike = boolean | null;
 type numberArrLike = number[] | null;
 
-const backendUrlBase = `http://${window.location.hostname}:3000`;
+let backendServerPort = -1;
+console.log(`--------- ENVIORNMENT USED IN FRONTEND: ${process.env.NODE_ENV} ---------`);
+if (process.env.NODE_ENV === "development") {
+  backendServerPort = 3000;
+} else if (process.env.NODE_ENV === "production") {
+  backendServerPort = 3001;
+}
+
+const backendUrlBase = `http://${window.location.hostname}:${backendServerPort}`;
 
 // Required with All MongoDB Entries:
 type MongoDBId = {
