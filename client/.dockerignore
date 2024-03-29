@@ -1,6 +1,11 @@
-dist
-node_modules
+# Frontend directories
+dist/
+node_modules/
+
+# Git-related files
 .git
 .gitignore
+
+# Docker-related files
 Dockerfile
 .dockerignore
