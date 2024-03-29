@@ -9,7 +9,7 @@ cd ..
 continue_running=true
 while [ "$continue_running" = true ]; do
     echo "Here are the following options:"
-    echo "[1] Type ['list'] to List Current Docker Processes"
+    echo "[1] Type ['list' or 'ls'] to List Current Docker Processes"
     echo "[2] Type ['deploy'] to Deploy the Application Fresh"
     echo "[3] Type ['stop-and-remove'] to Stop and Remove the Deployed & Running Application Containers"
     echo "[4] Type ['re-deploy'] to Re-Deploy the Application (Currently Running) -- Useful for Applying New Changes"
@@ -26,7 +26,7 @@ while [ "$continue_running" = true ]; do
     if [ -z "$userInputLowercase" ]; then
         echo "You didn't enter anything...the script will now just exit."
         exit 1
-    elif [ "$userInputLowercase" == "list" ]; then
+    elif [ "$userInputLowercase" == "list" ] || [ "$userInputLowercase" == "ls" ]; then
         docker ps
         docker images
     elif [ "$userInputLowercase" == "deploy" ]; then
