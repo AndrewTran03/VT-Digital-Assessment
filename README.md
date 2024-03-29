@@ -21,14 +21,14 @@ git clone git@github.com:AndrewTran03/VT-Digital-Assessment.git
 # Create a frontend terminal
 cd client/
 npm install
-sh run_frontend.sh
+sh run_frontend.sh development
 ```
 
 ```shell
 # Create a backend terminal
 cd server/
 npm install
-sh run_backend.sh
+sh run_backend.sh development
 ```
 
 `NOTE`: Please create a `.env` file (and structure it similarly to the `.env.sample` provided) and then populate it your Canvas API key first before running this application locally. If you do not have a `Canvas API Token`, please follow the steps outlined in the `Addendum: Creating a Canvas API Token` section (as shown below). Additionally, if you would like to see the `.drawio` files in the `system-design` directory, please install the [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) Extension on Visual Studio Code.
