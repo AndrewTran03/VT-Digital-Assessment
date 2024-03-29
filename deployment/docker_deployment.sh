@@ -19,6 +19,7 @@ while [ "$continue_running" = true ]; do
     echo "NOTE: If you press any other key, then the script will just exit."
 
     read userInput
+    clear
     userInputLowercase=$(echo "$userInput" | tr '[:upper:]' '[:lower:]')
     echo "You entered \"$userInputLowercase\"."
 
@@ -55,6 +56,7 @@ while [ "$continue_running" = true ]; do
         clear
     elif [ "$userInputLowercase" == "exit" ] || [ "$userInputLowercase" == "e" ] || [ "$userInputLowercase" == "quit" ] || [ "$userInputLowercase" == "q" ]; then
         echo "Safely exiting this deployment script..."
+        echo "Thank you! Have a great rest of your day."
         continue_running=false
     else
         echo "Invalid Input - You entered something else: $userInput"
