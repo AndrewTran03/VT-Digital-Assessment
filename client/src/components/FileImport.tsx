@@ -46,7 +46,7 @@ const FileImport: React.FC = () => {
   const [revealStep2, setRevealStep2] = useState(false);
   const [allowedToSubmit, setAllowedToSubmit] = useState(false);
   const navigate = useNavigate();
-  const acceptableFileTypes = ["CSV"];
+  const acceptableFileTypes = ["CSV"] as const;
 
   async function fetchData() {
     console.clear();
