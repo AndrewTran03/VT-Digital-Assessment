@@ -22,4 +22,5 @@ EXPOSE 3001
 # Build the "production" version of the backend app
 RUN npm run build
 # Run the backend app
-CMD ["npm", "run", "production"]
+# CMD ["npm", "run", "production"]
+CMD [ "sh", "./run_backend.sh", "production" ]

@@ -1,4 +1,4 @@
-# !/bin/bash
+#!/bin/bash
 
 echo "|-------- Beginning of Running Back-End Script --------|"
 echo "Installing NPM Dependencies:"
@@ -19,5 +19,39 @@ touch $file_name
 cd ..
 echo "Running JavaScript MongoDB/Express.js/Node.js Backend (with TypeScript):"
 npm run format
-npm_config_color=always npm run start 2>&1 | tee -a "./logs/$file_name"
+
+# Function to display usage instructions
+display_usage() {
+    echo "Usage: $0 <mode>"
+    echo "<mode> should be 'development' (or 'd') or 'production' (or 'p')"
+}
+
+# Check if the script was called with an argument
+if [ $# -eq 0 ]; then
+    # No argument provided, prompt the user for input
+    echo "Please type [ 'development' or 'd' ] or [ 'production' or 'p' ]:"
+    read mode 
+else
+    # Use the first argument passed to the script
+    mode="$1"
+fi
+
+modeLowercase=$(echo "$mode" | tr '[:upper:]' '[:lower:]')
+# Error-checking loop while the 1-argument input is not valid
+while [ "$modeLowercase" != "development" ] && [ "$modeLowercase" != "d" ] && [ "$modeLowercase" != "production" ] && [ "$modeLowercase" != "p" ]; do
+    echo "Invalid mode selected: '$mode'."
+    display_usage
+    read mode
+    modeLowercase=$(echo "$mode" | tr '[:upper:]' '[:lower:]')
+done
+
+# Check if the mode is 'development' or 'production'
+if [ "$modeLowercase" == "development" ] || [ "$modeLowercase" == "d" ]; then
+    echo "Backend: Development mode selected"
+    npm_config_color=always npm run start 2>&1 | tee -a "./logs/$file_name"
+elif [ "$modeLowercase" == "production" ] || [ "$modeLowercase" == "p" ]; then
+    echo "Backend: Production mode selected"
+    nnpm_config_color=always npm run production 2>&1 | tee -a "./logs/$file_name"
+fi
+
 echo "|-------- End of Running Back-End Script --------|"
