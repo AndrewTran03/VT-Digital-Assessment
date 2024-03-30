@@ -51,7 +51,7 @@ if [ "$modeLowercase" == "development" ] || [ "$modeLowercase" == "d" ]; then
     npm_config_color=always npm run start 2>&1 | tee -a "./logs/$file_name"
 elif [ "$modeLowercase" == "production" ] || [ "$modeLowercase" == "p" ]; then
     echo "Backend: Production mode selected"
-    nnpm_config_color=always npm run production 2>&1 | tee -a "./logs/$file_name"
+    npm_config_color=always npm run production 2>&1 | tee -a "./logs/$file_name"
 fi
 
 echo "|-------- End of Running Back-End Script --------|"
