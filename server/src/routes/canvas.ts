@@ -140,8 +140,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
         );
 
         // Save the old learning objectives to new/updated set of questions
-        canvasQuizItemToInsert.canvasMatchedLearningObjectivesArr =
-          olderCanvasQuizItemToDelete.canvasMatchedLearningObjectivesArr;
+        canvasQuizItemToInsert.canvasMatchedLearningObjectivesArr = [
+          ...olderCanvasQuizItemToDelete.canvasMatchedLearningObjectivesArr
+        ];
 
         // Delete the older quiz entry from MongoDB database
         const deleteOlderCanvasQuizItemResult = await CanvasCourseQuizModel.findOneAndDelete({
@@ -205,8 +206,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
         );
 
         // Save the old learning objectives to new/updated set of assignment rubrics
-        canvasAssignmentRubricItemToInsert.canvasMatchedLearningObjectivesArr =
-          olderCanvasAssignmentRubricItemToDelete.canvasMatchedLearningObjectivesArr;
+        canvasAssignmentRubricItemToInsert.canvasMatchedLearningObjectivesArr = [
+          ...olderCanvasAssignmentRubricItemToDelete.canvasMatchedLearningObjectivesArr
+        ];
 
         // Delete the older assignment rubric entry from MongoDB database
         const deleteOlderCanvasAssignmentRubricItemResult = await CanvasCourseAssignmentRubricObjModel.findOneAndDelete(
@@ -241,10 +243,9 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
 
   // Map: { { courseId, courseName, courseDept, courseNum }, Array <{ quizId, questioNames, [questions, [answers (optional)]] } }
   inputMap.forEach((questionGroups, { courseId, courseName, courseDept, courseNum }) => {
-    questionGroups.forEach((questionGroup) => {
+    questionGroups.forEach(({ quizId, quizName, questions }) => {
       const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
-      const { quizId, quizName } = questionGroup;
-      questionGroup.questions.forEach((question) => {
+      questions.forEach((question) => {
         const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
           questionType: question.question_type! as QuestionTypeEnumValues,
           questionText: question.question_text!
@@ -261,7 +262,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
             answers.push(newAnswer);
           });
         }
-        newQuizQuestionEntry.answers = answers;
+        newQuizQuestionEntry.answers = [...answers];
         quizEntries.push(newQuizQuestionEntry);
       });
       const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
@@ -290,7 +291,7 @@ function convertAssignmentWithRubricArrToBeMongoDBCompliant(
 
   assignmentRubricResultsArr.forEach((assignmentRubricResult) => {
     console.assert(assignmentRubricResult.canvasCourseAssignmentRubricObjArr.length === 1);
-    const assignmentRubricObjArrEntry = assignmentRubricResult.canvasCourseAssignmentRubricObjArr[0];
+    const assignmentRubricObjArrEntry = { ...assignmentRubricResult.canvasCourseAssignmentRubricObjArr[0] };
 
     const newAssignmentRubricResult: CanvasCourseAssignmentRubricObjBase = {
       canvasUserId: assignmentRubricResult.canvasUserId,
@@ -342,7 +343,7 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
     log.info("FINAL USER ID: ", canvasUserId);
     const canvasUserInfoEntryToInsert = new CanvasUserApiModel({
       canvasUserId: canvasUserId,
-      canvasUserApiKey: canvasUserApiKey,
+      canvasUserApiKey: canvasUserApiKey as string,
       canvasUsername: canvasUsername
     });
 
@@ -400,7 +401,7 @@ router.put("/api/canvas/quiz/update_objectives/:canvasQuizEntryId", async (req, 
     if (!canvasQuizEntryToUpdate) {
       throw new Error("The specified Canvas quiz questions do not exist in the MongoDB database");
     }
-    canvasQuizEntryToUpdate.canvasMatchedLearningObjectivesArr = learningObjectiveArrToUpdate;
+    canvasQuizEntryToUpdate.canvasMatchedLearningObjectivesArr = [...learningObjectiveArrToUpdate];
     const canvasQuizEntryUpdateResult = await canvasQuizEntryToUpdate.save();
     log.info(
       "Updated the specified Canvas quiz questions successfully with the following learning objectives! Congratulations!"
@@ -429,7 +430,7 @@ router.put("/api/canvas/assignment_rubric/update_objectives/:canvasAssignmentRub
     if (!canvasCourseAssignmentRubricObjEntryToUpdate) {
       throw new Error("The specified Canvas assignment (with rubric) does not exist in the MongoDB database");
     }
-    canvasCourseAssignmentRubricObjEntryToUpdate.canvasMatchedLearningObjectivesArr = learningObjectiveArrToUpdate;
+    canvasCourseAssignmentRubricObjEntryToUpdate.canvasMatchedLearningObjectivesArr = [...learningObjectiveArrToUpdate];
     const canvasCourseAssignmentRubricObjEntryUpdateResult = await canvasCourseAssignmentRubricObjEntryToUpdate.save();
     log.info(
       "Updated the specified Canvas assignment (with rubric) successfully with the following learning objectives! Congratulations!"

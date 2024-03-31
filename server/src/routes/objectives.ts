@@ -126,7 +126,7 @@ router.post("/api/objective", async (req, res) => {
       log.info("Inserted the specified course objectives successfully! Congratulations!");
       return res.status(201).json(courseObjectivesInsertResult); // 201 = Successful Resource Creation
     } else {
-      courseObjectivesFindResult.canvasObjectives = newCourseObjectivesArr;
+      courseObjectivesFindResult.canvasObjectives = [...newCourseObjectivesArr];
       const canvasQuizEntryUpdateResult = await courseObjectivesFindResult.save();
       log.info("Updated the specified Canvas learning objective successfully! Congratulations!");
       return res.status(200).json(canvasQuizEntryUpdateResult);
@@ -151,7 +151,7 @@ router.put("/api/objective/:canvasObjEntryId", async (req, res) => {
     if (!canvasCourseObjEntryToUpdate) {
       throw new Error("The specified Canvas course's learning objectives do not exist in the MongoDB database");
     }
-    canvasCourseObjEntryToUpdate.canvasObjectives = canvasCourseLearningObjectiveArrToUpdate;
+    canvasCourseObjEntryToUpdate.canvasObjectives = [...canvasCourseLearningObjectiveArrToUpdate];
     const canvasQuizEntryUpdateResult = await canvasCourseObjEntryToUpdate.save();
     log.info("Updated the specified Canvas quiz question successfully! Congratulations!");
     return res.status(200).json(canvasQuizEntryUpdateResult);
