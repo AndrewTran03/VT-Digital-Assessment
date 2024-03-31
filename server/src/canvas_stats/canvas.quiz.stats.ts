@@ -339,10 +339,9 @@ export class CanvasQuizStats {
           const frequencySetArr: CanvasQuizQuestionAnswerSetFrequencyArrEntry[] = [];
           if (question_statistic.answers && question_statistic.answers.length > 0) {
             for (const answer of question_statistic.answers) {
-              const currAnswer = answer;
               const newAnswerEntry: CanvasQuizQuestionAnswerFrequencyArrEntry = {
-                answer_text: currAnswer.text ?? currAnswer.id, // Nullish operator for "essay_question" case
-                frequency_count: currAnswer.responses
+                answer_text: answer.text ?? answer.id, // Nullish operator for "essay_question" case
+                frequency_count: answer.responses
               };
               frequencyArr.push(newAnswerEntry);
             }
