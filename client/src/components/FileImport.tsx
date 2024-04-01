@@ -65,7 +65,7 @@ const FileImport: React.FC = () => {
   async function fetchAllCanvasUserLearningObjectiveData() {
     const allCourseObjectiveData: CanvasLearningObjectives[] = [];
     await axios.get(`${backendUrlBase}/api/objective`).then((res) => {
-      (res.data as any[]).forEach((entry) => {
+      (res.data as unknown[]).forEach((entry) => {
         allCourseObjectiveData.push(entry as CanvasLearningObjectives);
       });
     });
