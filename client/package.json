@@ -12,7 +12,6 @@
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
     "preview": "vite preview --port 5001"
   },
-  "proxy": "http://server-backend:3000",
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
