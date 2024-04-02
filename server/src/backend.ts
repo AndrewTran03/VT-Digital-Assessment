@@ -1,5 +1,18 @@
+import path from "path";
 import dotenv from "dotenv";
-dotenv.config();
+
+let ENV_FILE_PATH = "";
+if (process.env["NODE_ENV"] === "development") {
+  ENV_FILE_PATH = "../.env";
+} else if (process.env["NODE_ENV"] === "production") {
+  ENV_FILE_PATH = "../../.env";
+}
+dotenv.config({
+  debug: true,
+  encoding: "utf8",
+  override: true,
+  path: path.resolve(__dirname, ENV_FILE_PATH)
+});
 
 import express, { NextFunction } from "express";
 import bodyParser from "body-parser";
