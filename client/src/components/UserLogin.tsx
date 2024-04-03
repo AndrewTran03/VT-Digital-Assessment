@@ -111,7 +111,6 @@ const UserLogin: React.FC = () => {
             setError(true);
             setTimeout(() => {
               setError(false);
-              navigate("/dashboard");
             }, TRANSITION_TIMER_COUNT * 1000);
           });
         setLoading(false);
