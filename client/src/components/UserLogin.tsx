@@ -8,16 +8,16 @@ import { APIRequestError } from "../shared/APIRequestError";
 import { CanvasUserInfoContext } from "../shared/contexts";
 import "../styles/UserLoginMessage.css";
 
-const TRANSITION_TIMER_COUNT = 10;
-const LOADING_TIMER_COUNT = 3;
+const FAILURE_TIMER_COUNT = 10;
+const TRANSITION_LOADING_TIMER_COUNT = 3;
 
 const UserLogin: React.FC = () => {
   const { setCanvasUserInfo } = useContext(CanvasUserInfoContext);
   const [authCookie, setAuthCookie, removeCookies] = useCookies(["Authenticated"]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [userSubmitError, setUserSubmitError] = useState(false);
   const [userSubmitInfoComplete, setUserSubmitInfoComplete] = useState(false);
-  const [countdown, setCountdown] = useState(LOADING_TIMER_COUNT);
+  const [countdown, setCountdown] = useState(TRANSITION_LOADING_TIMER_COUNT);
   const canvasUsernameInputRef = useRef<HTMLInputElement>(null);
   const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
   const [canvasApiKeyEncrpytedState, setCanvasApiKeyEncryptedState] = useState(true);
@@ -53,7 +53,7 @@ const UserLogin: React.FC = () => {
       setTimeout(() => {
         setUserSubmitInfoComplete(false);
         navigate("/dashboard");
-      }, LOADING_TIMER_COUNT * 1000);
+      }, TRANSITION_LOADING_TIMER_COUNT * 1000);
 
       return () => clearInterval(intervalId);
     }
@@ -108,10 +108,10 @@ const UserLogin: React.FC = () => {
             canvasApiKeyInputRef.current!.value = "";
 
             // Display "Failure" submission message for only 10 seconds
-            setError(true);
+            setUserSubmitError(true);
             setTimeout(() => {
-              setError(false);
-            }, TRANSITION_TIMER_COUNT * 1000);
+              setUserSubmitError(false);
+            }, FAILURE_TIMER_COUNT * 1000);
           });
         setLoading(false);
       }
@@ -191,7 +191,7 @@ const UserLogin: React.FC = () => {
         </Typography>
       )}
       {/* Failure Message */}
-      {error && (
+      {userSubmitError && (
         <Typography className="failure-message" variant="body1" style={{ color: "red", marginTop: "10px" }}>
           Error! Invalid Canvas credentials. Please try again.
         </Typography>
