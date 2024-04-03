@@ -120,6 +120,9 @@ const UserLogin: React.FC = () => {
 
   return (
     <>
+      <Typography variant="body1" fontSize={20} style={{ color: "white" }}>
+        <b>Welcome to the Virginia Tech Digital Assessment Application!</b>
+      </Typography>
       <Table
         style={{
           marginTop: "20px",
@@ -160,9 +163,7 @@ const UserLogin: React.FC = () => {
             </TableCell>
             <TableCell style={{ border: "none" }}>
               <button type="submit" onClick={() => setCanvasApiKeyEncryptedState((prevState) => !prevState)}>
-                <Typography style={{ fontSize: "12px" }}>
-                  {canvasApiKeyEncrpytedState ? "Show " : "Hide "}Your Typed API Key
-                </Typography>
+                <Typography style={{ fontSize: "12px" }}>{canvasApiKeyEncrpytedState ? "Show " : "Hide "}</Typography>
               </button>
             </TableCell>
           </TableRow>
