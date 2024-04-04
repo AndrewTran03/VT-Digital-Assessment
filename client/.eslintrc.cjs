@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   root: true,
   env: { browser: true, es2020: true },
   extends: [
@@ -18,4 +18,4 @@ module.exports = {
     "@typescript-eslint/ban-types": "warn",
     "@typescript-eslint/no-explicit-any": "warn"
   },
-}
+};
