@@ -9,8 +9,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "NODE_ENV=development ts-node-dev --respawn --transpile-only src/backend.ts",
-    "format": "prettier --write '**/*.ts' '**/*.js'",
-    "build": "tsc",
+    "format": "prettier --write \"**/*.ts*\" \"**/*.js*\"",
+    "build": "tsc --module nodenext --moduleResolution nodenext --target esnext --esModuleInterop true",
     "production": "NODE_ENV=production node dist/src/backend.js"
   },
   "devDependencies": {
