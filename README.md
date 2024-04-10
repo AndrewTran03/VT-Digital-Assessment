@@ -3,10 +3,15 @@
 ## >> Getting Started << DO THIS FIRST!
 
 ```shell
+# VT CS GitLab (git.cs.vt.edu)
+# HTTPS
+git clone https://git.cs.vt.edu/andrewt03/VT-Digital-Assessment.git
+# SSH (Recommended)
+git clone git@git.cs.vt.edu:andrewt03/VT-Digital-Assessment.git
+
 # VT CS GitLab (code.vt.edu)
 # HTTPS
 git clone https://code.vt.edu/andrewt03/vt-digital-assessment.git
-
 # SSH (Recommended)
 git clone git@code.vt.edu:andrewt03/vt-digital-assessment.git
 
