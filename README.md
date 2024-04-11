@@ -25,7 +25,7 @@ git clone git@github.com:AndrewTran03/VT-Digital-Assessment.git
 ```shell
 # Create a frontend terminal
 cd client/
-npm install
+npm install --legacy-peer-deps
 sh run_frontend.sh development
 ```
 
