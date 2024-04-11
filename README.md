@@ -44,6 +44,14 @@ cd server/
 touch .env
 cp .env.sample .env
 # Please add your API token on the `CANVAS_PUBLIC_API_TOKEN` line in quotations for safe-keeping as well as to make the backend work!
+cp .env .env.production
+# ^^^ Note: Only do this once you have finished editing the .env file and then will be pushing code into production! 
+```
+
+- To commit development code into Docker containers and push to CS Cloud:
+```shell
+cd deployment/
+sh docker_deployment.sh
 ```
 
 # Addendum: Creating a Canvas API Token
