@@ -2,8 +2,10 @@
 
 echo "|-------- Beginning of Running Docker Deployment Script --------|"
 
-echo "Attempting to login to 'docker.cs.vt.edu':"
+echo "Attempting to login to Docker locally, 'docker.cs.vt.edu' [VERSION.CS.VT.EDU], and 'container.cs.vt.edu' [GIT.CS.VT.EDU]:"
+docker login
 docker login docker.cs.vt.edu
+docker login container.cs.vt.edu
 
 cd ..
 continue_running=true
@@ -13,9 +15,10 @@ while [ "$continue_running" = true ]; do
     echo "[2] Type ['deploy'] to Deploy the Application Fresh"
     echo "[3] Type ['stop-and-remove'] to Stop and Remove the Deployed & Running Application Containers"
     echo "[4] Type ['re-deploy'] to Re-Deploy the Application (Currently Running) -- Useful for Applying New Changes"
-    echo "[5] Type ['system-clean'] to Un-Deploy the Application & Clear all Docker Containers, Images, Orphan-Processes, or other Objects from Docker Desktop"
-    echo "[6] Type ['clear'] to Clear and Re-Display the Menu Again"
-    echo "[7] Type ['exit', 'quit', 'e', or 'q'] to Exit this Deployment Script"
+    echo "[5] Type ['push' or 'p'] to Push the Docker Images to the GitLab (GIT.CS.VT.EDU) Container Registry"
+    echo "[6] Type ['system-clean'] to Un-Deploy the Application & Clear all Docker Containers, Images, Orphan-Processes, or other Objects from Docker Desktop"
+    echo "[7] Type ['clear'] to Clear and Re-Display the Menu Again"
+    echo "[8] Type ['exit', 'quit', 'e', or 'q'] to Exit this Deployment Script"
     echo "NOTE: If you press any other key, then the script will just exit."
 
     read userInput
@@ -33,7 +36,7 @@ while [ "$continue_running" = true ]; do
         docker ps
         docker images
         docker rmi $(docker images -q)
-        docker compose -f ./vt-digital-assessment-deployment.yml up -d --build
+        docker compose -f ./vt-digital-assessment-deployment.yml up -d --build --timestamps
         docker ps
     elif [ "$userInputLowercase" == "stop-and-remove" ]; then
         docker ps
@@ -43,8 +46,16 @@ while [ "$continue_running" = true ]; do
     elif [ "$userInputLowercase" == "re-deploy" ]; then
         docker ps
         docker compose -f ./vt-digital-assessment-deployment.yml down
-        docker compose -f ./vt-digital-assessment-deployment.yml up -d --build
+        docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
         docker ps
+    elif [ "$userInputLowercase" == "push" ] || [ "$userInputLowercase" == "p" ]; then
+        docker ps
+        docker images
+        docker login container.cs.vt.edu
+        docker tag vt-digital-assessment-client-frontend-img:latest container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
+        docker tag vt-digital-assessment-server-backend-img:latest container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
+        docker push container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
+        docker push container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
     elif [ "$userInputLowercase" == "system-clean" ]; then
         docker ps
         docker compose -f ./vt-digital-assessment-deployment.yml down
