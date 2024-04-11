@@ -6,7 +6,14 @@ LABEL maintainer="vtdigitalassessment@gmail.com"
 
 WORKDIR /server
 
-# Install dependencies
+# Set non-interactive environment variable
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install all necessary dependencies from Alpine Linux
+RUN apk update && \
+    apk add --no-cache vim npm make git openjdk11 build-base python3
+
+# Install NPM dependencies
 COPY package.json .
 RUN npm install
 
