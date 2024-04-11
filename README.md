@@ -63,7 +63,12 @@ sh docker_deployment.sh
 - Fill in the `Purpose` section with your reason for generating a Canvas API token and set your desired expiration date in the `Expires` row. Then, click `Generate Token`.
 - You will then see your `API Token`. Save this someplace safe as it will be generated only this once, and you cannot see it again. If you lose the token, you need to regenerate it again using the steps above.
 
-# Resources:
+## Useful Links:
+
+- VT CS Cloud Website - Frontend: https://vt-digital-assessment.discovery.cs.vt.edu/
+- VT CS Cloud Website - Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/
+
+## Extra Resources:
 
 - [Canvas Live API](https://canvas.vt.edu/doc/api/live#!/assignments.json/list_assignments_assignments_get_1) 
 
