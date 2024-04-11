@@ -17,7 +17,10 @@ if (process.env.NODE_ENV === "development") {
   backendServerPort = 3001;
 }
 
-const backendUrlBase = `http://${window.location.hostname}:${backendServerPort}`;
+const backendUrlBase =
+  window.location.hostname.toLowerCase() !== "localhost"
+    ? "https://vt-digital-assessment-server.discovery.cs.vt.edu"
+    : `http://${window.location.hostname}:${backendServerPort}`;
 
 // Required with All MongoDB Entries:
 type MongoDBId = {

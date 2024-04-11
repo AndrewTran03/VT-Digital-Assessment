@@ -2,11 +2,8 @@ version: "3"
 
 services:
   vt-digital-assessment-frontend:
-    build:
-      context: ./client
-      dockerfile: Dockerfile
-      args:
-        - BUILD_PLATFORM=linux/amd64
+    build: ./client
+    platform: linux/amd64
     image: vt-digital-assessment-client-frontend-img
     container_name: client-frontend
     restart: unless-stopped
@@ -20,11 +17,12 @@ services:
       - vt_digital_assessment_network
   
   vt-digital-assessment-backend:
-    build:
+    build: 
       context: ./server
       dockerfile: Dockerfile
       args:
-        - BUILD_PLATFORM=linux/amd64
+        - BUILD_TYPE="production"
+    platform: linux/amd64
     image: vt-digital-assessment-server-backend-img
     container_name: server-backend
     restart: unless-stopped
