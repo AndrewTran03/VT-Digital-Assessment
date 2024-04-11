@@ -1,11 +1,16 @@
 import path from "path";
 import dotenv from "dotenv";
 
+// Checking for a valid 'NODE_ENV' variable configuration
 let ENV_FILE_PATH = "";
 if (process.env["NODE_ENV"] === "development") {
   ENV_FILE_PATH = "../.env";
 } else if (process.env["NODE_ENV"] === "production") {
   ENV_FILE_PATH = "../../.env";
+} else {
+  log.error('Invalid configuration for the "NODE_ENV" variable: ');
+  log.fatal(process.env["NODE_ENV"]);
+  process.exit(1);
 }
 dotenv.config({
   debug: true,
