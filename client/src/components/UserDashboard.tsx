@@ -96,21 +96,29 @@ const UserDashboard: React.FC = () => {
 
   async function fetchCanvasQuizData() {
     setCoursesLoading(true);
-    await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`).then((res) => {
+    try {
+      const res = await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`);
       const parsedResult = parseCanvasQuizQuestionMongoDBDCollection(res.data);
       console.log(parsedResult);
       setCanvasQuizDataArr(parsedResult);
-    });
-    setCoursesLoading(false);
+    } catch (e: any) {
+      window.location.reload();
+    } finally {
+      setCoursesLoading(false);
+    }
   }
 
   async function fetchCanvasQuizStatisticsData() {
     setQuizStatsLoading(true);
-    await axios.get(`${backendUrlBase}/api/statistics/quiz/${canvasUserId}`).then((res) => {
+    try {
+      const res = await axios.get(`${backendUrlBase}/api/statistics/quiz/${canvasUserId}`);
       console.log(res.data);
       setCanvasQuizQuestionStatisticDataArr(res.data as CanvasQuizStatistic[]);
-    });
-    setQuizStatsLoading(false);
+    } catch (e: any) {
+      window.location.reload();
+    } finally {
+      setQuizStatsLoading(false);
+    }
   }
 
   async function fetchCanvasAssignmentsWithRubricsData() {
