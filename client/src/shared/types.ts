@@ -21,6 +21,7 @@ const backendUrlBase =
   window.location.hostname.toLowerCase() !== "localhost"
     ? "https://vt-digital-assessment-server.discovery.cs.vt.edu"
     : `http://${window.location.hostname}:${backendServerPort}`;
+console.log(`Server URL: ${backendUrlBase}`);
 
 // Required with All MongoDB Entries:
 type MongoDBId = {
