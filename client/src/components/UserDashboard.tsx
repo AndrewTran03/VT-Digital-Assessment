@@ -35,6 +35,7 @@ import {
 } from "../shared/contexts";
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
 import "../styles/TableCellStyles.css";
+import { APIRequestError } from "../shared/APIRequestError";
 
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
@@ -102,7 +103,9 @@ const UserDashboard: React.FC = () => {
       console.log(parsedResult);
       setCanvasQuizDataArr(parsedResult);
     } catch (e: any) {
-      window.location.reload();
+      if (e instanceof APIRequestError) {
+        window.location.reload();
+      }
     } finally {
       setCoursesLoading(false);
     }
@@ -115,7 +118,9 @@ const UserDashboard: React.FC = () => {
       console.log(res.data);
       setCanvasQuizQuestionStatisticDataArr(res.data as CanvasQuizStatistic[]);
     } catch (e: any) {
-      window.location.reload();
+      if (e instanceof APIRequestError) {
+        window.location.reload();
+      }
     } finally {
       setQuizStatsLoading(false);
     }
@@ -123,11 +128,17 @@ const UserDashboard: React.FC = () => {
 
   async function fetchCanvasAssignmentsWithRubricsData() {
     setAssignmentWithRubricDataLoading(true);
-    await axios.get(`${backendUrlBase}/api/statistics/assignment_rubric/${canvasUserId}`).then((res) => {
+    try {
+      const res = await axios.get(`${backendUrlBase}/api/statistics/assignment_rubric/${canvasUserId}`);
       console.log(res.data);
       setAssignmentWithRubricDataArr(res.data as CanvasCourseAssignmentRubricObjMongoDBEntry[]);
-    });
-    setAssignmentWithRubricDataLoading(false);
+    } catch (e: any) {
+      if (e instanceof APIRequestError) {
+        window.location.reload();
+      }
+    } finally {
+      setAssignmentWithRubricDataLoading(false);
+    }
   }
 
   async function handleApiRefreshButtonClick(e: FormEvent<HTMLButtonElement>) {

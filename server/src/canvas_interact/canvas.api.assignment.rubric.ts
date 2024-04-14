@@ -66,7 +66,7 @@ async function fetchCanvasUserAssignmentData(
         });
       }
     });
-    log.warn(`Finished Assignment Parsing Index ${j}: ---------------------------------`);
+    log.warn(`Finished Assignment Course Parsing Index ${j}: ---------------------------------`);
   }
   return assignmentsWithRubricsArr;
 }

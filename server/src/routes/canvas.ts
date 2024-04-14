@@ -1,6 +1,7 @@
 import express from "express";
 import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
+import { EventEmitter } from "events";
 import log from "../utils/logger";
 import {
   QuestionTypeValues,
@@ -29,6 +30,7 @@ import {
 import { CanvasCourseAssignmentRubricObjModel } from "../models/canvas.assignment.rubric.model";
 
 const router = express.Router();
+const userLoginProgressEmitter = new EventEmitter();
 
 const canvasQuizQuestionSchema = z.object({
   canvasUserId: z.number().gte(0),
@@ -100,7 +102,10 @@ const canvasAssignmentRubricSchema = z.object({
 
 async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) {
   const axiosHeaders = await getCanvasApiAuthHeaders(canvasUserId);
+  userLoginProgressEmitter.emit("progress", { progress: "Pulling Canvas User's Enrolled Course Data" });
   const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
+
+  userLoginProgressEmitter.emit("progress", { progress: "Pulling Canvas User's Quiz Entries from External API" });
   const canvasQuizMap = await fetchCanvasUserQuizData(axiosHeaders, canvasUserCourseIds);
   const canvasQuizMapTransformedToArray = convertCanvasQuizMapToArray(canvasUserId, canvasQuizMap);
 
@@ -116,6 +121,7 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
     }
   });
 
+  userLoginProgressEmitter.emit("progress", { progress: "Inserting/Updating Canvas User's Quiz Entries in MongoDB" });
   for (let i = 0; i < canvasQuizMapTransformedToArray.length; i++) {
     log.info(`QUIZ INDEX ${i} STARTED ------------------------------------- \n`);
     try {
@@ -162,6 +168,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
   }
   log.info("Inserted ALL of the specified quiz entries successfully! Congratulations!");
 
+  userLoginProgressEmitter.emit("progress", {
+    progress: "Pulling Canvas User's Assignment (with Rubric) Entries from External API"
+  });
   const assignmentRubricResultsArr = await fetchCanvasUserAssignmentData(
     canvasUserId,
     axiosHeaders,
@@ -187,6 +196,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
     }
   });
 
+  userLoginProgressEmitter.emit("progress", {
+    progress: "Inserting/Updating Canvas User's Assignment (with Rubric) Entries in MongoDB"
+  });
   for (let j = 0; j < parsedAssignmentRubricResultsArr.length; j++) {
     log.info(`ASSIGNMENT WITH RUBRIC INDEX ${j} STARTED ------------------------------------- \n`);
     try {
@@ -316,6 +328,25 @@ function convertAssignmentWithRubricArrToBeMongoDBCompliant(
   return newAssignmentRubricResultsArr;
 }
 
+router.get("/api/canvas/retrieveCanvasId/progress", (req, res) => {
+  // Set appropriate headers for SSE
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  // Listen for progress events
+  function progressHandler(data: any) {
+    return res.write(`data: ${JSON.stringify(data)}\n\n`);
+  }
+
+  userLoginProgressEmitter.on("progress", progressHandler);
+
+  // Remove listener when the client closes the connection
+  req.on("close", () => {
+    userLoginProgressEmitter.off("progress", progressHandler);
+  });
+});
+
 router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", async (req, res) => {
   const canvasAccountId = parseInt(req.params.canvasAccountId);
   const canvasUsername = req.params.canvasUsername as string;
@@ -325,12 +356,14 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
   log.info("Canvas Username:", canvasUsername);
   log.info("Canvas User API Key:", canvasUserApiKey);
   try {
+    userLoginProgressEmitter.emit("progress", { progress: "Process started..." });
     const axiosHeaders: AxiosAuthHeaders = {
       Authorization: `Bearer ${canvasUserApiKey}`
     };
 
     // Canvas API O-Auth Fallback
     // Instructors (and above can only use this)
+    userLoginProgressEmitter.emit("progress", { progress: `Looking up Canvas User ID...` });
     let canvasUserId = await fetchCanvasUserInfoAdmin(axiosHeaders, canvasAccountId, canvasUsername);
     // Students can use this
     if (canvasUserId === -1) {
@@ -341,6 +374,85 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
     }
     console.assert(canvasUserId !== -1);
     log.info("FINAL USER ID: ", canvasUserId);
+    const canvasUserInfoEntryToInsert = new CanvasUserApiModel({
+      canvasUserId: canvasUserId,
+      canvasUserApiKey: canvasUserApiKey as string,
+      canvasUsername: canvasUsername
+    });
+
+    userLoginProgressEmitter.emit("progress", { progress: `Storing Canvas User credentials in MongoDB...` });
+    const canvasUserInfoEntryFindResult = await CanvasUserApiModel.findOne({ canvasUserId: canvasUserId });
+    const isNewUser = !canvasUserInfoEntryFindResult;
+    if (isNewUser) {
+      const canvasUserInfoEntryInsertResult = await canvasUserInfoEntryToInsert.save();
+      log.info("Inserted the specified user information successfully! Congratulations!");
+    } else {
+      canvasUserInfoEntryFindResult.canvasUsername = canvasUsername;
+      canvasUserInfoEntryFindResult.canvasUserApiKey = canvasUserApiKey;
+      const canvasQuizEntryUpdateResult = await canvasUserInfoEntryFindResult.save();
+      log.info("Updated the specified Canvas user information successfully! Congratulations!");
+    }
+
+    userLoginProgressEmitter.emit("progress", { progress: "Started Canvas API caching into MongoDB..." });
+    await loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId);
+    userLoginProgressEmitter.emit("progress", {
+      progress: "Finished loading all entries from Canvas API into MongoDB..."
+    });
+
+    userLoginProgressEmitter.emit("progress", { progress: "Process completed!" });
+    return res.status(isNewUser ? 201 : 200).send(JSON.stringify({ UserId: canvasUserId })); // 201 = Successful Resource Creation
+  } catch (err) {
+    log.error("Error in storing Canvas user information in MongoDB database! Please try again!");
+    const resErrBody: APIErrorResponse = {
+      errorLoc: "PUT",
+      errorMsg: "Failed to store Canvas user information the MongoDB database"
+    };
+    userLoginProgressEmitter.emit("progress", { progress: "Error: Process failed!" });
+    return res.status(400).send(JSON.stringify(resErrBody));
+  }
+});
+
+/*
+router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", async (req, res) => {
+  const canvasAccountId = parseInt(req.params.canvasAccountId);
+  const canvasUsername = req.params.canvasUsername as string;
+  log.info(req.body);
+  const { canvasUserApiKey } = req.body;
+  log.info("Canvas Account ID:", canvasAccountId);
+  log.info("Canvas Username:", canvasUsername);
+  log.info("Canvas User API Key:", canvasUserApiKey);
+
+  try {
+    const axiosHeaders: AxiosAuthHeaders = {
+      Authorization: `Bearer ${canvasUserApiKey}`
+    };
+
+    log.info(res.getHeaders());
+
+    // Send initial response indicating the start of the process
+    res.write(`${JSON.stringify({ progress: "Process started..." })}\n\n`);
+
+    // Simulate processing delay
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Canvas API O-Auth Fallback
+    // Instructors (and above can only use this)
+    res.write(`${JSON.stringify({ progress: `Looking up Canvas User ID...` })}\n\n`);
+    let canvasUserId = await fetchCanvasUserInfoAdmin(axiosHeaders, canvasAccountId, canvasUsername);
+    // Students can use this
+    if (canvasUserId === -1) {
+      canvasUserId = await fetchCanvasUserInfoRegUser(axiosHeaders);
+      if (canvasUserId === -1) {
+        throw new Error("Error in storing Canvas user information in MongoDB database");
+      }
+    }
+    console.assert(canvasUserId !== -1);
+    res.write(`${JSON.stringify({ progress: `Got final Canvas User ID ${canvasUserId}` })}\n\n`);
+    log.info("FINAL USER ID: ", canvasUserId);
+
+    // Simulate processing delay
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+
     const canvasUserInfoEntryToInsert = new CanvasUserApiModel({
       canvasUserId: canvasUserId,
       canvasUserApiKey: canvasUserApiKey as string,
@@ -358,17 +470,33 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
       const canvasQuizEntryUpdateResult = await canvasUserInfoEntryFindResult.save();
       log.info("Updated the specified Canvas user information successfully! Congratulations!");
     }
+
+    // Simulate processing delay
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    res.write(`${JSON.stringify({ progress: "Started Canvas API caching into MongoDB..." })}\n\n`);
     await loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId);
-    return res.status(isNewUser ? 201 : 200).send(JSON.stringify({ UserId: canvasUserId })); // 201 = Successful Resource Creation
+
+    // Simulate processing delay
+    // await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    res.write(
+      `${JSON.stringify({ progress: "Finished loading all entries from Canvas API into MongoDB..." })}\n\n`
+    );
+
+    // return res.status(isNewUser ? 201 : 200).send(JSON.stringify({ UserId: canvasUserId }));
+    // Send final response indicating completion
+    return res.end(`${JSON.stringify({ status: isNewUser ? 201 : 200, UserId: canvasUserId })}`);
   } catch (err) {
     log.error("Error in storing Canvas user information in MongoDB database! Please try again!");
     const resErrBody: APIErrorResponse = {
       errorLoc: "PUT",
       errorMsg: "Failed to store Canvas user information the MongoDB database"
     };
-    return res.status(400).send(JSON.stringify(resErrBody));
+    return res.end(`${JSON.stringify({ status: 400, error: JSON.stringify(resErrBody)})}`);
   }
 });
+*/
 
 let index = 0;
 router.get("/api/canvas/:canvasUserId", async (req, res) => {

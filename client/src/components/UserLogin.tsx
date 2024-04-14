@@ -21,11 +21,33 @@ const UserLogin: React.FC = () => {
   const canvasUsernameInputRef = useRef<HTMLInputElement>(null);
   const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
   const [canvasApiKeyEncrpytedState, setCanvasApiKeyEncryptedState] = useState(true);
+  const [progressMsg, setProgressMsg] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
     // Clear local storage for fresh login
     window.localStorage.clear();
+  }, []);
+
+  useEffect(() => {
+    // Implements Server-Sent Event (SSE) logging (for longer API calls)
+    const eventSource = new EventSource(`${backendUrlBase}/api/canvas/retrieveCanvasId/progress`);
+
+    eventSource.onmessage = (event: MessageEvent) => {
+      const data = JSON.parse(event.data);
+      // Update state or UI based on the progress data received from the server
+      console.log("Progress Update:", data.progress);
+      setProgressMsg(data.progress);
+    };
+
+    eventSource.onerror = (error: Event) => {
+      console.error("EventSource error:", error);
+      eventSource.close();
+    };
+
+    return () => {
+      eventSource.close();
+    };
   }, []);
 
   useEffect(() => {
@@ -195,6 +217,12 @@ const UserLogin: React.FC = () => {
       {userSubmitError && (
         <Typography className="failure-message" variant="body1" style={{ color: "red", marginTop: "10px" }}>
           Error! Invalid Canvas credentials. Please try again.
+        </Typography>
+      )}
+      {/* Progress Message */}
+      {progressMsg && progressMsg.length > 0 && (
+        <Typography className="progress-message" variant="body1" style={{ color: "yellow", marginTop: "10px" }}>
+          In-Progress: {progressMsg}
         </Typography>
       )}
     </>
