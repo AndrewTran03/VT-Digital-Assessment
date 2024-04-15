@@ -13,7 +13,7 @@ async function ensureConnectionToCanvasApi() {
 
   try {
     const canvasUserId = await fetchCanvasUserInfoRegUser(axiosHeaders);
-    if (canvasUserId == -1) {
+    if (canvasUserId === -1) {
       throw new Error("Failed to connect to Canvas API. Exiting now...");
     }
     log.info("Successfully initiated connection to the Canvas API");

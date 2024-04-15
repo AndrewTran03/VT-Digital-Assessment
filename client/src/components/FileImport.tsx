@@ -157,7 +157,7 @@ const FileImport: React.FC = () => {
       }
       // Adds new Canvas Learning Objectives
       lines.forEach((line, idx) => {
-        if (idx == 0) {
+        if (idx === 0) {
           // Skip first line (descriptive headers)
           return;
         }
