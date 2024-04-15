@@ -37,19 +37,25 @@ while [ "$continue_running" = true ]; do
         docker images
         docker rmi $(docker images -q)
         MODE=development docker compose -f ./vt-digital-assessment-deployment.yml up -d --build --timestamps
+        docker image prune
         docker ps
+        docker images
     elif [ "$userInputLowercase" == "stop-and-remove" ]; then
         docker ps
         MODE=development docker compose -f ./vt-digital-assessment-deployment.yml stop
         MODE=development docker compose -f ./vt-digital-assessment-deployment.yml rm
+        docker image prune
         docker ps
+        docker images
     elif [ "$userInputLowercase" == "re-deploy" ]; then
         docker ps
         docker images
         docker rmi $(docker images -q)
         MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
         MODE=development docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
+        docker image prune
         docker ps
+        docker images
     elif [ "$userInputLowercase" == "push" ] || [ "$userInputLowercase" == "p" ]; then
         docker ps
         docker images
@@ -64,6 +70,8 @@ while [ "$continue_running" = true ]; do
         docker push container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker rmi vt-digital-assessment-client-frontend-img:latest
         docker rmi vt-digital-assessment-server-backend-img:latest
+        docker image prune
+        docker ps
         docker images
     elif [ "$userInputLowercase" == "system-clean" ]; then
         docker ps
