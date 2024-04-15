@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "development") {
 
 const backendUrlBase =
   window.location.hostname.toLowerCase() !== "localhost"
-    ? "https://vt-digital-assessment-server.discovery.cs.vt.edu"
+    ? window.location.hostname.toLowerCase()
     : `http://${window.location.hostname}:${backendServerPort}`;
 console.log(`Server URL: ${backendUrlBase}`);
 

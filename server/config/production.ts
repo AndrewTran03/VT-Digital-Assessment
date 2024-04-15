@@ -1,9 +1,9 @@
 // Necessary Back-End Configuration Properties (using NPM "config")
 export default {
   frontendClientPort: `${process.env.FRONTEND_PORT}`,
-  frontendClientUrl: `https://vt-digital-assessment.discovery.cs.vt.edu/`,
+  frontendClientUrl: `https://vt-digital-assessment.endeavour.cs.vt.edu/`,
   backendServerPort: `${process.env.BACKEND_PORT}`,
-  backendServerUrl: `https://vt-digital-assessment-server.discovery.cs.vt.edu/`,
+  backendServerUrl: `https://vt-digital-assessment-server.endeavour.cs.vt.edu/`,
   canvasPublicApiToken: `${process.env.CANVAS_PUBLIC_API_TOKEN}`,
   logLevel: "trace",
   mongoDatabaseUri: `mongodb+srv://${process.env.USERNAME}:${process.env.PASSWORD}@${process.env.DEPLOYMENT_NAME}.xqbvmpf.mongodb.net/${process.env.MONGO_DB_NAME}?retryWrites=true&w=majority`,
