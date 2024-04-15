@@ -36,33 +36,36 @@ while [ "$continue_running" = true ]; do
         docker ps
         docker images
         docker rmi $(docker images -q)
-        docker compose -f ./vt-digital-assessment-deployment.yml up -d --build --timestamps
+        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml up -d --build --timestamps
         docker ps
     elif [ "$userInputLowercase" == "stop-and-remove" ]; then
         docker ps
-        docker compose -f ./vt-digital-assessment-deployment.yml stop
-        docker compose -f ./vt-digital-assessment-deployment.yml rm
+        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml stop
+        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml rm
         docker ps
     elif [ "$userInputLowercase" == "re-deploy" ]; then
         docker ps
-        docker compose -f ./vt-digital-assessment-deployment.yml down
-        docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
+        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
+        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
         docker ps
     elif [ "$userInputLowercase" == "push" ] || [ "$userInputLowercase" == "p" ]; then
         docker ps
         docker images
         docker login container.cs.vt.edu
-        docker compose -f ./vt-digital-assessment-deployment.yml down
-        docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
+        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
+        MODE=production docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
         # docker build --no-cache --platform=linux/amd64 ../client/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
         # docker build --no-cache --platform=linux/amd64 ../server/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker tag vt-digital-assessment-client-frontend-img:latest container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
         docker tag vt-digital-assessment-server-backend-img:latest container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker push container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
         docker push container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
+        docker rmi vt-digital-assessment-client-frontend-img:latest
+        docker rmi vt-digital-assessment-server-backend-img:latest
+        docker images
     elif [ "$userInputLowercase" == "system-clean" ]; then
         docker ps
-        docker compose -f ./vt-digital-assessment-deployment.yml down
+        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
         docker rmi $(docker images -q)
         docker system prune -a
         docker images

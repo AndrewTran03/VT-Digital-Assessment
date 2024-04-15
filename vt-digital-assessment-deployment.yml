@@ -21,7 +21,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
       args:
-        - BUILD_TYPE="production"
+        BUILD_TYPE: ${MODE}
     platform: linux/amd64
     image: vt-digital-assessment-server-backend-img
     container_name: server-backend

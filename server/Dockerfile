@@ -5,8 +5,9 @@ FROM node:20-alpine
 LABEL maintainer="vtdigitalassessment@gmail.com"
 
 ARG BUILD_TYPE=""
+ENV BUILD=${BUILD_TYPE}
 
-RUN if [ -z "${BUILD_TYPE}" ]; then \
+RUN if [ -z "${BUILD}" ]; then \
     echo "Please provide a build argument!" \
     && echo "Exiting now..." \
     && exit 1; \
@@ -27,15 +28,16 @@ RUN npm install
 
 # Add backend source code
 COPY . .
+RUN echo "Build type is ${BUILD}"
 # Convert "config" file from "development" to "production" mode (if needed)
-RUN if [ ${BUILD_TYPE} == "development" ]; then \
+RUN if [ "${BUILD}" == "development" ]; then \
     mv config/development.ts config/production.ts \
-    && echo "Build type is ${BUILD_TYPE}}"; \
-elif [ ${BUILD_TYPE} == "production" ]; then \
+    && echo "Build type is ${BUILD}"; \
+elif [ "${BUILD}" == "production" ]; then \
     rm -f config/development.ts \
-    && echo "Build type is ${BUILD_TYPE}}"; \
+    && echo "Build type is ${BUILD}"; \
 else \
-    echo "Build type is not 'development' but is ${BUILD_TYPE}"; \
+    echo "Build type is not 'development' but is ${BUILD}"; \
 fi
 # Integrate "production" .env file into deployment ecosystem in the backend
 RUN mv .env.production .env
