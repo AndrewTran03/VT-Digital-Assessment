@@ -65,8 +65,10 @@ sh docker_deployment.sh
 
 ## Useful Links:
 
-- VT CS Cloud Website - Frontend: https://vt-digital-assessment.discovery.cs.vt.edu/
-- VT CS Cloud Website - Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/
+- VT CS Cloud Website (Discovery Cluster) - Frontend: https://vt-digital-assessment.discovery.cs.vt.edu/
+- VT CS Cloud Website (Discovery Cluster) - Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/
+- VT CS Cloud Website (Endeavour Cluster) - Frontend: https://vt-digital-assessment.endeavour.cs.vt.edu/
+- VT CS Cloud Website (Endeavour Cluster) - Backend: https://vt-digital-assessment-server.endeavour.cs.vt.edu/
 
 ## Extra Resources:
 
