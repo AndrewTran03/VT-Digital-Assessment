@@ -34,6 +34,8 @@ const CanvasObjectivesSchema = new mongoose.Schema<CanvasCourseObjectiveGroup>(
     }
   },
   {
+    strict: true,
+    strictQuery: true,
     timestamps: {
       createdAt: "created_date",
       updatedAt: "updated_date"

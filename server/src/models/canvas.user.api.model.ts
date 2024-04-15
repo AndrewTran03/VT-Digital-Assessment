@@ -21,6 +21,8 @@ const CanvasUserApiSchema = new mongoose.Schema<CanvasUserAPIEntryBase>(
     }
   },
   {
+    strict: true,
+    strictQuery: true,
     timestamps: {
       createdAt: "created_date",
       updatedAt: "updated_date"

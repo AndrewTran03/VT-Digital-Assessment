@@ -90,6 +90,8 @@ const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>
     }
   },
   {
+    strict: true,
+    strictQuery: true,
     timestamps: {
       createdAt: "created_date",
       updatedAt: "updated_date"

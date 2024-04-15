@@ -127,6 +127,8 @@ const CanvasCourseAssignmentRubricObjSchema = new mongoose.Schema<CanvasCourseAs
     }
   },
   {
+    strict: true,
+    strictQuery: true,
     timestamps: {
       createdAt: "created_date",
       updatedAt: "updated_date"
