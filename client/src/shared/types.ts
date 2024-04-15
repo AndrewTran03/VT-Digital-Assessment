@@ -19,7 +19,7 @@ if (process.env.NODE_ENV === "development") {
 
 const backendUrlBase =
   window.location.hostname.toLowerCase() !== "localhost"
-    ? window.location.hostname.toLowerCase()
+    ? `https://${window.location.hostname.toLowerCase()}`
     : `http://${window.location.hostname}:${backendServerPort}`;
 console.log(`Server URL: ${backendUrlBase}`);
 
