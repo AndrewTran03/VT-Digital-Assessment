@@ -17,10 +17,12 @@ if (process.env.NODE_ENV === "development") {
   backendServerPort = 3001;
 }
 
+const hostNameLowercase = window.location.hostname.toLowerCase();
+const firstDotIndex = hostNameLowercase.indexOf(".");
 const backendUrlBase =
-  window.location.hostname.toLowerCase() !== "localhost"
-    ? `https://${window.location.hostname.toLowerCase()}`
-    : `http://${window.location.hostname}:${backendServerPort}`;
+  hostNameLowercase !== "localhost" && firstDotIndex !== -1
+    ? `https://${`${hostNameLowercase.slice(0, firstDotIndex)}-server${hostNameLowercase.slice(firstDotIndex)}`}`
+    : `http://${hostNameLowercase}:${backendServerPort}`;
 console.log(`Server URL: ${backendUrlBase}`);
 
 // Required with All MongoDB Entries:
