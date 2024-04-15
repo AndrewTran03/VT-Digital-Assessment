@@ -45,6 +45,8 @@ while [ "$continue_running" = true ]; do
         docker ps
     elif [ "$userInputLowercase" == "re-deploy" ]; then
         docker ps
+        docker images
+        docker rmi $(docker images -q)
         MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
         MODE=development docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
         docker ps
