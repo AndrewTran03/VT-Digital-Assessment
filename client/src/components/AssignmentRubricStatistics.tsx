@@ -17,13 +17,13 @@ import {
   backendUrlBase,
   CanvasCourseAssignmentRubricObjMongoDBEntry,
   CanvasAssignmentWithRubricStatisticsResultObj,
-  RubricRatingSubmissionScore
+  RubricRatingSubmissionScore,
+  PERCENTAGE_CATEGORIES
 } from "../shared/types";
 import { AssignmentWithRubricLearningObjectiveContext, CanvasAssignmentWithRubricContext } from "../shared/contexts";
 import "../styles/TableCellStyles.css";
 
 const AssignmentRubricStatistics: React.FC = () => {
-  const PERCENTAGE_CATEGORIES = ["Exceeds", "Meets", "Below", "None"] as const;
   const { assignmentWithRubricDataArr } = useContext(CanvasAssignmentWithRubricContext);
   const { canvasAssignmentWithRubricLearningObjectiveData } = useContext(AssignmentWithRubricLearningObjectiveContext);
   const assignmentWithRubricData: CanvasCourseAssignmentRubricObjMongoDBEntry[] =

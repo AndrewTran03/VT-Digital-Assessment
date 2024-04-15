@@ -20,7 +20,8 @@ import {
   CanvasQuizStatistic,
   CanvasQuizStatisticsResultObj,
   CanvasQuizQuestionAnswerFrequencyArrEntry,
-  CanvasQuizQuestionAnswerSetFrequencyArrEntry
+  CanvasQuizQuestionAnswerSetFrequencyArrEntry,
+  PERCENTAGE_CATEGORIES
 } from "../shared/types";
 import {
   CanvasQuizQuestionContext,
@@ -31,7 +32,6 @@ import {
 import "../styles/TableCellStyles.css";
 
 const QuizStatistics: React.FC = () => {
-  const PERCENTAGE_CATEGORIES = ["Exceeds", "Meets", "Below", "None"] as const;
   const { canvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
   const { canvasQuizLearningObjectiveData } = useContext(QuizLearningObjectiveContext);
   const { canvasUserInfo } = useContext(CanvasUserInfoContext);

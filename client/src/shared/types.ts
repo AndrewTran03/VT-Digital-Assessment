@@ -405,6 +405,8 @@ type RubricRatingSubmissionScore = Prettify<
   }
 >;
 
+const PERCENTAGE_CATEGORIES = ["Exceeds", "Meets", "Below", "None"] as const;
+
 export {
   backendUrlBase,
   MongoDBWithId,
@@ -432,5 +434,6 @@ export {
   LearningObjectiveAssignmentWithRubricData,
   CanvasAssignmentWithRubricStatisticsResultObj,
   CanvasCourseAssignmentRubricCategoryAnswerStatistic,
-  RubricRatingSubmissionScore
+  RubricRatingSubmissionScore,
+  PERCENTAGE_CATEGORIES
 };

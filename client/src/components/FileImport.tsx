@@ -26,6 +26,7 @@ import {
 } from "@mui/material";
 import "../styles/DragDropFileImport.css";
 
+const acceptableFileTypes = ["CSV"] as const;
 const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
 const learningObjSchema = z.object({
   deptAbbrev: z.string().min(2).max(4),
@@ -46,7 +47,6 @@ const FileImport: React.FC = () => {
   const [revealStep2, setRevealStep2] = useState(false);
   const [allowedToSubmit, setAllowedToSubmit] = useState(false);
   const navigate = useNavigate();
-  const acceptableFileTypes = ["CSV"] as const;
 
   async function fetchData() {
     console.clear();
