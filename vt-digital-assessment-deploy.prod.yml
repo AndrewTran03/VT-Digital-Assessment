@@ -2,7 +2,11 @@ version: "3.8"
 
 services:
   vt-digital-assessment-frontend:
-    build: ./client
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        BUILD_TYPE: ${MODE}
     platform: linux/amd64
     image: vt-digital-assessment-client-frontend-img
     container_name: client-frontend
