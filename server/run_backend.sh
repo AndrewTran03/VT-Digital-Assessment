@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 echo "|-------- Beginning of Running Back-End Script --------|"
 echo "Installing NPM Dependencies:"

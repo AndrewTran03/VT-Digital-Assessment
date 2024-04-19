@@ -20,7 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install all necessary dependencies from Alpine Linux
 RUN apk update && \
-    apk add --no-cache vim npm make git openjdk11 build-base python3
+    apk add --no-cache vim bash npm make git openjdk11 build-base python3
 
 # Install NPM dependencies
 COPY package.json .
@@ -32,13 +32,13 @@ COPY . .
 # Expose frontend React app on port
 EXPOSE 5001
 # Build the "production" version of the frontend app
-RUN echo "Build type is ${BUILD_TYPE}"
-RUN if [ "${BUILD_TYPE}" == "production" ]; then \
+RUN echo "Build type is ${BUILD}"
+RUN if [ "${BUILD}" == "production" ]; then \
     npm run build-prod \
-    && echo "Build type is ${BUILD_TYPE}"; \
-elif [ "${BUILD_TYPE}" == "staging" ]; then \
+    && echo "Build type is ${BUILD}"; \
+elif [ "${BUILD}" == "staging" ]; then \
     npm run build-stage \
-    && echo "Build type is ${BUILD_TYPE}"; \
+    && echo "Build type is ${BUILD}"; \
 else \
     echo "Error: Build type is ${BUILD} which is NOT VALID!"; \
 fi
