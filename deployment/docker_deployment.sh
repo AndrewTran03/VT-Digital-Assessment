@@ -36,14 +36,14 @@ while [ "$continue_running" = true ]; do
         docker ps
         docker images
         docker rmi $(docker images -q)
-        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml up -d --build --timestamps
+        MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml up -d --build --timestamps
         docker image prune
         docker ps
         docker images
     elif [ "$userInputLowercase" == "stop-and-remove" ]; then
         docker ps
-        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml stop
-        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml rm
+        MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml stop
+        MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml rm
         docker image prune
         docker ps
         docker images
@@ -51,8 +51,8 @@ while [ "$continue_running" = true ]; do
         docker ps
         docker images
         docker rmi $(docker images -q)
-        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
-        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
+        MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml down
+        MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml up  -d --build --timestamps
         docker image prune
         docker ps
         docker images
@@ -60,8 +60,8 @@ while [ "$continue_running" = true ]; do
         docker ps
         docker images
         docker login container.cs.vt.edu
-        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
-        MODE=production docker compose -f ./vt-digital-assessment-deployment.yml up  -d --build --timestamps
+        MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml down
+        MODE=production docker compose -f ./vt-digital-assessment-deploy.prod.yml up  -d --build --timestamps
         # docker build --no-cache --platform=linux/amd64 ../client/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
         # docker build --no-cache --platform=linux/amd64 ../server/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker tag vt-digital-assessment-client-frontend-img:latest container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
@@ -75,7 +75,7 @@ while [ "$continue_running" = true ]; do
         docker images
     elif [ "$userInputLowercase" == "system-clean" ]; then
         docker ps
-        MODE=development docker compose -f ./vt-digital-assessment-deployment.yml down
+        MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml down
         docker rmi $(docker images -q)
         docker system prune -a
         docker images

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "|-------- Beginning of Running Back-End Script --------|"
 echo "Installing NPM Dependencies:"
@@ -20,16 +20,19 @@ cd ..
 echo "Running JavaScript MongoDB/Express.js/Node.js Backend (with TypeScript):"
 npm run format
 
+echo "Arg 1:"
+echo $1
+
 # Function to display usage instructions
 display_usage() {
-    echo "Usage: $0 <mode>"
+    echo "Usage: '$0' <mode>"
     echo "<mode> should be 'development' (or 'd') or 'production' (or 'p')"
 }
 
 # Check if the script was called with an argument
 if [ $# -eq 0 ]; then
     # No argument provided, prompt the user for input
-    echo "Please type [ 'development' or 'd' ] or [ 'production' or 'p' ]:"
+    echo "Please type [ 'development' or 'd' ], [ 'production' or 'p' ], or [ 'staging' or 's' ]:"
     read mode 
 else
     # Use the first argument passed to the script
@@ -38,7 +41,7 @@ fi
 
 modeLowercase=$(echo "$mode" | tr '[:upper:]' '[:lower:]')
 # Error-checking loop while the 1-argument input is not valid
-while [ "$modeLowercase" != "development" ] && [ "$modeLowercase" != "d" ] && [ "$modeLowercase" != "production" ] && [ "$modeLowercase" != "p" ]; do
+while [ "$modeLowercase" != "development" ] && [ "$modeLowercase" != "d" ] && [ "$modeLowercase" != "production" ] && [ "$modeLowercase" != "p" ] && [ "$modeLowercase" != "staging" ] && [ "$modeLowercase" != "s" ]; do
     echo "Invalid mode selected: '$mode'."
     display_usage
     read mode
@@ -49,6 +52,9 @@ done
 if [ "$modeLowercase" == "development" ] || [ "$modeLowercase" == "d" ]; then
     echo "Backend: Development mode selected"
     npm_config_color=always npm run start 2>&1 | tee -a "./logs/$file_name"
+elif [ "$modeLowercase" == "staging" ] || [ "$modeLowercase" == "s" ]; then
+    echo "Backend: Staging/Testing mode selected"
+    npm_config_color=always npm run stage 2>&1 | tee -a "./logs/$file_name"
 elif [ "$modeLowercase" == "production" ] || [ "$modeLowercase" == "p" ]; then
     echo "Backend: Production mode selected"
     npm_config_color=always npm run production 2>&1 | tee -a "./logs/$file_name"

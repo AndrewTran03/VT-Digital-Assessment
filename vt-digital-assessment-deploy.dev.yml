@@ -1,0 +1,69 @@
+version: "3.8"
+
+services:
+  vt-digital-assessment-frontend:
+    build: 
+      context: ./client
+      dockerfile: Dockerfile
+      args:
+        BUILD_TYPE: ${MODE}
+    platform: linux/amd64
+    image: vt-digital-assessment-client-frontend-img
+    container_name: client-frontend
+    restart: always
+    stdin_open: true
+    tty: true
+    ports:
+      - "5001:5001"
+    expose:
+      - 5001
+    depends_on:
+      - vt-digital-assessment-backend
+      - proxy
+    labels:
+      traefik.http.routers.vt-digital-assessment.rule: Host(`vt-digital-assessment.localhost.devcom.vt.edu`)
+      traefik.http.services.vt-digital-assessment.loadbalancer.server.port: 5001
+    networks:
+      - vt_digital_assessment_network
+  
+  vt-digital-assessment-backend:
+    build: 
+      context: ./server
+      dockerfile: Dockerfile
+      args:
+        BUILD_TYPE: ${MODE}
+    platform: linux/amd64
+    image: vt-digital-assessment-server-backend-img
+    container_name: server-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    expose:
+      - 3001
+    depends_on:
+      - proxy
+    labels:
+      traefik.http.routers.vt-digital-assessment-server.rule: Host(`vt-digital-assessment-server.localhost.devcom.vt.edu`)
+      traefik.http.services.vt-digital-assessment-server.loadbalancer.server.port: 3001
+    networks:
+      - vt_digital_assessment_network
+
+  proxy:
+    image: code.vt.edu:5005/devcom/devcom-localhost-proxy:traefik-2.3
+    platform: linux/amd64
+    ports:
+      - 80:80
+      - 443:443
+      - 127.0.0.1:8000:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      default:
+        aliases: # Ensure all container-to-container HTTP requests go through the proxy
+          - vt-digital-assessment.localhost.devcom.vt.edu
+          - vt-digital-asssessment-server.localhost.devcom.vt.edu
+  
+networks:
+  vt_digital_assessment_network:
+    name: shared_network
+    driver: bridge

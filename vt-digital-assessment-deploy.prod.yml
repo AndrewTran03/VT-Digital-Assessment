@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   vt-digital-assessment-frontend:
@@ -6,7 +6,7 @@ services:
     platform: linux/amd64
     image: vt-digital-assessment-client-frontend-img
     container_name: client-frontend
-    restart: unless-stopped
+    restart: always
     stdin_open: true
     tty: true
     ports:
@@ -25,7 +25,7 @@ services:
     platform: linux/amd64
     image: vt-digital-assessment-server-backend-img
     container_name: server-backend
-    restart: unless-stopped
+    restart: always
     ports:
       - "3001:3001"
     networks:

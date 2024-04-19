@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 echo "|-------- Beginning of Running Front-End Script --------|"
 echo "Installing NPM Dependencies"
@@ -6,9 +6,12 @@ time npm install
 echo "Running React + Vite Frontend:"
 npm run format
 
+echo "Arg 1:"
+echo $1
+
 # Function to display usage instructions
 display_usage() {
-    echo "Usage: $0 <mode>"
+    echo "Usage: '$0' <mode>"
     echo "<mode> should be 'development' (or 'd') or 'production' (or 'p')"
 }
 
@@ -24,7 +27,7 @@ fi
 
 modeLowercase=$(echo "$mode" | tr '[:upper:]' '[:lower:]')
 # Error-checking loop while the 1-argument input is not valid
-while [ "$modeLowercase" != "development" ] && [ "$modeLowercase" != "d" ] && [ "$modeLowercase" != "production" ] && [ "$modeLowercase" != "p" ]; do
+while [ "$modeLowercase" != "development" ] && [ "$modeLowercase" != "d" ] && [ "$modeLowercase" != "production" ] && [ "$modeLowercase" != "p" ] && [ "$modeLowercase" != "staging" ] && [ "$modeLowercase" != "s" ]; do
     echo "Invalid mode selected: '$mode'."
     display_usage
     read mode
@@ -35,8 +38,9 @@ done
 if [ "$modeLowercase" == "development" ] || [ "$modeLowercase" == "d" ]; then
     echo "Frontend: Development mode selected"
     npm run dev
-elif [ "$modeLowercase" == "production" ] || [ "$modeLowercase" == "p" ]; then
-    echo "Frontend: Production mode selected"
+elif [ "$modeLowercase" == "production" ] || [ "$modeLowercase" == "p" ] || [ "$modeLowercase" == "staging" ] || [ "$modeLowercase" == "s" ]; then
+    echo "Frontend: Production/Staging mode selected"
+    echo "Specific Mode: $modeLowercase"
     npm run preview -- --host
 fi
 

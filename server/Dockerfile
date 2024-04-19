@@ -28,24 +28,29 @@ RUN npm install
 
 # Add backend source code
 COPY . .
-RUN echo "Build type is ${BUILD}"
-# Convert "config" file from "development" to "production" mode (if needed)
-RUN if [ "${BUILD}" == "development" ]; then \
-    mv config/development.ts config/production.ts \
-    && echo "Build type is ${BUILD}"; \
-elif [ "${BUILD}" == "production" ]; then \
-    rm -f config/development.ts \
-    && echo "Build type is ${BUILD}"; \
-else \
-    echo "Build type is not 'development' but is ${BUILD}"; \
-fi
+RUN echo "Build type is ${BUILD_TYPE}"
+# Move correct "config" file into the correct container
 # Integrate "production" .env file into deployment ecosystem in the backend
-RUN mv .env.production .env
+RUN if [ "${BUILD_TYPE}" == "development" ]; then \
+    rm config/production.ts config/staging.ts \
+    && mv .env .env.development \
+    && echo "Build type is ${BUILD_TYPE}"; \
+elif [ "${BUILD_TYPE}" == "production" ]; then \
+    rm config/development.ts config/staging.ts \
+    && echo "Build type is ${BUILD_TYPE}"; \
+elif [ "${BUILD_TYPE}" == "staging" ]; then \
+   rm config/development.ts config/production.ts \
+    && mv .env.production .env.staging \
+    && echo "Build type is ${BUILD_TYPE}"; \
+else \
+    echo "Error: Build type is ${BUILD_TYPE} which is NOT VALID!"; \
+fi
 
 # Expose backend Node/Express.js app on port
 EXPOSE 3001
 # Build the "production" version of the backend app
 RUN npm run build
+# Grant execute permission to the "run_backend.sh" script
+RUN chmod +x ./run_backend.sh
 # Run the backend app
-# CMD ["npm", "run", "production"]
-CMD ["sh", "./run_backend.sh", "production"]
+CMD [ "sh", "-c", "./run_backend.sh ${BUILD}" ]

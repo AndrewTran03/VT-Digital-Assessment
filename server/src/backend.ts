@@ -4,12 +4,14 @@ import dotenv from "dotenv";
 // Checking for a valid 'NODE_ENV' variable configuration
 let ENV_FILE_PATH = "";
 if (process.env["NODE_ENV"] === "development") {
-  ENV_FILE_PATH = "../.env";
+  ENV_FILE_PATH = "../.env.development";
 } else if (process.env["NODE_ENV"] === "production") {
-  ENV_FILE_PATH = "../../.env";
+  ENV_FILE_PATH = "../../.env.production";
+} else if (process.env["NODE_ENV"] === "staging") {
+  ENV_FILE_PATH = "../../.env.staging";
 } else {
-  log.error('Invalid configuration for the "NODE_ENV" variable: ');
-  log.fatal(process.env["NODE_ENV"]);
+  console.error('Invalid configuration for the "NODE_ENV" variable: ');
+  console.error(process.env["NODE_ENV"]);
   process.exit(1);
 }
 dotenv.config({
@@ -24,6 +26,7 @@ import bodyParser from "body-parser";
 import config from "config";
 import cors from "cors";
 import http from "http";
+import util from "util";
 import { Server } from "socket.io";
 import log from "./utils/logger";
 import router from "./routes";
@@ -43,6 +46,9 @@ app.use((_, res, next: NextFunction) => {
   res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
   next();
 });
+
+log.info("'Config' Internal Object Properties:");
+log.trace(util.inspect(config, { depth: null }));
 
 const frontendClientPort = config.get<number>("frontendClientPort");
 const frontendClientUrl = config.get<string>("frontendClientUrl");
