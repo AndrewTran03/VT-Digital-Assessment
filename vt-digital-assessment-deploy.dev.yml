@@ -10,7 +10,7 @@ services:
     platform: linux/amd64
     image: vt-digital-assessment-client-frontend-img
     container_name: client-frontend
-    restart: always
+    restart: unless-stopped
     stdin_open: true
     tty: true
     ports:
