@@ -61,6 +61,8 @@ while [ "$continue_running" = true ]; do
         docker images
         docker login container.cs.vt.edu
         MODE=staging docker compose -f ./vt-digital-assessment-deploy.dev.yml down
+        docker rmi $(docker images -q)
+        docker system prune -a
         MODE=production docker compose -f ./vt-digital-assessment-deploy.prod.yml up  -d --build --timestamps
         # docker build --no-cache --platform=linux/amd64 ../client/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
         # docker build --no-cache --platform=linux/amd64 ../server/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
@@ -70,7 +72,6 @@ while [ "$continue_running" = true ]; do
         docker push container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker rmi vt-digital-assessment-client-frontend-img:latest
         docker rmi vt-digital-assessment-server-backend-img:latest
-        docker image prune
         docker ps
         docker images
     elif [ "$userInputLowercase" == "system-clean" ]; then
