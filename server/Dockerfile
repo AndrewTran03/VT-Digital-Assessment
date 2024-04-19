@@ -53,4 +53,4 @@ RUN npm run build
 # Grant execute permission to the "run_backend.sh" script
 RUN chmod +x ./run_backend.sh
 # Run the backend app
-CMD [ "sh", "-c", "./run_backend.sh ${BUILD}" ]
+CMD [ "sh", "-c", "./run_backend.sh ${BUILD_TYPE}" ]
