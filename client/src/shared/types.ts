@@ -17,6 +17,10 @@ if (mode === "development") {
   backendServerPort = 3000;
 } else if (mode === "production" || mode === "staging") {
   backendServerPort = 3001;
+} else {
+  console.error('Invalid configuration for the Vite "MODE" variable: ');
+  console.error(mode);
+  process.exit(1);
 }
 
 const hostNameLowercase = window.location.hostname.toLowerCase();
