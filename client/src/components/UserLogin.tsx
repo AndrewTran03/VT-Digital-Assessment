@@ -10,6 +10,7 @@ import "../styles/UserLoginMessage.css";
 
 const FAILURE_TIMER_COUNT = 10;
 const TRANSITION_LOADING_TIMER_COUNT = 3;
+const SSE_TIMER_INTERVAL = 20000; // Timer interval of 15 secons (in milliseconds)
 
 const UserLogin: React.FC = () => {
   const { setCanvasUserInfo } = useContext(CanvasUserInfoContext);
@@ -23,30 +24,70 @@ const UserLogin: React.FC = () => {
   const [canvasApiKeyEncrpytedState, setCanvasApiKeyEncryptedState] = useState(true);
   const [progressMsg, setProgressMsg] = useState("");
   const navigate = useNavigate();
+  let eventSource: EventSource | null = null;
+  let timerId: NodeJS.Timeout | null = null;
 
   useEffect(() => {
     // Clear local storage for fresh login
     window.localStorage.clear();
   }, []);
 
+  // Implements Server-Sent Event (SSE) logging (for longer API calls)
   useEffect(() => {
-    // Implements Server-Sent Event (SSE) logging (for longer API calls)
-    const eventSource = new EventSource(`${backendUrlBase}/api/canvas/retrieveCanvasId/progress`);
+    function startTimer() {
+      timerId = setInterval(() => {
+        console.log("Server inactive. Reconnecting...");
+        handleReconnection();
+      }, SSE_TIMER_INTERVAL);
+    }
 
-    eventSource.onmessage = (event: MessageEvent) => {
-      const data = JSON.parse(event.data);
-      // Update state or UI based on the progress data received from the server
-      console.log("Progress Update:", data.progress);
-      setProgressMsg(data.progress);
-    };
+    function resetTimer() {
+      if (timerId) {
+        clearInterval(timerId);
+      }
+      startTimer();
+    }
 
-    eventSource.onerror = (error: Event) => {
-      console.error("EventSource error:", error);
-      eventSource.close();
-    };
+    function handleReconnection() {
+      console.log("Attempting to reconnect...");
+      if (eventSource) {
+        eventSource.close();
+      }
+      if (timerId) {
+        clearInterval(timerId);
+      }
+      // Reopen EventSource and start the timer again
+      setupSSEHelper();
+      startTimer();
+    }
+
+    function setupSSEHelper() {
+      eventSource = new EventSource(`${backendUrlBase}/api/canvas/retrieveCanvasId/progress`);
+
+      eventSource.onmessage = (event: MessageEvent) => {
+        const data = JSON.parse(event.data);
+        // Update state or UI based on the progress data received from the server
+        console.log("Progress Update:", data.progress);
+        setProgressMsg(data.progress);
+        resetTimer(); // Reset the timer on receiving data from the server
+      };
+
+      eventSource.onerror = (error: Event) => {
+        console.error("EventSource error:", error);
+        handleReconnection();
+      };
+    }
+
+    setupSSEHelper();
+    startTimer();
 
     return () => {
-      eventSource.close();
+      if (eventSource) {
+        eventSource.close();
+      }
+      if (timerId) {
+        clearInterval(timerId);
+      }
     };
   }, []);
 

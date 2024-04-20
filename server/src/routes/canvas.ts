@@ -334,6 +334,17 @@ router.get("/api/canvas/retrieveCanvasId/progress", (req, res) => {
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
 
+  // Function to send keep-alive messages
+  function sendKeepAlive() {
+    return res.write(":\n\n"); // SSE comment to keep connection alive
+  }
+
+  // Send initial keep-alive message
+  sendKeepAlive();
+
+  // Interval to send keep-alive messages every 15 seconds
+  const keepAliveInterval = setInterval(sendKeepAlive, 15000);
+
   // Listen for progress events
   function progressHandler(data: any) {
     return res.write(`data: ${JSON.stringify(data)}\n\n`);
@@ -344,6 +355,7 @@ router.get("/api/canvas/retrieveCanvasId/progress", (req, res) => {
   // Remove listener when the client closes the connection
   req.on("close", () => {
     userLoginProgressEmitter.off("progress", progressHandler);
+    clearInterval(keepAliveInterval);
   });
 });
 
