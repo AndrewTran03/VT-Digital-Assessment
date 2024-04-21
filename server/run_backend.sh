@@ -26,14 +26,14 @@ echo $1
 # Function to display usage instructions
 display_usage() {
     echo "Usage: '$0' <mode>"
-    echo "<mode> should be 'development' (or 'd') or 'production' (or 'p')"
+    echo "<mode> should be 'development' (or 'd'), 'production' (or 'p'), or 'staging' (or 's')"
 }
 
 # Check if the script was called with an argument
+# No argument provided
 if [ $# -eq 0 ]; then
-    # No argument provided, prompt the user for input
-    echo "Please type [ 'development' or 'd' ], [ 'production' or 'p' ], or [ 'staging' or 's' ]:"
-    read mode 
+    echo "No CLI argument provided: Defaulting to 'development' Mode"
+    mode="development" 
 else
     # Use the first argument passed to the script
     mode="$1"
