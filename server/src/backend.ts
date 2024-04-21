@@ -1,10 +1,11 @@
 import path from "path";
 import dotenv from "dotenv";
+import fs from "fs";
 
 // Checking for a valid 'NODE_ENV' variable configuration
 let ENV_FILE_PATH = "";
 if (process.env["NODE_ENV"] === "development") {
-  ENV_FILE_PATH = "../.env.development";
+  ENV_FILE_PATH = "../.env.develop";
 } else if (process.env["NODE_ENV"] === "production") {
   ENV_FILE_PATH = "../../.env.production";
 } else if (process.env["NODE_ENV"] === "staging") {
@@ -14,6 +15,13 @@ if (process.env["NODE_ENV"] === "development") {
   console.error(process.env["NODE_ENV"]);
   process.exit(1);
 }
+
+// Fallback to default '.env' file
+if (!fs.existsSync(ENV_FILE_PATH)) {
+  console.error("Error: Falling back to default '.env' file");
+  ENV_FILE_PATH = ENV_FILE_PATH.substring(0, ENV_FILE_PATH.lastIndexOf("."));
+}
+
 dotenv.config({
   debug: true,
   encoding: "utf8",
@@ -49,6 +57,13 @@ app.use((_, res, next: NextFunction) => {
 
 log.info("'Config' Internal Object Properties:");
 log.trace(util.inspect(config, { depth: null }));
+
+// Fallback in case of invalid '.env.*' file configuration or no '.env' original fallback file existing
+if (Object.values(config).includes("undefined")) {
+  log.error(".env File did NOT load correctly or improper setting of '.env' file properties");
+  log.error("Exiting server now before future crash...");
+  process.exit(1);
+}
 
 const frontendClientPort = config.get<number>("frontendClientPort");
 const frontendClientUrl = config.get<string>("frontendClientUrl");
