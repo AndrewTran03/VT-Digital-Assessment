@@ -34,7 +34,7 @@ RUN echo "Build type is ${BUILD}"
 RUN if [ "${BUILD}" == "development" ]; then \
     rm config/production.ts config/staging.ts \
     && mv .env .env.development \
-    && echo "Build type is ${BUILD_TYPE}"; \
+    && echo "Build type is ${BUILD}"; \
 elif [ "${BUILD}" == "production" ]; then \
     rm config/development.ts config/staging.ts \
     && echo "Build type is ${BUILD}"; \
@@ -43,7 +43,7 @@ elif [ "${BUILD}" == "staging" ]; then \
     && mv .env.production .env.staging \
     && echo "Build type is ${BUILD}"; \
 else \
-    echo "Error: Build type is ${BUILD_TYPE} which is NOT VALID!"; \
+    echo "Error: Build type is ${BUILD} which is NOT VALID!"; \
 fi
 
 # Expose backend Node/Express.js app on port
