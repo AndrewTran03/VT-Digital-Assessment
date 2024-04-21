@@ -26,14 +26,14 @@ git clone git@github.com:AndrewTran03/VT-Digital-Assessment.git
 # Create a frontend terminal
 cd client/
 npm install --legacy-peer-deps
-sh run_frontend.sh development
+sh run_frontend.sh
 ```
 
 ```shell
 # Create a backend terminal
 cd server/
 npm install
-sh run_backend.sh development
+sh run_backend.sh
 ```
 
 `NOTE`: Please create a `.env` file (and structure it similarly to the `.env.sample` provided) and then populate it your Canvas API key first before running this application locally. If you do not have a `Canvas API Token`, please follow the steps outlined in the `Addendum: Creating a Canvas API Token` section (as shown below). Additionally, if you would like to see the `.drawio` files in the `system-design` directory, please install the [Draw.io Integration](https://marketplace.visualstudio.com/items?itemName=hediet.vscode-drawio) Extension on Visual Studio Code.
@@ -44,8 +44,10 @@ cd server/
 touch .env
 cp .env.sample .env
 # Please add your API token on the `CANVAS_PUBLIC_API_TOKEN` line in quotations for safe-keeping as well as to make the backend work!
+cp .env .env.development
 cp .env .env.production
-# ^^^ Note: Only do this once you have finished editing the .env file and then will be pushing code into production! ^^^
+# ^^^ Note: Only do this once you have finished editing the .env file and then will be pushing code into development/staging/production! ^^^
+# Typically, for staging/production, it is recommended to add 1 to the 'FRONTEND_PORT' and 'BACKEND_PORT' properties when compared to development property configurations.
 ```
 
 - To commit development code into Docker containers and push to CS Cloud:
