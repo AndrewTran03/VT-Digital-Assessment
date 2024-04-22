@@ -24,8 +24,6 @@ const UserLogin: React.FC = () => {
   const [canvasApiKeyEncrpytedState, setCanvasApiKeyEncryptedState] = useState(true);
   const [progressMsg, setProgressMsg] = useState("");
   const navigate = useNavigate();
-  let eventSource: EventSource | null = null;
-  let timerId: NodeJS.Timeout | null = null;
 
   useEffect(() => {
     // Clear local storage for fresh login
@@ -34,6 +32,9 @@ const UserLogin: React.FC = () => {
 
   // Implements Server-Sent Event (SSE) logging (for longer API calls)
   useEffect(() => {
+    let eventSource: EventSource | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+
     function startTimer() {
       timerId = setInterval(() => {
         console.log("Server inactive. Reconnecting...");
@@ -54,7 +55,7 @@ const UserLogin: React.FC = () => {
         eventSource.close();
       }
       if (timerId) {
-        clearInterval(timerId);
+        clearTimeout(timerId);
       }
       // Reopen EventSource and start the timer again
       setupSSEHelper();
