@@ -31,6 +31,8 @@ const backendUrlBase =
     : `http://${hostNameLowercase}:${backendServerPort}`;
 console.log(`Server URL: ${backendUrlBase}`);
 
+type SystemColorThemes = "dark" | "light" | "high-contrast" | "other";
+
 // Required with All MongoDB Entries:
 type MongoDBId = {
   readonly _id: string; // Primary Key (IDentifier)
@@ -417,6 +419,7 @@ const PERCENTAGE_CATEGORIES = ["Exceeds", "Meets", "Below", "None"] as const;
 
 export {
   backendUrlBase,
+  SystemColorThemes,
   MongoDBWithId,
   MongoDBCombined,
   SeasonEnumValues,

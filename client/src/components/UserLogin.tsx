@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { APIErrorResponse, backendUrlBase } from "../shared/types";
 import { APIRequestError } from "../shared/APIRequestError";
 import { CanvasUserInfoContext } from "../shared/contexts";
+import useSystemColorThemeDetector from "../shared/hooks/useSystemColorThemeDetector";
 import "../styles/UserLoginMessage.css";
 
 const FAILURE_TIMER_COUNT = 10;
@@ -23,12 +24,15 @@ const UserLogin: React.FC = () => {
   const canvasApiKeyInputRef = useRef<HTMLInputElement>(null);
   const [canvasApiKeyEncrpytedState, setCanvasApiKeyEncryptedState] = useState(true);
   const [progressMsg, setProgressMsg] = useState("");
+  const systemColorTheme = useSystemColorThemeDetector();
   const navigate = useNavigate();
 
   useEffect(() => {
     // Clear local storage for fresh login
     window.localStorage.clear();
   }, []);
+
+  // use
 
   // Implements Server-Sent Event (SSE) logging (for longer API calls)
   useEffect(() => {
@@ -184,7 +188,7 @@ const UserLogin: React.FC = () => {
 
   return (
     <>
-      <Typography variant="body1" fontSize={20} style={{ color: "white" }}>
+      <Typography variant="body1" fontSize={20}>
         <b>Welcome to the Virginia Tech Digital Assessment Application!</b>
       </Typography>
       <Table
@@ -198,7 +202,7 @@ const UserLogin: React.FC = () => {
         <TableBody>
           <TableRow>
             <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-              <Typography variant="body1" style={{ color: "white" }}>
+              <Typography variant="body1" style={{ color: systemColorTheme === "dark" ? "white" : "black" }}>
                 Enter your Canvas Username:
               </Typography>
             </TableCell>
@@ -213,7 +217,7 @@ const UserLogin: React.FC = () => {
           </TableRow>
           <TableRow>
             <TableCell style={{ border: "none", textAlign: "right", paddingRight: "10px" }}>
-              <Typography variant="body1" style={{ color: "white" }}>
+              <Typography variant="body1" style={{ color: systemColorTheme === "dark" ? "white" : "black" }}>
                 Enter your Canvas User API Key:
               </Typography>
             </TableCell>
@@ -263,7 +267,7 @@ const UserLogin: React.FC = () => {
       )}
       {/* Progress Message */}
       {progressMsg && progressMsg.length > 0 && (
-        <Typography className="progress-message" variant="body1" style={{ color: "yellow", marginTop: "10px" }}>
+        <Typography className="progress-message" variant="body1" style={{ color: "orange", marginTop: "10px" }}>
           In-Progress: {progressMsg}
         </Typography>
       )}
