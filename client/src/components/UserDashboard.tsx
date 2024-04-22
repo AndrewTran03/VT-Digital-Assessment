@@ -1,6 +1,6 @@
 import { useEffect, useContext, FormEvent, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import {
   Accordion,
   AccordionSummary,
@@ -103,7 +103,10 @@ const UserDashboard: React.FC = () => {
       console.log(parsedResult);
       setCanvasQuizDataArr(parsedResult);
     } catch (e: any) {
-      if (e instanceof APIRequestError) {
+      if (
+        e instanceof APIRequestError ||
+        (e instanceof AxiosError && (e as AxiosError).status && (e as AxiosError).status! > 500)
+      ) {
         window.location.reload();
       }
     } finally {
@@ -118,7 +121,10 @@ const UserDashboard: React.FC = () => {
       console.log(res.data);
       setCanvasQuizQuestionStatisticDataArr(res.data as CanvasQuizStatistic[]);
     } catch (e: any) {
-      if (e instanceof APIRequestError) {
+      if (
+        e instanceof APIRequestError ||
+        (e instanceof AxiosError && (e as AxiosError).status && (e as AxiosError).status! > 500)
+      ) {
         window.location.reload();
       }
     } finally {
@@ -133,7 +139,10 @@ const UserDashboard: React.FC = () => {
       console.log(res.data);
       setAssignmentWithRubricDataArr(res.data as CanvasCourseAssignmentRubricObjMongoDBEntry[]);
     } catch (e: any) {
-      if (e instanceof APIRequestError) {
+      if (
+        e instanceof APIRequestError ||
+        (e instanceof AxiosError && (e as AxiosError).status && (e as AxiosError).status! > 500)
+      ) {
         window.location.reload();
       }
     } finally {
@@ -296,12 +305,20 @@ const UserDashboard: React.FC = () => {
       <Typography fontSize={24}>
         <b>Canvas Course Dashboard</b>
       </Typography>
-      <button type="button" onClick={handleClickToObjectives} disabled={coursesLoading || quizStatsLoading}>
+      <button
+        type="button"
+        onClick={handleClickToObjectives}
+        disabled={coursesLoading || assignmentWithRubricDataLoading || quizStatsLoading}
+      >
         <Typography>
           <b>+ Add Learning Objectives for Your Course</b>
         </Typography>
       </button>
-      <button type="submit" onClick={handleApiRefreshButtonClick} disabled={coursesLoading || quizStatsLoading}>
+      <button
+        type="submit"
+        onClick={handleApiRefreshButtonClick}
+        disabled={coursesLoading || assignmentWithRubricDataLoading || quizStatsLoading}
+      >
         <Typography>
           <b>Refresh User Dashboard</b>
         </Typography>

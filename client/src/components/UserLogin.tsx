@@ -163,9 +163,16 @@ const UserLogin: React.FC = () => {
               setCanvasUserInfo({ canvasUserId: parseInt(res.data.UserId) });
               window.localStorage.setItem("canvasUserId", res.data.UserId as string);
               setAuthCookie("Authenticated", true);
+            } else if (res.status.toString().startsWith("5")) {
+              setProgressMsg("Reloading window...API call took too long. Please try again!");
+              window.location.reload();
             }
           })
           .catch((err: AxiosError) => {
+            if (err.status && err.status > 500) {
+              setProgressMsg("Reloading window...API call took too long. Please try again!");
+              window.location.reload();
+            }
             setUserSubmitInfoComplete(false);
             const errorConfig = err.response?.data as APIErrorResponse;
             const error = new APIRequestError("Failed to retrieve Canvas User ID", errorConfig);
