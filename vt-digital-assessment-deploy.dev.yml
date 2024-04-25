@@ -58,6 +58,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
+      vt_digital_assessment_network:
       default:
         aliases: # Ensure all container-to-container HTTP requests go through the proxy
           - vt-digital-assessment.localhost.devcom.vt.edu
