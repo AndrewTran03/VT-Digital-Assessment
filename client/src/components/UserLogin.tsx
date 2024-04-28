@@ -11,7 +11,7 @@ import "../styles/UserLoginMessage.css";
 
 const FAILURE_TIMER_COUNT = 10;
 const TRANSITION_LOADING_TIMER_COUNT = 3;
-const SSE_TIMER_INTERVAL = 20000; // Timer interval of 15 secons (in milliseconds)
+const SSE_TIMER_INTERVAL = 20000; // Timer interval of 15 seconds (in milliseconds)
 
 const UserLogin: React.FC = () => {
   const { setCanvasUserInfo } = useContext(CanvasUserInfoContext);
@@ -31,8 +31,6 @@ const UserLogin: React.FC = () => {
     // Clear local storage for fresh login
     window.localStorage.clear();
   }, []);
-
-  // use
 
   // Implements Server-Sent Event (SSE) logging (for longer API calls)
   useEffect(() => {
@@ -187,8 +185,10 @@ const UserLogin: React.FC = () => {
             setTimeout(() => {
               setUserSubmitError(false);
             }, FAILURE_TIMER_COUNT * 1000);
+          })
+          .finally(() => {
+            setLoading(false);
           });
-        setLoading(false);
       }
     }
   }
