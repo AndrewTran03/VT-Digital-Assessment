@@ -7,6 +7,7 @@ import { FileUploader } from "react-drag-drop-files";
 import {
   backendUrlBase,
   SeasonEnumValues,
+  seasonValues,
   SingleCanvasLearningObjective,
   CanvasLearningObjectives
 } from "../shared/types";
@@ -27,15 +28,16 @@ import {
 import "../styles/DragDropFileImport.css";
 
 const acceptableFileTypes = ["CSV"] as const;
-const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
-const learningObjSchema = z.object({
-  deptAbbrev: z.string().min(2).max(4),
-  courseNum: z.number().min(1000).max(9999),
-  semester: z.enum(seasonValues),
-  year: z.number().gte(0).lte(9999),
-  canvasCourseInternalId: z.number().gte(100000),
-  canvasObjective: z.string().min(1)
-});
+const learningObjSchema = z
+  .object({
+    deptAbbrev: z.string().min(2).max(4),
+    courseNum: z.number().min(1000).max(9999),
+    semester: z.enum(seasonValues),
+    year: z.number().gte(0).lte(9999),
+    canvasCourseInternalId: z.number().gte(100000),
+    canvasObjective: z.string().min(1)
+  })
+  .strict();
 
 // function FileImport(): ReturnType<React.FC> { // Another way to return React FC components
 const FileImport: React.FC = () => {
@@ -249,7 +251,7 @@ const FileImport: React.FC = () => {
                 <Typography>Select the Course You Wish to Insert / Update its Learning Objectives</Typography>
                 <FormControl>
                   <RadioGroup
-                    aria-labelledby="demo-radio-buttons-group-label"
+                    aria-labelledby="radio-buttons-group-label"
                     name="radio-buttons-group"
                     value={selectedCourseId}
                     onChange={(e) => {
