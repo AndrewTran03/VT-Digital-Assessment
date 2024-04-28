@@ -6,13 +6,13 @@ function useSystemColorThemeDetector() {
 
   useEffect(() => {
     // Function to detect system color scheme
-    const detectSystemColorScheme = () => {
+    function detectSystemColorScheme() {
       if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
         setSystemColorScheme("dark");
       } else {
         setSystemColorScheme("light");
       }
-    };
+    }
 
     detectSystemColorScheme(); // Detect initial color scheme
 
