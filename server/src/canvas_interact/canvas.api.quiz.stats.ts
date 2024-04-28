@@ -16,15 +16,19 @@ import {
   numberLike,
   booleanLike,
   numberArrLike,
-  CanvasQuizQuestionAnswerSetStatistic
+  CanvasQuizQuestionAnswerSetStatistic,
+  SeasonTypeEnumValues
 } from "../shared/types";
 import { extractTextFromHTMLHelper } from "../utils/html.extracter";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 
+// TODO: Pass semester filters over
 async function fetchCanvasUserQuizReportData(
   axiosHeaders: AxiosAuthHeaders,
-  userId: number,
-  courseArr: readonly CanvasCourseInfo[]
+  canvasUserId: number,
+  courseArr: readonly CanvasCourseInfo[],
+  academicSemesterFilter: SeasonTypeEnumValues,
+  academicYearFilter: number
 ) {
   const quizStatsResponses: CanvasQuizStatistic[] = [];
 
@@ -62,7 +66,15 @@ async function fetchCanvasUserQuizReportData(
     // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
 
-    await fetchCanvasUserQuizAnswerReportData(axiosHeaders, userId, courseId, quizArr, quizStatsResponses);
+    await fetchCanvasUserQuizAnswerReportData(
+      axiosHeaders,
+      canvasUserId,
+      courseId,
+      quizArr,
+      quizStatsResponses,
+      academicSemesterFilter,
+      academicYearFilter
+    );
   }
   log.info(quizStatsResponses.length);
   return quizStatsResponses;
@@ -71,10 +83,12 @@ async function fetchCanvasUserQuizReportData(
 // End Result: A data structure as folows - Map { K: { CourseId, CourseName, CourseDept, CourseNum }, V: Array<{ QuizId, QuizQuestionsObj }> }
 async function fetchCanvasUserQuizAnswerReportData(
   axiosHeaders: AxiosAuthHeaders,
-  userId: number,
+  canvasUserId: number,
   courseId: number,
   quizArr: readonly CanvasQuizInfo[],
-  quizStatsResponses: CanvasQuizStatistic[]
+  quizStatsResponses: CanvasQuizStatistic[],
+  academicSemesterFilter: SeasonTypeEnumValues,
+  academicYearFilter: number
 ) {
   // Get every QUIZ QUESTION (W/ ANSWERS) REPORT for every available quiz of every Canvas course where the user is a TA or Course Instructor
   for (const { quizId } of quizArr) {
@@ -91,9 +105,11 @@ async function fetchCanvasUserQuizAnswerReportData(
     // NOTE: Quiz Questions API endpoint and Quiz Statistics API endpoint return quiz question data in different order
     const unorganizedQuestionStatistics = newCanvasQuizStatistic.question_statistics;
     const quizQuestionsToFind = await CanvasCourseQuizModel.findOne({
-      canvasUserId: userId,
+      canvasUserId: canvasUserId,
       canvasCourseInternalId: courseId,
-      quizId: quizId
+      quizId: quizId,
+      canvasCourseAcademicSemesterOffered: academicSemesterFilter,
+      canvasCourseAcademicYearOffered: academicYearFilter
     });
     // Conditional check to avoid working on "empty" quizId entries
     if (quizQuestionsToFind && unorganizedQuestionStatistics.length > 0) {

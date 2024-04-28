@@ -4,7 +4,9 @@ import {
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,
-  QuestionTypeValues
+  QuestionTypeValues,
+  seasonValuesArr,
+  SeasonTypeEnumValues
 } from "../shared/types";
 
 const mongoDBName = config.get<string>("mongoDatabaseName");
@@ -69,6 +71,15 @@ const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>
       required: true
     },
     canvasCourseNum: {
+      type: Number,
+      required: true
+    },
+    canvasCourseAcademicSemesterOffered: {
+      type: String,
+      required: true,
+      enum: seasonValuesArr
+    },
+    canvasCourseAcademicYearOffered: {
       type: Number,
       required: true
     },

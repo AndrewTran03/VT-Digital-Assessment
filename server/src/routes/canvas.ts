@@ -1,10 +1,8 @@
 import express from "express";
-import { z } from "zod";
 import { fromZodError } from "zod-validation-error";
 import { EventEmitter } from "events";
 import log from "../utils/logger";
 import {
-  QuestionTypeValues,
   APIErrorResponse,
   CanvasCourseMCQAnswerMongoDBEntry,
   CanvasCourseQuizMongoDBEntry,
@@ -14,8 +12,10 @@ import {
   CanvasCourseInfo,
   AxiosAuthHeaders,
   CanvasUserAssignmentWithRubricBase,
-  CanvasCourseAssignmentRubricObjBase
+  CanvasCourseAssignmentRubricObjBase,
+  SeasonTypeEnumValues
 } from "../shared/types";
+import { canvasQuizQuestionSchema, canvasAssignmentRubricSchema } from "../shared/canvas.zod.schemas";
 import { fetchCanvasUserInfoRegUser, fetchCanvasUserInfoAdmin } from "../canvas_interact/canvas.api.shared";
 import { fetchCanvasUserCourseData } from "../canvas_interact/canvas.api.course";
 import { fetchCanvasUserQuizData } from "../canvas_interact/canvas.api.quiz";
@@ -31,89 +31,40 @@ import { CanvasCourseAssignmentRubricObjModel } from "../models/canvas.assignmen
 
 const router = express.Router();
 const userLoginProgressEmitter = new EventEmitter();
+const userDashboardProgressEmitter = new EventEmitter();
 
-const canvasQuizQuestionSchema = z.object({
-  canvasUserId: z.number().gte(0),
-  canvasCourseInternalId: z.number().gte(0),
-  quizId: z.number().gte(0),
-  canvasMatchedLearningObjectiveArr: z.array(z.array(z.string())).default([]),
-  canvasQuizEntries: z
-    .array(
-      z.object({
-        questionType: z.enum(QuestionTypeValues),
-        questionText: z.string().min(1),
-        answers: z.array(
-          z.object({
-            weight: z.number().gte(0).optional(),
-            migration_id: z.string().min(0).optional(),
-            id: z.number().gte(0).optional(),
-            text: z.string().min(0).optional()
-          })
-        )
-      })
-    )
-    .default([])
-});
-
-const canvasAssignmentRubricSchema = z.object({
-  canvasUserId: z.number().gte(0),
-  canvasDeptAbbrev: z.string().min(1),
-  canvasCourseNum: z.number().gte(0),
-  canvasCourseName: z.string().min(1),
-  canvasCourseInternalId: z.number().gte(0),
-  canvasRubricId: z.number().gte(0),
-  canvasAssignmentId: z.number().gte(0),
-  canvasAssignmentName: z.string().min(1),
-  title: z.string().min(1),
-  maxPoints: z.number().gte(0),
-  data: z
-    .array(
-      z.object({
-        id: z.string().min(1),
-        maxCategoryPoints: z.number().gte(0),
-        description: z.string().min(1),
-        ratings: z
-          .array(
-            z.object({
-              description: z.string().min(1),
-              ratingPoints: z.number().gte(0)
-            })
-          )
-          .default([])
-      })
-    )
-    .default([]),
-  canvasMatchedLearningObjectivesArr: z.array(z.array(z.string())).default([]),
-  recentSubmissionData: z
-    .array(
-      z.object({
-        canvasAssignmentScore: z.number().gte(0),
-        rubricCategoryScores: z.array(
-          z.object({
-            id: z.string().min(1),
-            points: z.number().gte(0).default(0)
-          })
-        )
-      })
-    )
-    .default([])
-    .optional()
-});
-
-async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) {
+async function loadCanvasDataFromExternalApiAndSaveIntoDB(
+  canvasUserId: number,
+  academicYear: number,
+  academicSemester: SeasonTypeEnumValues
+) {
   const axiosHeaders = await getCanvasApiAuthHeaders(canvasUserId);
-  userLoginProgressEmitter.emit("progress", { progress: "Pulling Canvas User's Enrolled Course Data" });
-  const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders);
+  const academicYearAndSemesterFilterStr = `${academicYear} ${academicSemester}` as const;
+  userDashboardProgressEmitter.emit("progress", {
+    progress: `[${academicYearAndSemesterFilterStr}] Pulling Canvas User's Enrolled Course Data`
+  });
+  const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders, academicYearAndSemesterFilterStr);
 
-  userLoginProgressEmitter.emit("progress", { progress: "Pulling Canvas User's Quiz Entries from External API" });
-  const canvasQuizMap = await fetchCanvasUserQuizData(axiosHeaders, canvasUserCourseIds);
+  userDashboardProgressEmitter.emit("progress", {
+    progress: `[${academicYearAndSemesterFilterStr}] Pulling Canvas User's Quiz Entries from External API`
+  });
+  const canvasQuizMap = await fetchCanvasUserQuizData(
+    axiosHeaders,
+    canvasUserCourseIds,
+    academicSemester,
+    academicYear
+  );
   const canvasQuizMapTransformedToArray = convertCanvasQuizMapToArray(canvasUserId, canvasQuizMap);
 
   // Checks for valid Quiz schema creation
   log.info("QUIZ LENGTH: " + canvasQuizMapTransformedToArray.length);
   canvasQuizMapTransformedToArray.forEach((currEntry, idx) => {
+    console.log(currEntry);
     const validResult = canvasQuizQuestionSchema.safeParse(currEntry);
     if (validResult.success) {
+      userDashboardProgressEmitter.emit("progress", {
+        progress: `[${academicYearAndSemesterFilterStr}] The following quiz question object array (at index ${idx}) is of the proper schema`
+      });
       log.info(`The following quiz question object array (at index ${idx}) is of the proper schema`);
     } else {
       log.error(fromZodError(validResult.error));
@@ -121,7 +72,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
     }
   });
 
-  userLoginProgressEmitter.emit("progress", { progress: "Inserting/Updating Canvas User's Quiz Entries in MongoDB" });
+  userDashboardProgressEmitter.emit("progress", {
+    progress: `[${academicYearAndSemesterFilterStr}] Inserting/Updating Canvas User's Quiz Entries in MongoDB`
+  });
   for (let i = 0; i < canvasQuizMapTransformedToArray.length; i++) {
     log.info(`QUIZ INDEX ${i} STARTED ------------------------------------- \n`);
     try {
@@ -138,7 +91,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
       // Delete "older" Canvas quiz entries (if they exist)
       const olderCanvasQuizItemToDelete = await CanvasCourseQuizModel.findOne({
         canvasUserId: canvasQuizItemToInsert.canvasUserId,
-        quizId: canvasQuizItemToInsert.quizId
+        quizId: canvasQuizItemToInsert.quizId,
+        canvasCourseAcademicSemesterOffered: canvasQuizItemToInsert.canvasCourseAcademicSemesterOffered,
+        canvasCourseAcademicYearOffered: canvasQuizItemToInsert.canvasCourseAcademicYearOffered
       });
       if (olderCanvasQuizItemToDelete) {
         log.warn(
@@ -153,33 +108,50 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
         // Delete the older quiz entry from MongoDB database
         const deleteOlderCanvasQuizItemResult = await CanvasCourseQuizModel.findOneAndDelete({
           canvasUserId: canvasQuizItemToInsert.canvasUserId,
-          quizId: canvasQuizItemToInsert.quizId
+          quizId: canvasQuizItemToInsert.quizId,
+          canvasCourseAcademicSemesterOffered: canvasQuizItemToInsert.canvasCourseAcademicSemesterOffered,
+          canvasCourseAcademicYearOffered: canvasQuizItemToInsert.canvasCourseAcademicYearOffered
         });
         console.assert(deleteOlderCanvasQuizItemResult, "Error! The older quiz item did not get deleted properly!");
       }
 
       const canvasQuizItemInsertResult = await canvasQuizItemToInsert.save();
       log.info("Inserted the specified quiz entry successfully! Congratulations!");
+      userDashboardProgressEmitter.emit("progress", {
+        progress: `[${academicYearAndSemesterFilterStr}] Inserted the specified quiz entry successfully! Congratulations!`
+      });
     } catch (err) {
-      log.error("Error with interacting the Canvas API! Please try again!");
+      log.error("Error with the specified quiz entry and interacting the Canvas API! Please try again!");
+      userDashboardProgressEmitter.emit("progress", {
+        progress: `[${academicYearAndSemesterFilterStr}] Error with the specified quiz entry and interacting the Canvas API! Please try again!`
+      });
       process.exit(1);
     }
     log.info(`QUIZ INDEX ${i} COMPLETED ------------------------------------- \n`);
+    userDashboardProgressEmitter.emit("progress", {
+      progress: `[${academicYearAndSemesterFilterStr}] QUIZ INDEX ${i} COMPLETED ------------------------------------- \n`
+    });
   }
   log.info("Inserted ALL of the specified quiz entries successfully! Congratulations!");
+  userDashboardProgressEmitter.emit("progress", {
+    progress: `[${academicYearAndSemesterFilterStr}] Inserted ALL of the specified quiz entries successfully! Congratulations!`
+  });
 
-  userLoginProgressEmitter.emit("progress", {
-    progress: "Pulling Canvas User's Assignment (with Rubric) Entries from External API"
+  userDashboardProgressEmitter.emit("progress", {
+    progress: `[${academicYearAndSemesterFilterStr}] Pulling Canvas User's Assignment (with Rubric) Entries from External API`
   });
   const assignmentRubricResultsArr = await fetchCanvasUserAssignmentData(
-    canvasUserId,
     axiosHeaders,
-    canvasUserCourseIds
+    canvasUserCourseIds,
+    academicSemester,
+    academicYear
   );
   await fetchCanvasUserAssignmentRubricData(axiosHeaders, assignmentRubricResultsArr);
   await fetchCanvasUserAssignmentSubmissionData(axiosHeaders, assignmentRubricResultsArr);
-  const parsedAssignmentRubricResultsArr =
-    convertAssignmentWithRubricArrToBeMongoDBCompliant(assignmentRubricResultsArr);
+  const parsedAssignmentRubricResultsArr = convertAssignmentWithRubricArrToBeMongoDBCompliant(
+    canvasUserId,
+    assignmentRubricResultsArr
+  );
 
   // Checks for valid Assignment with Rubric schema creation
   log.info("ASSIGNMENTS WITH RUBRICS LENGTH: " + parsedAssignmentRubricResultsArr.length);
@@ -196,7 +168,7 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
     }
   });
 
-  userLoginProgressEmitter.emit("progress", {
+  userDashboardProgressEmitter.emit("progress", {
     progress: "Inserting/Updating Canvas User's Assignment (with Rubric) Entries in MongoDB"
   });
   for (let j = 0; j < parsedAssignmentRubricResultsArr.length; j++) {
@@ -210,7 +182,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
       const olderCanvasAssignmentRubricItemToDelete = await CanvasCourseAssignmentRubricObjModel.findOne({
         canvasUserId: canvasAssignmentRubricItemToInsert.canvasUserId,
         canvasCourseInternalId: canvasAssignmentRubricItemToInsert.canvasCourseInternalId,
-        canvasRubricId: canvasAssignmentRubricItemToInsert.canvasRubricId
+        canvasRubricId: canvasAssignmentRubricItemToInsert.canvasRubricId,
+        canvasCourseAcademicSemesterOffered: canvasAssignmentRubricItemToInsert.canvasCourseAcademicSemesterOffered,
+        canvasCourseAcademicYearOffered: canvasAssignmentRubricItemToInsert.canvasCourseAcademicYearOffered
       });
       if (olderCanvasAssignmentRubricItemToDelete) {
         log.warn(
@@ -227,7 +201,9 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
           {
             canvasUserId: canvasAssignmentRubricItemToInsert.canvasUserId,
             canvasCourseInternalId: canvasAssignmentRubricItemToInsert.canvasCourseInternalId,
-            canvasRubricId: canvasAssignmentRubricItemToInsert.canvasRubricId
+            canvasRubricId: canvasAssignmentRubricItemToInsert.canvasRubricId,
+            canvasCourseAcademicSemesterOffered: canvasAssignmentRubricItemToInsert.canvasCourseAcademicSemesterOffered,
+            canvasCourseAcademicYearOffered: canvasAssignmentRubricItemToInsert.canvasCourseAcademicYearOffered
           }
         );
         console.assert(
@@ -238,14 +214,28 @@ async function loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId: number) 
 
       const canvasAssignmentRubricItemInsertResult = await canvasAssignmentRubricItemToInsert.save();
       log.info("Inserted the specified assignment with rubric entry successfully! Congratulations!");
+      userDashboardProgressEmitter.emit("progress", {
+        progress: `[${academicYearAndSemesterFilterStr}] Inserted the specified assignment with rubric entry successfully! Congratulations!`
+      });
     } catch (err) {
-      log.error((err as Error).stack);
-      log.error("Error with interacting the Canvas API! Please try again!");
+      log.error(
+        "Error with the specified assignment with rubric entry and interacting the Canvas API! Please try again!"
+      );
+      userDashboardProgressEmitter.emit("progress", {
+        progress: `[${academicYearAndSemesterFilterStr}] Error with the specified assignment with rubric entry and interacting the Canvas API! Please try again!`
+      });
+
       process.exit(1);
     }
     log.info(`ASSIGNMENT WITH RUBRIC INDEX ${j} COMPLETED ------------------------------------- \n`);
+    userDashboardProgressEmitter.emit("progress", {
+      progress: `[${academicYearAndSemesterFilterStr}] ASSIGNMENT WITH RUBRIC INDEX ${j} COMPLETED ------------------------------------- \n`
+    });
   }
   log.info("Inserted ALL of the specified assignment with rubric entries successfully! Congratulations!");
+  userDashboardProgressEmitter.emit("progress", {
+    progress: `[${academicYearAndSemesterFilterStr}] Inserted ALL of the specified assignment with rubric entries successfully! Congratulations!`
+  });
 
   return true;
 }
@@ -254,49 +244,57 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
   const resultArray: CanvasCourseQuizMongoDBEntry[] = [];
 
   // Map: { { courseId, courseName, courseDept, courseNum }, Array <{ quizId, questioNames, [questions, [answers (optional)]] } }
-  inputMap.forEach((questionGroups, { courseId, courseName, courseDept, courseNum }) => {
-    questionGroups.forEach(({ quizId, quizName, questions }) => {
-      const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
-      questions.forEach((question) => {
-        const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
-          questionType: question.question_type! as QuestionTypeEnumValues,
-          questionText: question.question_text!
+  inputMap.forEach(
+    (
+      questionGroups,
+      { courseId, courseName, courseDept, courseNum, courseAcademicSemesterOffered, courseAcademicYearOffered }
+    ) => {
+      questionGroups.forEach(({ quizId, quizName, questions }) => {
+        const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
+        questions.forEach((question) => {
+          const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
+            questionType: question.question_type! as QuestionTypeEnumValues,
+            questionText: question.question_text!
+          };
+          const answers: CanvasCourseMCQAnswerMongoDBEntry[] = [];
+          if (question.answers) {
+            question.answers.forEach((answer) => {
+              const newAnswer: CanvasCourseMCQAnswerMongoDBEntry = {
+                weight: answer.weight,
+                migration_id: answer.migration_id,
+                id: answer.id,
+                text: answer.text
+              };
+              answers.push(newAnswer);
+            });
+          }
+          newQuizQuestionEntry.answers = [...answers];
+          quizEntries.push(newQuizQuestionEntry);
+        });
+        const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
+          canvasUserId: userId,
+          canvasCourseInternalId: courseId,
+          canvasCourseName: courseName,
+          canvasCourseDept: courseDept,
+          canvasCourseNum: courseNum,
+          quizId: quizId,
+          quizName: quizName,
+          canvasCourseAcademicSemesterOffered: courseAcademicSemesterOffered,
+          canvasCourseAcademicYearOffered: courseAcademicYearOffered,
+          // Empty for now: Will be resolved later in front-end React Matching Component
+          canvasMatchedLearningObjectivesArr: new Array<string[]>(quizEntries.length).fill([]) as string[][],
+          canvasQuizEntries: quizEntries
         };
-        const answers: CanvasCourseMCQAnswerMongoDBEntry[] = [];
-        if (question.answers) {
-          question.answers.forEach((answer) => {
-            const newAnswer: CanvasCourseMCQAnswerMongoDBEntry = {
-              weight: answer.weight,
-              migration_id: answer.migration_id,
-              id: answer.id,
-              text: answer.text
-            };
-            answers.push(newAnswer);
-          });
-        }
-        newQuizQuestionEntry.answers = [...answers];
-        quizEntries.push(newQuizQuestionEntry);
+        resultArray.push(newQuizEntry);
       });
-      const newQuizEntry: CanvasCourseQuizMongoDBEntry = {
-        canvasUserId: userId,
-        canvasCourseInternalId: courseId,
-        canvasCourseName: courseName,
-        canvasCourseDept: courseDept,
-        canvasCourseNum: courseNum,
-        quizId: quizId,
-        quizName: quizName,
-        // Empty for now: Will be resolved later in front-end React Matching Component
-        canvasMatchedLearningObjectivesArr: new Array<string[]>(quizEntries.length).fill([]) as string[][],
-        canvasQuizEntries: quizEntries
-      };
-      resultArray.push(newQuizEntry);
-    });
-  });
+    }
+  );
 
   return resultArray;
 }
 
 function convertAssignmentWithRubricArrToBeMongoDBCompliant(
+  canvasUserId: number,
   assignmentRubricResultsArr: CanvasUserAssignmentWithRubricBase[]
 ): CanvasCourseAssignmentRubricObjBase[] {
   const newAssignmentRubricResultsArr: CanvasCourseAssignmentRubricObjBase[] = [];
@@ -306,7 +304,9 @@ function convertAssignmentWithRubricArrToBeMongoDBCompliant(
     const assignmentRubricObjArrEntry = { ...assignmentRubricResult.canvasCourseAssignmentRubricObjArr[0] };
 
     const newAssignmentRubricResult: CanvasCourseAssignmentRubricObjBase = {
-      canvasUserId: assignmentRubricResult.canvasUserId,
+      canvasUserId: canvasUserId,
+      canvasCourseAcademicSemesterOffered: assignmentRubricResult.canvasCourseAcademicSemesterOffered,
+      canvasCourseAcademicYearOffered: assignmentRubricResult.canvasCourseAcademicYearOffered,
       canvasCourseInternalId: assignmentRubricResult.canvasCourseInternalId,
       canvasDeptAbbrev: assignmentRubricResult.canvasDeptAbbrev,
       canvasCourseNum: assignmentRubricResult.canvasCourseNum,
@@ -405,12 +405,6 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
       log.info("Updated the specified Canvas user information successfully! Congratulations!");
     }
 
-    userLoginProgressEmitter.emit("progress", { progress: "Started Canvas API caching into MongoDB..." });
-    await loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId);
-    userLoginProgressEmitter.emit("progress", {
-      progress: "Finished loading all entries from Canvas API into MongoDB..."
-    });
-
     userLoginProgressEmitter.emit("progress", { progress: "Process completed!" });
     return res.status(isNewUser ? 201 : 200).send(JSON.stringify({ UserId: canvasUserId })); // 201 = Successful Resource Creation
   } catch (err) {
@@ -424,15 +418,83 @@ router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", asyn
   }
 });
 
+router.get("/api/canvas/retrieveCanvasData/progress", async (req, res) => {
+  // Set appropriate headers for SSE
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  // Function to send keep-alive messages
+  function sendKeepAlive() {
+    return res.write(":\n\n"); // SSE comment to keep connection alive
+  }
+
+  // Send initial keep-alive message
+  sendKeepAlive();
+
+  // Interval to send keep-alive messages every 15 seconds
+  const keepAliveInterval = setInterval(sendKeepAlive, 15000);
+
+  // Listen for progress events
+  function progressHandler(data: any) {
+    return res.write(`data: ${JSON.stringify(data)}\n\n`);
+  }
+
+  userDashboardProgressEmitter.on("progress", progressHandler);
+
+  // Remove listener when the client closes the connection
+  req.on("close", () => {
+    userDashboardProgressEmitter.off("progress", progressHandler);
+    clearInterval(keepAliveInterval);
+  });
+});
+
+router.patch("/api/canvas/:canvasUserId/:academicSemesterStr/:academicYearStr", async (req, res) => {
+  try {
+    const canvasUserId = parseInt(req.params.canvasUserId);
+    const { academicSemesterStr, academicYearStr } = req.params;
+    const academicSemester = academicSemesterStr as SeasonTypeEnumValues;
+    const academicYear = parseInt(academicYearStr);
+    userDashboardProgressEmitter.emit("progress", { progress: "Started Canvas API caching into MongoDB..." });
+    const academicYearAndSemesterFilterStr = `${academicYear} ${academicSemester}` as const;
+    log.trace(academicYearAndSemesterFilterStr);
+    await loadCanvasDataFromExternalApiAndSaveIntoDB(canvasUserId, academicYear, academicSemester);
+    userDashboardProgressEmitter.emit("progress", {
+      progress: "Finished loading all entries from Canvas API into MongoDB..."
+    });
+    return res.status(200).send(
+      JSON.stringify({
+        message: `[${academicYearAndSemesterFilterStr}] Sucessfully parsed through the selected semester's Canvas course quizzes and assignments (with rubrics) data!`
+      })
+    );
+  } catch (err) {
+    log.error("Did not find parse the selected semester's Canvas information! Please try again!");
+    const resErrBody: APIErrorResponse = {
+      errorLoc: "PATCH",
+      errorMsg: "Error in parsing the selected semester's Canvas information"
+    };
+    return res.status(400).send(JSON.stringify(resErrBody));
+  }
+});
+
 let index = 0;
-router.get("/api/canvas/:canvasUserId", async (req, res) => {
+router.get("/api/canvas/quiz/:canvasUserId/:academicSemesterStr/:academicYearStr", async (req, res) => {
   try {
     const canvasUserId = parseInt(req.params.canvasUserId);
     log.warn(`Quiz Info Requested Canvas User ID: ${canvasUserId}`);
-    const currItems = await CanvasCourseQuizModel.find({ canvasUserId: canvasUserId });
+    const { academicSemesterStr, academicYearStr } = req.params;
+    const academicSemester = academicSemesterStr as SeasonTypeEnumValues;
+    const academicYear = parseInt(academicYearStr);
+    const academicYearAndSemesterFilterStr = `${academicYear} ${academicSemester}` as const;
+    log.trace(academicYearAndSemesterFilterStr);
+    const currItems = await CanvasCourseQuizModel.find({
+      canvasUserId: canvasUserId,
+      canvasCourseAcademicSemesterOffered: academicSemester,
+      canvasCourseAcademicYearOffered: academicYear
+    });
     log.info(currItems);
     index++;
-    log.info(`END OF GET REQUEST #${index} ---------------------`);
+    log.info(`END OF QUIZ GET REQUEST #${index} (SEMESTER: ${academicYearAndSemesterFilterStr}) ---------------------`);
     return res.status(200).json(currItems);
   } catch (err) {
     log.error("Did not find any Canvas quiz question for any course! Please try again!");

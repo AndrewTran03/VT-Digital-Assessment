@@ -4,8 +4,14 @@ import axios, { AxiosError } from "axios";
 import {
   Accordion,
   AccordionSummary,
+  Box,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  MenuItem,
   Paper,
+  Select,
+  SelectChangeEvent,
   Table,
   TableBody,
   TableCell,
@@ -16,12 +22,16 @@ import {
 } from "@mui/material";
 import { OverridableStringUnion } from "@mui/types";
 import { Variant } from "@mui/material/styles/createTypography";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import _ from "lodash";
 import {
   CanvasCourseAssignmentRubricObjMongoDBEntry,
   CanvasCourseAssociations,
   CanvasCourseQuizMongoDBEntry,
   CanvasQuizStatistic,
+  seasonValues,
+  SeasonEnumValues,
   backendUrlBase
 } from "../shared/types";
 import {
@@ -36,6 +46,9 @@ import {
 import { parseCanvasQuizQuestionMongoDBDCollection } from "../shared/FrontendParser";
 import "../styles/TableCellStyles.css";
 import { APIRequestError } from "../shared/APIRequestError";
+import useSystemColorThemeDetector from "../shared/hooks/useSystemColorThemeDetector";
+
+const SSE_TIMER_INTERVAL = 20000; // Timer interval of 15 seconds (in milliseconds)
 
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
@@ -68,7 +81,14 @@ const UserDashboard: React.FC = () => {
     (entry: CanvasCourseAssignmentRubricObjMongoDBEntry) => entry.canvasCourseInternalId
   );
   const navigate = useNavigate();
-  const [coursesLoading, setCoursesLoading] = useState(false);
+  const [progressMsg, setProgressMsg] = useState("");
+  const systemColorTheme = useSystemColorThemeDetector();
+  const [seasonStr, setSeasonStr] = useState<SeasonEnumValues>(determineDefaultSemesterByMonthHelper());
+  const academicYearSelectRangeArr = use200YearArrGenerator();
+  const [academicYear, setAcademicYear] = useState(new Date().getFullYear());
+  const selectedSemester = `${seasonStr} ${academicYear}`;
+  const [canvasAPISemesterDataLoading, setCanvasAPISemesterDataLoading] = useState(false);
+  const [quizzesLoading, setQuizzesLoading] = useState(false);
   const [quizStatsLoading, setQuizStatsLoading] = useState(false);
   const [assignmentWithRubricDataLoading, setAssignmentWithRubricDataLoading] = useState(false);
 
@@ -79,8 +99,70 @@ const UserDashboard: React.FC = () => {
     await fetchCanvasQuizStatisticsData();
   }
 
+  // useEffect(() => {
+  //   fetchData();
+  // }, []);
+
+  // Implements Server-Sent Event (SSE) logging (for longer API calls)
   useEffect(() => {
-    fetchData();
+    let eventSource: EventSource | null = null;
+    let timerId: NodeJS.Timeout | null = null;
+
+    function startTimer() {
+      timerId = setInterval(() => {
+        console.log("Server inactive. Reconnecting...");
+        handleReconnection();
+      }, SSE_TIMER_INTERVAL);
+    }
+
+    function resetTimer() {
+      if (timerId) {
+        clearInterval(timerId);
+      }
+      startTimer();
+    }
+
+    function handleReconnection() {
+      console.log("Attempting to reconnect...");
+      if (eventSource) {
+        eventSource?.close();
+      }
+      if (timerId) {
+        clearTimeout(timerId);
+      }
+      // Reopen EventSource and start the timer again
+      setupSSEHelper();
+      startTimer();
+    }
+
+    function setupSSEHelper() {
+      eventSource = new EventSource(`${backendUrlBase}/api/canvas/retrieveCanvasData/progress`);
+
+      eventSource.onmessage = (event: MessageEvent) => {
+        const data = JSON.parse(event.data);
+        // Update state or UI based on the progress data received from the server
+        console.log("Progress Update:", data.progress);
+        setProgressMsg(data.progress);
+        resetTimer(); // Reset the timer on receiving data from the server
+      };
+
+      eventSource.onerror = (error: Event) => {
+        console.error("EventSource error:", error);
+        handleReconnection();
+      };
+    }
+
+    setupSSEHelper();
+    startTimer();
+
+    return () => {
+      if (eventSource) {
+        eventSource.close();
+      }
+      if (timerId) {
+        clearInterval(timerId);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -95,10 +177,60 @@ const UserDashboard: React.FC = () => {
     console.log(assignmentWithRubricDataArrGroupBy);
   }, [assignmentWithRubricDataArrGroupBy]);
 
+  // useEffect(() => {
+  //   console.log(`Selected Semester: ${seasonStr} ${academicYear}`);
+  // }, [seasonStr, academicYear]);
+
+  useEffect(() => {
+    console.log(`Selected Semester: ${selectedSemester}`);
+  }, [selectedSemester]);
+
+  function determineDefaultSemesterByMonthHelper() {
+    const month = new Date().getMonth();
+    let semester: SeasonEnumValues = "Spring";
+    switch (month) {
+      case 1:
+      case 12: {
+        semester = "Winter";
+        break;
+      }
+      case 2:
+      case 3:
+      case 4:
+      case 5: {
+        semester = "Spring";
+        break;
+      }
+      case 6:
+      case 7: {
+        semester = "Summer";
+        break;
+      }
+      case 8:
+      case 9:
+      case 10:
+      case 11: {
+        semester = "Fall";
+        break;
+      }
+    }
+    return semester;
+  }
+
+  function use200YearArrGenerator() {
+    const currentYear = new Date().getFullYear();
+    const floorCenturyYear = Math.floor(currentYear / 100) * 100;
+    const startYear = floorCenturyYear - 100;
+    const endYear = floorCenturyYear + 99;
+
+    const yearRange = Array.from({ length: endYear - startYear + 1 }, (_, index) => Math.ceil(startYear + index));
+    return yearRange;
+  }
+
   async function fetchCanvasQuizData() {
-    setCoursesLoading(true);
+    setQuizzesLoading(true);
     try {
-      const res = await axios.get(`${backendUrlBase}/api/canvas/${canvasUserId}`);
+      const res = await axios.get(`${backendUrlBase}/api/canvas/quiz/${canvasUserId}/${seasonStr}/${academicYear}`);
       const parsedResult = parseCanvasQuizQuestionMongoDBDCollection(res.data);
       console.log(parsedResult);
       setCanvasQuizDataArr(parsedResult);
@@ -110,14 +242,14 @@ const UserDashboard: React.FC = () => {
         window.location.reload();
       }
     } finally {
-      setCoursesLoading(false);
+      setQuizzesLoading(false);
     }
   }
 
   async function fetchCanvasQuizStatisticsData() {
     setQuizStatsLoading(true);
     try {
-      const res = await axios.get(`${backendUrlBase}/api/statistics/quiz/${canvasUserId}`);
+      const res = await axios.get(`${backendUrlBase}/api/statistics/quiz/${canvasUserId}/${seasonStr}/${academicYear}`);
       console.log(res.data);
       setCanvasQuizQuestionStatisticDataArr(res.data as CanvasQuizStatistic[]);
     } catch (e: any) {
@@ -135,7 +267,9 @@ const UserDashboard: React.FC = () => {
   async function fetchCanvasAssignmentsWithRubricsData() {
     setAssignmentWithRubricDataLoading(true);
     try {
-      const res = await axios.get(`${backendUrlBase}/api/statistics/assignment_rubric/${canvasUserId}`);
+      const res = await axios.get(
+        `${backendUrlBase}/api/statistics/assignment_rubric/${canvasUserId}/${seasonStr}/${academicYear}`
+      );
       console.log(res.data);
       setAssignmentWithRubricDataArr(res.data as CanvasCourseAssignmentRubricObjMongoDBEntry[]);
     } catch (e: any) {
@@ -152,10 +286,7 @@ const UserDashboard: React.FC = () => {
 
   async function handleApiRefreshButtonClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
-    console.clear();
-    await fetchCanvasQuizData();
-    await fetchCanvasAssignmentsWithRubricsData();
-    await fetchCanvasQuizStatisticsData();
+    await fetchData();
   }
 
   function handleClickToObjectives(e: FormEvent<HTMLButtonElement>) {
@@ -294,6 +425,37 @@ const UserDashboard: React.FC = () => {
     return false;
   }
 
+  function handleSeasonSelectChange(e: SelectChangeEvent) {
+    e.preventDefault();
+    setSeasonStr(e.target.value as SeasonEnumValues);
+  }
+
+  function handleAcademicYearCalendarChange(e: SelectChangeEvent) {
+    e.preventDefault();
+    setAcademicYear(parseInt(e.target.value.toString()));
+  }
+
+  async function handleAcademicSemesterYearButtonClick(e: FormEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    setCanvasAPISemesterDataLoading(true);
+    try {
+      const res = await axios.patch(`${backendUrlBase}/api/canvas/${canvasUserId}/${seasonStr}/${academicYear}`);
+      if (!res.status.toString().startsWith("2")) {
+        throw new Error(`[ERROR] Status: ${res.status.toString()}`);
+      }
+    } catch (e: any) {
+      if (
+        e instanceof APIRequestError ||
+        (e instanceof AxiosError && (e as AxiosError).status && (e as AxiosError).status! > 500)
+      ) {
+        window.location.reload();
+      }
+    } finally {
+      setCanvasAPISemesterDataLoading(false);
+    }
+    await fetchData();
+  }
+
   function handleLogout(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     console.clear();
@@ -308,7 +470,7 @@ const UserDashboard: React.FC = () => {
       <button
         type="button"
         onClick={handleClickToObjectives}
-        disabled={coursesLoading || assignmentWithRubricDataLoading || quizStatsLoading}
+        disabled={quizzesLoading || assignmentWithRubricDataLoading || quizStatsLoading || canvasAPISemesterDataLoading}
       >
         <Typography>
           <b>+ Add Learning Objectives for Your Course</b>
@@ -317,7 +479,7 @@ const UserDashboard: React.FC = () => {
       <button
         type="submit"
         onClick={handleApiRefreshButtonClick}
-        disabled={coursesLoading || assignmentWithRubricDataLoading || quizStatsLoading}
+        disabled={quizzesLoading || assignmentWithRubricDataLoading || quizStatsLoading || canvasAPISemesterDataLoading}
       >
         <Typography>
           <b>Refresh User Dashboard</b>
@@ -328,7 +490,14 @@ const UserDashboard: React.FC = () => {
           <b>Logout</b>
         </Typography>
       </button>
-      {coursesLoading && (
+      {canvasAPISemesterDataLoading && (
+        <>
+          <br />
+          <Typography>Canvas API Selected Semester Course Parser Loading...</Typography>
+          <CircularProgress />
+        </>
+      )}
+      {quizzesLoading && (
         <>
           <br />
           <Typography>Course Quizzes and Learning Objectives Loading...</Typography>
@@ -351,8 +520,79 @@ const UserDashboard: React.FC = () => {
           <CircularProgress />
         </>
       )}
+      {/* Progress Message */}
+      {progressMsg && progressMsg.length > 0 && (
+        <>
+          <br />
+          <Typography className="progress-message" variant="body1" style={{ color: "orange", marginTop: "10px" }}>
+            In-Progress: {progressMsg}
+          </Typography>
+        </>
+      )}
 
-      <Typography fontSize={20}>
+      <br />
+      <br />
+
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+        <Box sx={{ minWidth: 120, maxWidth: 150 }}>
+          <FormControl fullWidth>
+            <InputLabel id="simple-select-label">
+              <Typography variant="body1" style={{ color: systemColorTheme === "dark" ? "white" : "black" }}>
+                Season
+              </Typography>
+            </InputLabel>
+            <Select
+              labelId="season-select-label"
+              id="season-select"
+              value={seasonStr}
+              label="SeasonStr"
+              style={{ color: systemColorTheme === "dark" ? "white" : "black" }}
+              onChange={handleSeasonSelectChange}
+            >
+              {seasonValues.map((season) => (
+                <MenuItem value={season}>
+                  <Typography variant="body1">{season}</Typography>
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+        <Box sx={{ minWidth: 120, maxWidth: 150 }}>
+          <FormControl fullWidth>
+            <InputLabel id="simple-select-label">
+              <Typography variant="body1" style={{ color: systemColorTheme === "dark" ? "white" : "black" }}>
+                Academic Year
+              </Typography>
+            </InputLabel>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <Select
+                labelId="academic-year-select-label"
+                id="academic-year-select"
+                defaultValue=""
+                value={academicYear.toString()}
+                label="AcademicYearStr"
+                style={{ color: systemColorTheme === "dark" ? "white" : "black" }}
+                onChange={handleAcademicYearCalendarChange}
+              >
+                {academicYearSelectRangeArr.map((year) => (
+                  <MenuItem key={year} value={year}>
+                    <Typography variant="body1">{year}</Typography>
+                  </MenuItem>
+                ))}
+              </Select>
+            </LocalizationProvider>
+          </FormControl>
+        </Box>
+        <button type="button" onClick={handleAcademicSemesterYearButtonClick}>
+          <Typography variant="body1">
+            <b>Search</b>
+          </Typography>
+        </button>
+      </div>
+
+      <br />
+
+      <Typography variant="body1" fontSize={20}>
         <b>Your Canvas Course Quiz Entries</b>
       </Typography>
       {canvasQuizDataArrGroupBy &&
@@ -418,7 +658,7 @@ const UserDashboard: React.FC = () => {
                             <button
                               type="submit"
                               onClick={(e) => handleClickToMatcherQuiz(e, entry.canvasCourseInternalId, entry.quizId)}
-                              disabled={coursesLoading}
+                              disabled={quizzesLoading}
                             >
                               {canvasQuizDataArr.filter(
                                 (currEntry) =>

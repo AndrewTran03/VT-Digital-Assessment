@@ -16,14 +16,16 @@ import {
   CanvasAssignmentSubmissionWorkflowState,
   CanvasCourseAssignmentRubricSubmissionMongoDBEntry,
   CanvasCourseAssignmentRubricCategorySubmissionScore,
-  CanvasAssignmentPaginationLinkHeaders
+  CanvasAssignmentPaginationLinkHeaders,
+  SeasonTypeEnumValues
 } from "../shared/types";
 
 // Returns a Map (described below) of the Canvas user's available Quiz IDs
 async function fetchCanvasUserAssignmentData(
-  canvasUserId: number,
   axiosHeaders: AxiosAuthHeaders,
-  courseArr: readonly CanvasCourseInfo[]
+  courseArr: readonly CanvasCourseInfo[],
+  academicSemesterFilter: SeasonTypeEnumValues,
+  academicYearFilter: number
 ): Promise<CanvasUserAssignmentWithRubricBase[]> {
   const assignmentsWithRubricsArr: CanvasUserAssignmentWithRubricBase[] = [];
   // Get every available Assignment of every Canvas course where the user is a TA or Course Instructor
@@ -50,11 +52,12 @@ async function fetchCanvasUserAssignmentData(
         });
 
         assignmentsWithRubricsArr.push({
-          canvasUserId: canvasUserId,
           canvasDeptAbbrev: courseDept,
           canvasCourseNum: courseNum,
           canvasCourseName: courseName,
           canvasCourseInternalId: courseId,
+          canvasCourseAcademicSemesterOffered: academicSemesterFilter,
+          canvasCourseAcademicYearOffered: academicYearFilter,
           canvasCourseAssignmentId: assignmentId,
           canvasCourseAssignmentName: assignmentName,
           canvasCourseAssignmentRubricId: rubricId,

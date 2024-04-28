@@ -8,11 +8,17 @@ import {
   CanvasQuiz,
   CanvasCourse,
   CanvasQuizInfo,
-  CanvasQuizQuestion
+  CanvasQuizQuestion,
+  SeasonTypeEnumValues
 } from "../shared/types";
 
 // Returns a Map (described below) of the Canvas user's available Quiz IDs
-async function fetchCanvasUserQuizData(axiosHeaders: AxiosAuthHeaders, courseArr: readonly CanvasCourseInfo[]) {
+async function fetchCanvasUserQuizData(
+  axiosHeaders: AxiosAuthHeaders,
+  courseArr: readonly CanvasCourseInfo[],
+  academicSemesterFilter: SeasonTypeEnumValues,
+  academicYearFilter: number
+) {
   const canvasQuizAssociations = new Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>();
 
   // Get every available QUIZ of every Canvas course where the user is a TA or Course Instructor
@@ -56,6 +62,8 @@ async function fetchCanvasUserQuizData(axiosHeaders: AxiosAuthHeaders, courseArr
       courseName,
       courseDept,
       courseNum,
+      academicSemesterFilter,
+      academicYearFilter,
       quizArr,
       canvasQuizAssociations
     );
@@ -71,6 +79,8 @@ async function fetchCanvasUserQuizQuestionData(
   courseName: string,
   courseDept: string,
   courseNum: number,
+  academicSemesterFilter: SeasonTypeEnumValues,
+  academicYearFilter: number,
   quizArr: CanvasQuizInfo[],
   canvasQuizAssociations: Map<CanvasCourseInfo, Array<CanvasQuizQuestionGroup>>
 ) {
@@ -102,7 +112,9 @@ async function fetchCanvasUserQuizQuestionData(
       courseId: courseId,
       courseName: courseName,
       courseDept: courseDept,
-      courseNum: courseNum
+      courseNum: courseNum,
+      courseAcademicSemesterOffered: academicSemesterFilter,
+      courseAcademicYearOffered: academicYearFilter
     };
     const mapAccess = canvasQuizAssociations.get(courseInfo);
     if (mapAccess === undefined) {

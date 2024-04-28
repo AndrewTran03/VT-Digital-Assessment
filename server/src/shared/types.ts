@@ -47,6 +47,8 @@ type CanvasCourseInfo = {
   courseName: string;
   courseDept: string;
   courseNum: number;
+  courseAcademicSemesterOffered: SeasonTypeEnumValues;
+  courseAcademicYearOffered: number;
 };
 
 type CanvasQuizInfo = {
@@ -114,10 +116,14 @@ type Calendar = {
 };
 
 type Term = {
-  id?: number;
-  name?: string;
+  id: number;
+  name: string;
   start_at?: Date;
   end_at?: Date;
+  created_at?: Date;
+  completed_at?: Date;
+  workflow_state?: string;
+  gradind_period_group_id?: string;
 };
 
 type CourseProgress = {
@@ -226,7 +232,7 @@ type CanvasQuizQuestionGroup = {
 type CourseObjectiveBase = {
   deptAbbrev: string;
   courseNum: number;
-  semester: "Fall" | "Spring" | "Summer" | "Winter";
+  semester: SeasonTypeEnumValues;
   year: number;
   canvasCourseInternalId: number;
 };
@@ -243,7 +249,15 @@ type CanvasCourseObjectiveGroup = Prettify<
   }
 >;
 
-const SeasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
+const seasonValuesArr = ["Fall", "Spring", "Summer", "Winter"] as const;
+enum SeasonType {
+  Fall = "Fall",
+  Spring = "Spring",
+  Summer = "Summer",
+  Winter = "Winter"
+}
+type SeasonTypeEnumValues = keyof typeof SeasonType;
+
 enum QuestionType {
   multiple_choice_question = "multiple_choice_question",
   essay_question = "essay_question",
@@ -262,6 +276,8 @@ type CanvasCourseQuizMongoDBEntry = {
   canvasCourseName: string;
   canvasCourseDept: string;
   canvasCourseNum: number;
+  canvasCourseAcademicSemesterOffered: SeasonTypeEnumValues;
+  canvasCourseAcademicYearOffered: number;
   quizId: number;
   quizName: string;
   canvasMatchedLearningObjectivesArr: string[][];
@@ -421,11 +437,12 @@ type CanvasUserAPIEntryBase = {
 type CanvasUserAPIEntry = MongoDBCombined<CanvasUserAPIEntryBase>;
 
 type CanvasUserAssignmentWithRubricBase = {
-  canvasUserId: number;
   canvasDeptAbbrev: string;
   canvasCourseNum: number;
   canvasCourseName: string;
   canvasCourseInternalId: number;
+  canvasCourseAcademicSemesterOffered: SeasonTypeEnumValues;
+  canvasCourseAcademicYearOffered: number;
   canvasCourseAssignmentId: number;
   canvasCourseAssignmentName: string;
   canvasCourseAssignmentRubricId: number;
@@ -451,6 +468,8 @@ type CanvasCourseAssignmentRubricObjExtraProperties = {
   canvasCourseNum: number;
   canvasCourseName: string;
   canvasCourseInternalId: number;
+  canvasCourseAcademicSemesterOffered: SeasonTypeEnumValues;
+  canvasCourseAcademicYearOffered: number;
   canvasMatchedLearningObjectivesArr: string[][];
   recentSubmissionData: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
 };
@@ -541,7 +560,8 @@ export {
   CanvasQuizQuestionGroup,
   CanvasCourseSingleCourseObjective,
   CanvasCourseObjectiveGroup,
-  SeasonValues,
+  seasonValuesArr,
+  SeasonTypeEnumValues,
   CanvasCourseQuizMongoDBEntry,
   CanvasCourseQuizQuestionMongoDBEntry,
   CanvasCourseMCQAnswerMongoDBEntry,

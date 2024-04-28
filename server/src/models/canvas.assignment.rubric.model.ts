@@ -5,7 +5,8 @@ import {
   AssignmentRubricCriteriaMongoDBEntry,
   AssignmentRubricRatingMongoDBEntry,
   CanvasCourseAssignmentRubricSubmissionMongoDBEntry,
-  CanvasCourseAssignmentRubricCategorySubmissionScore
+  CanvasCourseAssignmentRubricCategorySubmissionScore,
+  seasonValuesArr
 } from "../shared/types";
 
 const mongoDBName = config.get<string>("mongoDatabaseName");
@@ -115,6 +116,15 @@ const CanvasCourseAssignmentRubricObjSchema = new mongoose.Schema<CanvasCourseAs
     },
     rubricData: {
       type: [AssignmentRubricCriteriaSchema],
+      required: true
+    },
+    canvasCourseAcademicSemesterOffered: {
+      type: String,
+      required: true,
+      enum: seasonValuesArr
+    },
+    canvasCourseAcademicYearOffered: {
+      type: Number,
       required: true
     },
     canvasMatchedLearningObjectivesArr: {

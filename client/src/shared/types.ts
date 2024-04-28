@@ -62,6 +62,7 @@ enum Season {
   Winter = "Winter"
 }
 type SeasonEnumValues = keyof typeof Season;
+const seasonValues = ["Fall", "Spring", "Summer", "Winter"] as const;
 
 type SingleCanvasLearningObjective = {
   deptAbbrev: string;
@@ -420,6 +421,7 @@ const PERCENTAGE_CATEGORIES = ["Exceeds", "Meets", "Below", "None"] as const;
 export {
   backendUrlBase,
   SystemColorThemes,
+  seasonValues,
   MongoDBWithId,
   MongoDBCombined,
   SeasonEnumValues,

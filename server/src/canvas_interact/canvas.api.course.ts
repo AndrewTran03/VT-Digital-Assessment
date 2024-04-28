@@ -1,8 +1,9 @@
 import axios from "axios";
-import { canvasUrl, AxiosAuthHeaders, CanvasCourse, CanvasCourseInfo } from "../shared/types";
+import { canvasUrl, AxiosAuthHeaders, CanvasCourse, CanvasCourseInfo, SeasonTypeEnumValues } from "../shared/types";
+import log from "../utils/logger";
 
 // Returns a number[] of the Canvas user's available Course IDs
-async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
+async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders, academicYearAndSemesterFilterStr: string) {
   let canvasCoursesArr: CanvasCourse[] = [];
 
   const enrollmentTypeRoles = ["teacher", "ta"] as const;
@@ -11,6 +12,7 @@ async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
     const courseParams = {
       enrollment_type: role,
       enrollment_state: "active",
+      include: ["term"],
       state: ["available"]
     } as const;
     const courseRes = await axios.get(`${canvasUrl}/v1/courses?per_page=100`, {
@@ -41,15 +43,32 @@ async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
       if (typeof course.term?.end_at === "string") {
         course.term.end_at = new Date(course.term.end_at);
       }
+      if (typeof course.term?.created_at === "string") {
+        course.term.created_at = new Date(course.term.created_at);
+      }
 
       canvasCoursesTemp[idx] = course;
     });
-    const currArr = Object.values(canvasCoursesTemp);
-    canvasCoursesArr = canvasCoursesArr.concat(currArr);
+    const currEntry = Object.values(canvasCoursesTemp);
+    canvasCoursesArr = canvasCoursesArr.concat(currEntry);
   }
 
+  log.warn(academicYearAndSemesterFilterStr);
+  console.log(JSON.stringify(canvasCoursesArr, null, 2));
+  log.info(canvasCoursesArr.length);
+  canvasCoursesArr.forEach((course) => {
+    log.error(course.term!.name);
+    log.error(course.name);
+    log.error(course.term);
+  });
+  const canvasCourseArrCurrSemesterFiltered = canvasCoursesArr.filter(
+    (entry) => entry.term!.name === academicYearAndSemesterFilterStr
+  );
+  console.log(JSON.stringify(canvasCourseArrCurrSemesterFiltered, null, 2));
+  log.info(canvasCourseArrCurrSemesterFiltered.length);
+
   // Extracts only the relevant information from Course data: CourseIds and CourseNames
-  const courseArr: CanvasCourseInfo[] = canvasCoursesArr.map((item) => {
+  const courseArr: CanvasCourseInfo[] = canvasCourseArrCurrSemesterFiltered.map((item) => {
     // Split the course code string based on "_" or space characters
     const parts = (item.course_code || "").split(/[_\s]+/);
 
@@ -57,11 +76,18 @@ async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders) {
     const courseDept = parts[0];
     const courseNum = parseInt(parts[1]);
 
+    const courseTermParts = item.term!.name.split(" ");
+    console.assert(courseTermParts.length === 2);
+    const courseTermAcademicYear = parseInt(courseTermParts[0]);
+    const courseTermAcademicSemester = courseTermParts[1] as SeasonTypeEnumValues;
+
     return {
       courseId: item.id!,
       courseName: item.name!,
       courseDept: courseDept,
-      courseNum: courseNum
+      courseNum: courseNum,
+      courseAcademicSemesterOffered: courseTermAcademicSemester,
+      courseAcademicYearOffered: courseTermAcademicYear
     };
   });
 
