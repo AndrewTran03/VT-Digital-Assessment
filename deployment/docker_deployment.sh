@@ -64,12 +64,12 @@ while [ "$continue_running" = true ]; do
         docker rmi $(docker images -q)
         docker system prune -a
         MODE=production docker compose -f ./vt-digital-assessment-deploy.prod.yml up  -d --build --timestamps
-        # docker build --no-cache --platform=linux/amd64 ../client/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
-        # docker build --no-cache --platform=linux/amd64 ../server/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker tag vt-digital-assessment-client-frontend-img:latest andrewt03/vt-digital-assessment-client-frontend-img:latest
         docker tag vt-digital-assessment-server-backend-img:latest andrewt03/vt-digital-assessment-server-backend-img:latest
         docker push andrewt03/vt-digital-assessment-client-frontend-img:latest
         docker push andrewt03/vt-digital-assessment-server-backend-img:latest
+        # docker build --no-cache --platform=linux/amd64 ../client/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
+        # docker build --no-cache --platform=linux/amd64 ../server/ -t container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker tag vt-digital-assessment-client-frontend-img:latest container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
         docker tag vt-digital-assessment-server-backend-img:latest container.cs.vt.edu/andrewt03/vt-digital-assessment/server-backend:latest
         docker push container.cs.vt.edu/andrewt03/vt-digital-assessment/client-frontend:latest
