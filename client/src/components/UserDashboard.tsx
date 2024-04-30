@@ -86,9 +86,18 @@ const UserDashboard: React.FC = () => {
   const navigate = useNavigate();
   const [progressMsg, setProgressMsg] = useState("");
   const systemColorTheme = useSystemColorThemeDetector();
-  const [seasonStr, setSeasonStr] = useState<SeasonEnumValues>(determineDefaultSemesterByMonthHelper());
+  const [seasonStr, setSeasonStr] = useState<SeasonEnumValues>(
+    window.localStorage.getItem("selectedAcademicSeasonStr")
+      ? ((JSON.parse(window.localStorage.getItem("selectedAcademicSeasonStr")!) as string).replaceAll(
+          '"',
+          ""
+        ) as SeasonEnumValues)
+      : determineDefaultSemesterByMonthHelper()
+  );
   const academicYearSelectRangeArr = use200YearArrGenerator();
-  const [academicYear, setAcademicYear] = useState(new Date().getFullYear());
+  const [academicYear, setAcademicYear] = useState(
+    parseInt(window.localStorage.getItem("selectedAcademicSemesterYear") ?? new Date().getFullYear().toString())
+  );
   const selectedSemester = `${seasonStr} ${academicYear}`;
   const [canvasAPISemesterDataLoading, setCanvasAPISemesterDataLoading] = useState(false);
   const [quizzesLoading, setQuizzesLoading] = useState(false);
@@ -170,16 +179,6 @@ const UserDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(canvasQuizDataArrIsEmpty);
-    console.log(canvasQuizQuestionStatisticDataArrIsEmpty);
-    console.log(assignmentWithRubricDataArrIsEmpty);
-  }, [
-    canvasQuizQuestionStatisticDataArrIsEmpty,
-    canvasQuizQuestionStatisticDataArrIsEmpty,
-    assignmentWithRubricDataArrIsEmpty
-  ]);
-
-  useEffect(() => {
     console.log(canvasUserId);
   }, [canvasUserId]);
 
@@ -195,9 +194,19 @@ const UserDashboard: React.FC = () => {
     console.log(`Selected Semester: ${selectedSemester}`);
   }, [selectedSemester]);
 
-  function determineDefaultSemesterByMonthHelper() {
+  useEffect(() => {
+    console.log(canvasQuizDataArrIsEmpty);
+    console.log(canvasQuizQuestionStatisticDataArrIsEmpty);
+    console.log(assignmentWithRubricDataArrIsEmpty);
+  }, [
+    canvasQuizQuestionStatisticDataArrIsEmpty,
+    canvasQuizQuestionStatisticDataArrIsEmpty,
+    assignmentWithRubricDataArrIsEmpty
+  ]);
+
+  function determineDefaultSemesterByMonthHelper(): SeasonEnumValues {
     const month = new Date().getMonth();
-    let semester: SeasonEnumValues = "Spring";
+    let semester: SeasonEnumValues = "Spring"; // Default semester value
     switch (month) {
       case 1:
       case 12: {
@@ -323,6 +332,8 @@ const UserDashboard: React.FC = () => {
       const deserializedArray = serializedArray.map((entry) => JSON.parse(entry) as CanvasCourseAssociations);
       setCanvasUserCourseNamesArr(deserializedArray);
     }
+    window.localStorage.setItem("selectedAcademicSeasonStr", JSON.stringify(seasonStr));
+    window.localStorage.setItem("selectedAcademicSemesterYear", JSON.stringify(academicYear));
     navigate("/file_import");
   }
 
@@ -340,6 +351,8 @@ const UserDashboard: React.FC = () => {
     window.localStorage.setItem("canvasCourseInternalId", courseInternalId.toString());
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
+    window.localStorage.setItem("selectedAcademicSeasonStr", JSON.stringify(seasonStr as string));
+    window.localStorage.setItem("selectedAcademicSemesterYear", JSON.stringify(academicYear));
     navigate("/quiz_learning_obj_match");
   }
 
@@ -358,6 +371,8 @@ const UserDashboard: React.FC = () => {
     window.localStorage.setItem("canvasQuizId", specifiedQuizId.toString());
     window.localStorage.setItem("canvasQuizDataArr", JSON.stringify(canvasQuizDataArr));
     window.localStorage.setItem("canvasStatsArr", JSON.stringify(canvasQuizQuestionStatisticDataArr));
+    window.localStorage.setItem("selectedAcademicSeasonStr", JSON.stringify(seasonStr));
+    window.localStorage.setItem("selectedAcademicSemesterYear", JSON.stringify(academicYear));
     navigate("/quiz_statistics");
   }
 
@@ -375,6 +390,8 @@ const UserDashboard: React.FC = () => {
     window.localStorage.setItem("canvasCourseInternalId", specifiedCourseInternalId.toString());
     window.localStorage.setItem("canvasRubricId", specifiedRubricId.toString());
     window.localStorage.setItem("assignmentWithRubricArr", JSON.stringify(assignmentWithRubricDataArr));
+    window.localStorage.setItem("selectedAcademicSeasonStr", JSON.stringify(seasonStr));
+    window.localStorage.setItem("selectedAcademicSemesterYear", JSON.stringify(academicYear));
     navigate("/assignment_with_rubric_learning_obj_match");
   }
 
@@ -392,6 +409,8 @@ const UserDashboard: React.FC = () => {
     window.localStorage.setItem("canvasCourseInternalId", specifiedCourseInternalId.toString());
     window.localStorage.setItem("canvasRubricId", specifiedRubricId.toString());
     window.localStorage.setItem("assignmentWithRubricArr", JSON.stringify(assignmentWithRubricDataArr));
+    window.localStorage.setItem("selectedAcademicSeasonStr", JSON.stringify(seasonStr));
+    window.localStorage.setItem("selectedAcademicSemesterYear", JSON.stringify(academicYear));
     navigate("/assignment_with_rubric_statistics");
   }
 
