@@ -52,6 +52,7 @@ const SSE_TIMER_INTERVAL = 20000; // Timer interval of 15 seconds (in millisecon
 
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);
+  const canvasQuizDataArrIsEmpty = canvasQuizDataArr.length === 0;
   const { setCanvasQuizLearningObjectiveData } = useContext(QuizLearningObjectiveContext);
   const { canvasUserInfo } = useContext(CanvasUserInfoContext);
   const [canvasUserId] = useState(
@@ -60,7 +61,9 @@ const UserDashboard: React.FC = () => {
   const { setCanvasUserCourseNamesArr } = useContext(CanvasUserCourseNamesArrContext);
   const { canvasQuizQuestionStatisticDataArr, setCanvasQuizQuestionStatisticDataArr } =
     useContext(CanvasQuizStatisticContext);
+  const canvasQuizQuestionStatisticDataArrIsEmpty = canvasQuizQuestionStatisticDataArr.length === 0;
   const { assignmentWithRubricDataArr, setAssignmentWithRubricDataArr } = useContext(CanvasAssignmentWithRubricContext);
+  const assignmentWithRubricDataArrIsEmpty = assignmentWithRubricDataArr.length === 0;
   const { setCanvasAssignmentWithRubricLearningObjectiveData } = useContext(
     AssignmentWithRubricLearningObjectiveContext
   );
@@ -91,6 +94,7 @@ const UserDashboard: React.FC = () => {
   const [quizzesLoading, setQuizzesLoading] = useState(false);
   const [quizStatsLoading, setQuizStatsLoading] = useState(false);
   const [assignmentWithRubricDataLoading, setAssignmentWithRubricDataLoading] = useState(false);
+  const [filterButtonSubmitted, setFilterButtonSubmitted] = useState(false);
 
   async function fetchData() {
     console.clear();
@@ -166,6 +170,16 @@ const UserDashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log(canvasQuizDataArrIsEmpty);
+    console.log(canvasQuizQuestionStatisticDataArrIsEmpty);
+    console.log(assignmentWithRubricDataArrIsEmpty);
+  }, [
+    canvasQuizQuestionStatisticDataArrIsEmpty,
+    canvasQuizQuestionStatisticDataArrIsEmpty,
+    assignmentWithRubricDataArrIsEmpty
+  ]);
+
+  useEffect(() => {
     console.log(canvasUserId);
   }, [canvasUserId]);
 
@@ -176,10 +190,6 @@ const UserDashboard: React.FC = () => {
   useEffect(() => {
     console.log(assignmentWithRubricDataArrGroupBy);
   }, [assignmentWithRubricDataArrGroupBy]);
-
-  // useEffect(() => {
-  //   console.log(`Selected Semester: ${seasonStr} ${academicYear}`);
-  // }, [seasonStr, academicYear]);
 
   useEffect(() => {
     console.log(`Selected Semester: ${selectedSemester}`);
@@ -438,6 +448,7 @@ const UserDashboard: React.FC = () => {
   async function handleAcademicSemesterYearButtonClick(e: FormEvent<HTMLButtonElement>) {
     e.preventDefault();
     setCanvasAPISemesterDataLoading(true);
+    setFilterButtonSubmitted(true);
     try {
       const res = await axios.patch(`${backendUrlBase}/api/canvas/${canvasUserId}/${seasonStr}/${academicYear}`);
       if (!res.status.toString().startsWith("2")) {
@@ -593,7 +604,15 @@ const UserDashboard: React.FC = () => {
       <br />
 
       <Typography variant="body1" fontSize={20}>
-        <b>Your Canvas Course Quiz Entries</b>
+        {canvasQuizDataArrIsEmpty && canvasQuizQuestionStatisticDataArrIsEmpty && !filterButtonSubmitted && (
+          <b>No Canvas Quiz Data has been loaded yet.</b>
+        )}
+        {canvasQuizDataArrIsEmpty && canvasQuizQuestionStatisticDataArrIsEmpty && filterButtonSubmitted && (
+          <b>No Canvas Quiz Data found.</b>
+        )}
+        {!canvasQuizDataArrIsEmpty && !canvasQuizQuestionStatisticDataArrIsEmpty && (
+          <b>Your Canvas Course Quiz Entries</b>
+        )}
       </Typography>
       {canvasQuizDataArrGroupBy &&
         Object.entries(canvasQuizDataArrGroupBy).length > 0 &&
@@ -741,7 +760,13 @@ const UserDashboard: React.FC = () => {
         ))}
 
       <Typography fontSize={20}>
-        <b>Your Canvas Course Assignment Entries (With Rubrics)</b>
+        {assignmentWithRubricDataArrIsEmpty && !filterButtonSubmitted && (
+          <b>No Canvas Course Assignment (with Rubric) Data has been loaded yet.</b>
+        )}
+        {assignmentWithRubricDataArrIsEmpty && filterButtonSubmitted && (
+          <b>No Canvas Course Assignment (with Rubric) Data found.</b>
+        )}
+        {!assignmentWithRubricDataArrIsEmpty && <b>Your Canvas Course Assignment Entries (With Rubrics)</b>}
       </Typography>
       {assignmentWithRubricDataArrGroupBy &&
         Object.entries(assignmentWithRubricDataArrGroupBy).length > 0 &&
