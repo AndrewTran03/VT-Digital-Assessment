@@ -65,12 +65,19 @@ sh docker_deployment.sh
 - Fill in the `Purpose` section with your reason for generating a Canvas API token and set your desired expiration date in the `Expires` row. Then, click `Generate Token`.
 - You will then see your `API Token`. Save this someplace safe as it will be generated only this once, and you cannot see it again. If you lose the token, you need to regenerate it again using the steps above.
 
-## Useful Links:
+## Useful Production Links:
 
-- VT CS Cloud Website (Discovery Cluster) - Frontend: https://vt-digital-assessment.discovery.cs.vt.edu/
-- VT CS Cloud Website (Discovery Cluster) - Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/
-- VT CS Cloud Website (Endeavour Cluster) - Frontend: https://vt-digital-assessment.endeavour.cs.vt.edu/
-- VT CS Cloud Website (Endeavour Cluster) - Backend: https://vt-digital-assessment-server.endeavour.cs.vt.edu/
+- VT CS Cloud Website (`Discovery` Cluster) - Frontend: https://vt-digital-assessment.discovery.cs.vt.edu/
+- VT CS Cloud Website (`Discovery` Cluster) - Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/
+- VT CS Cloud Website (`Endeavour` Cluster) - Frontend: https://vt-digital-assessment.endeavour.cs.vt.edu/
+- VT CS Cloud Website (`Endeavour` Cluster) - Backend: https://vt-digital-assessment-server.endeavour.cs.vt.edu/
+
+## Useful Development Links (LOCAL ONLY):
+
+- Frontend: https://vt-digital-assessment.discovery.cs.vt.edu/
+OR http://localhost:5001/
+- Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/ OR http://localhost:3001/
+- Traefik Dashboard: http://localhost:8000/
 
 ## Extra Resources:
 

@@ -12,14 +12,14 @@ continue_running=true
 while [ "$continue_running" = true ]; do
     echo "Here are the following options:"
     echo "[1] Type ['list' or 'ls'] to List Current Docker Processes"
-    echo "[2] Type ['deploy'] to Deploy the Application Fresh"
+    echo "[2] Type ['deploy-local'] to Deploy the Application Fresh"
     echo "[3] Type ['stop-and-remove'] to Stop and Remove the Deployed & Running Application Containers"
-    echo "[4] Type ['re-deploy'] to Re-Deploy the Application (Currently Running) -- Useful for Applying New Changes"
+    echo "[4] Type ['re-deploy-local'] to Re-Deploy the Application (Currently Running) -- Useful for Applying New Changes"
     echo "[5] Type ['push' or 'p'] to Push the Docker Images to the GitLab (GIT.CS.VT.EDU) Container Registry"
     echo "[6] Type ['system-clean'] to Un-Deploy the Application & Clear all Docker Containers, Images, Orphan-Processes, or other Objects from Docker Desktop"
     echo "[7] Type ['clear'] to Clear and Re-Display the Menu Again"
     echo "[8] Type ['exit', 'quit', 'e', or 'q'] to Exit this Deployment Script"
-    echo "NOTE: If you press any other key, then the script will just exit."
+    echo "NOTE: If you press any other key or type any other word, then the script will just exit."
 
     read userInput
     clear
@@ -32,7 +32,7 @@ while [ "$continue_running" = true ]; do
     elif [ "$userInputLowercase" == "list" ] || [ "$userInputLowercase" == "ls" ]; then
         docker ps
         docker images
-    elif [ "$userInputLowercase" == "deploy" ]; then
+    elif [ "$userInputLowercase" == "deploy-local" ]; then
         docker ps
         docker images
         docker rmi $(docker images -q)
@@ -47,7 +47,7 @@ while [ "$continue_running" = true ]; do
         docker image prune
         docker ps
         docker images
-    elif [ "$userInputLowercase" == "re-deploy" ]; then
+    elif [ "$userInputLowercase" == "re-deploy-local" ]; then
         docker ps
         docker images
         docker rmi $(docker images -q)
