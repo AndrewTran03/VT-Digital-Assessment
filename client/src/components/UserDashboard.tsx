@@ -48,7 +48,7 @@ import "../styles/TableCellStyles.css";
 import { APIRequestError } from "../shared/APIRequestError";
 import useSystemColorThemeDetector from "../shared/hooks/useSystemColorThemeDetector";
 
-const SSE_TIMER_INTERVAL = 20000; // Timer interval of 15 seconds (in milliseconds)
+const SSE_TIMER_INTERVAL = 20000; // Timer interval of 20 seconds (in milliseconds)
 
 const UserDashboard: React.FC = () => {
   const { canvasQuizDataArr, setCanvasQuizDataArr } = useContext(CanvasQuizQuestionContext);

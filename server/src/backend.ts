@@ -5,10 +5,8 @@ import dotenv from "dotenv";
 let ENV_FILE_PATH = "";
 if (process.env["NODE_ENV"] === "development") {
   ENV_FILE_PATH = "../.env.development";
-} else if (process.env["NODE_ENV"] === "production") {
-  ENV_FILE_PATH = "../../.env.production";
-} else if (process.env["NODE_ENV"] === "staging") {
-  ENV_FILE_PATH = "../../.env.staging";
+} else if (process.env["NODE_ENV"] === "production" || process.env["NODE_ENV"] === "staging") {
+  ENV_FILE_PATH = `../../.env.${process.env["NODE_ENV"]}`;
 } else {
   console.error('Invalid configuration for the "NODE_ENV" variable:');
   console.error(process.env["NODE_ENV"]);

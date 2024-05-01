@@ -11,7 +11,7 @@ import "../styles/UserLoginMessage.css";
 
 const FAILURE_TIMER_COUNT = 10;
 const TRANSITION_LOADING_TIMER_COUNT = 3;
-const SSE_TIMER_INTERVAL = 20000; // Timer interval of 15 seconds (in milliseconds)
+const SSE_TIMER_INTERVAL = 20000; // Timer interval of 20 seconds (in milliseconds)
 
 const UserLogin: React.FC = () => {
   const { setCanvasUserInfo } = useContext(CanvasUserInfoContext);
