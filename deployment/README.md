@@ -93,4 +93,3 @@ push (or p) # [TYPE THIS]
 - VT CS Cloud Website (`Discovery` Cluster) - Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/
 - VT CS Cloud Website (`Endeavour` Cluster) - Frontend: https://vt-digital-assessment.endeavour.cs.vt.edu/
 - VT CS Cloud Website (`Endeavour` Cluster) - Backend: https://vt-digital-assessment-server.endeavour.cs.vt.edu/
-
