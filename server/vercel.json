@@ -1,0 +1,26 @@
+{
+  "version": 2,
+  "builds": { 
+    "src": "src/**/*.ts", 
+    "use": "@vercel/node",
+    "config": {
+      "tscOptions": {
+        "module": "nodenext",
+        "moduleResolution": "node",
+        "target": "esnext",
+        "esModuleInterop": true
+      }
+    }
+  },
+  "routes": [
+    { "src": "/(.*)", "dest": "/src/backend.ts" }
+  ],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "production": {
+      "handler": "dist/src/backend.js"
+    }
+  }
+}
