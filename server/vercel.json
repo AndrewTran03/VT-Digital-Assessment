@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "builds": { 
+  "builds": [{
     "src": "src/**/*.ts", 
     "use": "@vercel/node",
     "config": {
@@ -10,8 +10,8 @@
         "target": "esnext",
         "esModuleInterop": true
       }
-    }
-  },
+    } 
+  }],
   "routes": [
     { "src": "/(.*)", "dest": "/src/backend.ts" }
   ],
