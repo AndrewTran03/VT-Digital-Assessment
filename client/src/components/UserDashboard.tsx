@@ -102,7 +102,6 @@ const UserDashboard: React.FC = () => {
       return "";
     }
   });
-  // const courseSelectRef = useRef<HTMLSelectElement>(null);
   const mergedCanvasItemDataArrForTermAndYear: CanvasCourseItemMongoDBEntry[] = window.localStorage.getItem(
     "mergedCollectionArr"
   )
@@ -722,7 +721,6 @@ const UserDashboard: React.FC = () => {
                 defaultValue={"Hi"}
                 value={selectedCourse}
                 label="CourseSelectStr"
-                // ref={courseSelectRef}
                 style={{ color: systemColorTheme === "dark" ? "white" : "black" }}
                 onChange={handleCourseSelectChange}
               >
