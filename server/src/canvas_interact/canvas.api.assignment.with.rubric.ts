@@ -49,6 +49,7 @@ async function fetchCanvasUserAssignmentData(
         const canvasCourseAssignmentRubricUsedForGrading = use_rubric_for_grading as boolean;
         const assignmentName = assignmentData.name as string;
         const assignmentId = assignmentData.id as number;
+        const assignmentHtmlUrl = assignmentData.html_url as string;
         const rubricId = assignmentData.rubric_settings.id as number;
         const rubricTitle = assignmentData.rubric_settings.title as string;
 
@@ -67,6 +68,7 @@ async function fetchCanvasUserAssignmentData(
           canvasCourseAcademicYearOffered: academicYearFilter,
           canvasCourseAssignmentId: assignmentId,
           canvasCourseAssignmentName: assignmentName,
+          canvasCourseAssignmentHtmlUrl: assignmentHtmlUrl,
           canvasCourseAssignmentRubricId: rubricId,
           canvasCourseAssignmentRubricTitle: rubricTitle,
           canvasCourseAssignmentRubricUsedForGrading: canvasCourseAssignmentRubricUsedForGrading,

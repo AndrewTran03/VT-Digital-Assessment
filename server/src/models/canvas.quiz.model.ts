@@ -97,6 +97,10 @@ const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>
       type: Date,
       required: true
     },
+    quizHtmlUrl: {
+      type: String,
+      required: true
+    },
     canvasMatchedLearningObjectivesArr: {
       type: [[String]],
       required: true

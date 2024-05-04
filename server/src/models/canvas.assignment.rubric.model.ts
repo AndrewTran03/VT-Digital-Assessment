@@ -100,6 +100,10 @@ const CanvasCourseAssignmentRubricObjSchema = new mongoose.Schema<CanvasCourseAs
       type: Date,
       required: true
     },
+    canvasAssignmentHtmlUrl: {
+      type: String,
+      required: true
+    },
     canvasRubricId: {
       type: Number,
       required: true

@@ -59,7 +59,8 @@ async function fetchCanvasUserQuizData(
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({
       quizId: item.id!,
       quizName: item.title!,
-      quizDueAt: item.due_at!
+      quizDueAt: item.due_at!,
+      quizHtmlUrl: item.html_url!
     }));
 
     await fetchCanvasUserQuizQuestionData(
@@ -92,7 +93,7 @@ async function fetchCanvasUserQuizQuestionData(
 ) {
   console.clear();
   // Get every QUESTION for every available quiz of every Canvas course where the user is a TA or Course Instructor
-  for (const { quizId, quizName, quizDueAt } of quizArr) {
+  for (const { quizId, quizName, quizDueAt, quizHtmlUrl } of quizArr) {
     const quizQuestionsRes = await axios.get(
       `${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/questions?per_page=100`,
       {
@@ -111,6 +112,7 @@ async function fetchCanvasUserQuizQuestionData(
       quizId: quizId,
       quizName: quizName,
       quizDueAt: quizDueAt,
+      quizHtmlUrl: quizHtmlUrl,
       questions: canvasCurrQuizQuestionsArr
     };
 

@@ -72,7 +72,8 @@ async function fetchCanvasUserQuizStatisticsData(
     const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({
       quizId: item.id!,
       quizName: item.title!,
-      quizDueAt: item.due_at!
+      quizDueAt: item.due_at!,
+      quizHtmlUrl: item.html_url!
     }));
 
     await fetchCanvasUserQuizAnswerReportData(

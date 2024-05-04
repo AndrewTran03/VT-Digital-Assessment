@@ -13,6 +13,7 @@ const canvasQuizQuestionSchema = z
     quizId: z.number().gte(0),
     quizName: z.string().min(1),
     quizDueAt: z.date().nullable(),
+    quizHtmlUrl: z.string().min(1),
     canvasMatchedLearningObjectivesArr: z.array(z.array(z.string()).default([])).default([]),
     canvasQuizEntries: z
       .array(
@@ -41,6 +42,7 @@ const canvasAssignmentRubricSchema = z
     canvasCourseName: z.string().min(1),
     canvasCourseInternalId: z.number().gte(0),
     canvasAssignmentDueAt: z.date().nullable(),
+    canvasAssignmentHtmlUrl: z.string().min(1),
     canvasCourseAcademicSemesterOffered: z.enum(seasonValuesArr),
     canvasCourseAcademicYearOffered: z.number().gte(0),
     canvasMatchedLearningObjectivesArr: z.array(z.array(z.string())).default([]),

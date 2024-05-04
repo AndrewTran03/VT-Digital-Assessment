@@ -26,7 +26,7 @@ import {
   fetchCanvasUserAssignmentData,
   fetchCanvasUserAssignmentRubricData,
   fetchCanvasUserAssignmentSubmissionData
-} from "../canvas_interact/canvas.api.assignment.rubric";
+} from "../canvas_interact/canvas.api.assignment.with.rubric";
 import { CanvasCourseAssignmentRubricObjModel } from "../models/canvas.assignment.rubric.model";
 import { CourseObjectivesModel } from "../models/canvas.objectives.model";
 
@@ -250,7 +250,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
       questionGroups,
       { courseId, courseName, courseDept, courseNum, courseAcademicSemesterOffered, courseAcademicYearOffered }
     ) => {
-      questionGroups.forEach(({ quizId, quizName, quizDueAt, questions }) => {
+      questionGroups.forEach(({ quizId, quizName, quizDueAt, quizHtmlUrl, questions }) => {
         const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
         questions.forEach((question) => {
           const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
@@ -281,6 +281,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
           quizId: quizId,
           quizName: quizName,
           quizDueAt: quizDueAt,
+          quizHtmlUrl: quizHtmlUrl,
           canvasCourseAcademicSemesterOffered: courseAcademicSemesterOffered,
           canvasCourseAcademicYearOffered: courseAcademicYearOffered,
           // Empty for now: Will be resolved later in front-end React Matching Component
@@ -317,6 +318,7 @@ function convertAssignmentWithRubricArrToBeMongoDBCompliant(
       canvasAssignmentId: assignmentRubricResult.canvasCourseAssignmentId,
       canvasAssignmentName: assignmentRubricResult.canvasCourseAssignmentName,
       canvasAssignmentDueAt: assignmentRubricResult.canvasCourseAssignmentDueAt,
+      canvasAssignmentHtmlUrl: assignmentRubricResult.canvasCourseAssignmentHtmlUrl,
       title: assignmentRubricObjArrEntry.title,
       maxPoints: assignmentRubricObjArrEntry.maxPoints,
       rubricData: assignmentRubricObjArrEntry.rubricData,
