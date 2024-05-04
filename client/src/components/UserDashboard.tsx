@@ -648,7 +648,13 @@ const UserDashboard: React.FC = () => {
 
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
         <Box sx={{ minWidth: 120, maxWidth: 150 }}>
-          <FormControl fullWidth>
+          <FormControl
+            fullWidth
+            variant="outlined"
+            disabled={
+              quizzesLoading || assignmentWithRubricDataLoading || quizStatsLoading || canvasAPISemesterDataLoading
+            }
+          >
             <InputLabel id="simple-select-label">
               <Typography variant="body1" style={{ color: systemColorTheme === "dark" ? "white" : "black" }}>
                 Term
@@ -672,7 +678,13 @@ const UserDashboard: React.FC = () => {
           </FormControl>
         </Box>
         <Box sx={{ minWidth: 120, maxWidth: 150 }}>
-          <FormControl fullWidth>
+          <FormControl
+            fullWidth
+            variant="outlined"
+            disabled={
+              quizzesLoading || assignmentWithRubricDataLoading || quizStatsLoading || canvasAPISemesterDataLoading
+            }
+          >
             <InputLabel id="simple-select-label">
               <Typography variant="body1" style={{ color: systemColorTheme === "dark" ? "white" : "black" }}>
                 Academic Year
@@ -697,7 +709,13 @@ const UserDashboard: React.FC = () => {
             </LocalizationProvider>
           </FormControl>
         </Box>
-        <button type="button" onClick={handleAcademicSemesterYearButtonClick}>
+        <button
+          type="button"
+          onClick={handleAcademicSemesterYearButtonClick}
+          disabled={
+            quizzesLoading || assignmentWithRubricDataLoading || quizStatsLoading || canvasAPISemesterDataLoading
+          }
+        >
           <Typography variant="body1">
             <b>Search</b>
           </Typography>
@@ -709,7 +727,13 @@ const UserDashboard: React.FC = () => {
       {uniqueCanvasCourseArrForTermandYear.length > 0 ? (
         <div style={{ display: "flex", justifyContent: "center", alignItems: "center", marginBottom: "20px" }}>
           <Box sx={{ minWidth: 300, maxWidth: 450 }}>
-            <FormControl fullWidth>
+            <FormControl
+              fullWidth
+              variant="outlined"
+              disabled={
+                quizzesLoading || assignmentWithRubricDataLoading || quizStatsLoading || canvasAPISemesterDataLoading
+              }
+            >
               <InputLabel id="simple-select-label">
                 <Typography variant="body1" style={{ color: systemColorTheme === "dark" ? "white" : "black" }}>
                   Course To Display
@@ -724,8 +748,8 @@ const UserDashboard: React.FC = () => {
                 style={{ color: systemColorTheme === "dark" ? "white" : "black" }}
                 onChange={handleCourseSelectChange}
               >
-                {uniqueCanvasCourseArrForTermandYear.map((courseName, idx) => (
-                  <MenuItem key={courseName} value={courseName} defaultChecked={idx === 0}>
+                {uniqueCanvasCourseArrForTermandYear.map((courseName) => (
+                  <MenuItem key={courseName} value={courseName}>
                     <Typography variant="body1">{courseName}</Typography>
                   </MenuItem>
                 ))}
