@@ -171,6 +171,7 @@ type CanvasCourseQuizMongoDBEntry = MongoDBCombined<{
   quizId: number;
   quizName: string;
   quizDueAt: dateLike;
+  quizHtmlUrl: string;
   canvasMatchedLearningObjectivesArr: string[][];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 }>;
@@ -373,6 +374,7 @@ type CanvasCourseAssignmentRubricObjExtraProperties = {
   canvasCourseName: string;
   canvasCourseInternalId: number;
   canvasAssignmentDueAt: dateLike;
+  canvasAssignmentHtmlUrl: string;
   canvasCourseAcademicSemesterOffered: SeasonEnumValues;
   canvasCourseAcademicYearOffered: number;
   canvasMatchedLearningObjectivesArr: string[][];
@@ -435,9 +437,10 @@ type CanvasCourseItemMongoDBEntry = {
   canvasCourseAcademicYearOffered: number;
   canvasItemId: number;
   canvasAssignmentRubricId?: number;
-  canvasItenName: string;
+  canvasItemName: string;
   canvasNumberItems: number;
   canvasCourseItemDueAt: dateLike;
+  canvasCourseItemHtmlUrl: string;
   canvasMatchedLearningObjectivesArr: string[][];
   canvasItemType: "Assessment (Quiz/Test)" | "Assignment (with Rubric)";
 };

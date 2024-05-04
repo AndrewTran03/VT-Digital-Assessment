@@ -827,7 +827,11 @@ const UserDashboard: React.FC = () => {
                       <Typography>{entry.canvasItemId}</Typography>
                     </TableCell>
                     <TableCell className="table-cell" style={{ width: "30%" }}>
-                      <Typography>{entry.canvasItenName}</Typography>
+                      <Typography>
+                        <a href={entry.canvasCourseItemHtmlUrl} hrefLang="en" target="_blank" rel="noopener noreferrer">
+                          {entry.canvasItemName}
+                        </a>
+                      </Typography>
                     </TableCell>
                     <TableCell className="table-cell" style={{ width: "15%" }}>
                       <Typography>{entry.canvasNumberItems}</Typography>

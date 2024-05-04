@@ -27,6 +27,7 @@ function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]): CanvasCours
     const quizId = data.quizId as number;
     const quizName = data.quizName;
     const quizDueAt = data.quizDueAt as dateLike;
+    const quizHtmlUrl = data.quizHtmlUrl;
     const canvasMatchedLearningObjectivesArr: string[][] = [];
     data.canvasMatchedLearningObjectivesArr.forEach((learningObjectiveQuesArr: any) => {
       const currLearningObjectiveQuesArr = learningObjectiveQuesArr as string[];
@@ -81,6 +82,7 @@ function parseCanvasQuizQuestionMongoDBDCollection(quizData: any[]): CanvasCours
       quizId: quizId,
       quizName: quizName,
       quizDueAt: quizDueAt,
+      quizHtmlUrl: quizHtmlUrl,
       canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr,
       canvasQuizEntries: canvasQuizEntries
     };
@@ -99,6 +101,7 @@ function mergeCanvasQuizAndAssignmentRubricDBCollectionArr(
   quizData.forEach((quizEntry) => {
     const itemId = quizEntry.quizId;
     const itemName = quizEntry.quizName;
+    const itemHtmlUrl = quizEntry.quizHtmlUrl;
 
     let itemDueAt: dateLike = null;
     if (typeof quizEntry.quizDueAt === "string") {
@@ -126,8 +129,9 @@ function mergeCanvasQuizAndAssignmentRubricDBCollectionArr(
       canvasCourseAcademicSemesterOffered: canvasCourseAcademicSemesterOffered,
       canvasCourseAcademicYearOffered: canvasCourseAcademicYearOffered,
       canvasItemId: itemId,
-      canvasItenName: itemName,
+      canvasItemName: itemName,
       canvasCourseItemDueAt: itemDueAt,
+      canvasCourseItemHtmlUrl: itemHtmlUrl,
       canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr,
       canvasNumberItems: canvasNumberItems,
       canvasItemType: "Assessment (Quiz/Test)"
@@ -137,8 +141,9 @@ function mergeCanvasQuizAndAssignmentRubricDBCollectionArr(
 
   assignmentWithRubricData.forEach((assignmentEntry) => {
     const itemId = assignmentEntry.canvasAssignmentId;
-    const rubricId = assignmentEntry.canvasRubricId;
     const itemName = assignmentEntry.canvasAssignmentName;
+    const rubricId = assignmentEntry.canvasRubricId;
+    const itemHtmlUrl = assignmentEntry.canvasAssignmentHtmlUrl;
 
     let itemDueAt: dateLike = null;
     if (typeof assignmentEntry.canvasAssignmentDueAt === "string") {
@@ -167,8 +172,9 @@ function mergeCanvasQuizAndAssignmentRubricDBCollectionArr(
       canvasCourseAcademicYearOffered: canvasCourseAcademicYearOffered,
       canvasItemId: itemId,
       canvasAssignmentRubricId: rubricId,
-      canvasItenName: itemName,
+      canvasItemName: itemName,
       canvasCourseItemDueAt: itemDueAt,
+      canvasCourseItemHtmlUrl: itemHtmlUrl,
       canvasMatchedLearningObjectivesArr: canvasMatchedLearningObjectivesArr,
       canvasNumberItems: canvasNumberItems,
       canvasItemType: "Assignment (with Rubric)"
@@ -182,21 +188,21 @@ function determineUniqueSetOfCanvasCourseArrForTermandYear(
   quizData: CanvasCourseQuizMongoDBEntry[],
   assignmentWithRubricData: CanvasCourseAssignmentRubricObjMongoDBEntry[]
 ) {
-  const canvasCourseTermUniqueSet: string[] = [];
+  const canvasCourseTermUniqueCollection: string[] = [];
 
   for (const { canvasCourseName } of quizData) {
-    if (!canvasCourseTermUniqueSet.includes(canvasCourseName)) {
-      canvasCourseTermUniqueSet.push(canvasCourseName);
+    if (!canvasCourseTermUniqueCollection.includes(canvasCourseName)) {
+      canvasCourseTermUniqueCollection.push(canvasCourseName);
     }
   }
 
   for (const { canvasCourseName } of assignmentWithRubricData) {
-    if (!canvasCourseTermUniqueSet.includes(canvasCourseName)) {
-      canvasCourseTermUniqueSet.push(canvasCourseName);
+    if (!canvasCourseTermUniqueCollection.includes(canvasCourseName)) {
+      canvasCourseTermUniqueCollection.push(canvasCourseName);
     }
   }
 
-  return canvasCourseTermUniqueSet;
+  return canvasCourseTermUniqueCollection;
 }
 
 export {
