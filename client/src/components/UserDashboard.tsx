@@ -142,11 +142,6 @@ const UserDashboard: React.FC = () => {
   const [assignmentWithRubricDataLoading, setAssignmentWithRubricDataLoading] = useState(false);
   const [filterButtonSubmitted, setFilterButtonSubmitted] = useState(false);
   const [displayedCourseHasLearningObjectives, setDisplayedCourseHasLearningObjectives] = useState(true);
-  // const [courseSelectMUISelected, setCourseSelectMUISelected] = useState(
-  //   window.localStorage.getItem("courseSelectMUISelected")
-  //     ? (JSON.parse(window.localStorage.getItem("courseSelectMUISelected")!) as boolean)
-  //     : false
-  // );
   const [courseSelectMUISelected, setCourseSelectMUISelected] = useState(false);
 
   async function fetchData() {
@@ -769,17 +764,6 @@ const UserDashboard: React.FC = () => {
             <br />
           </>
         )}
-        {/* {filterButtonSubmitted && (!canvasQuizDataArrIsEmpty ||
-          !canvasQuizQuestionStatisticDataArrIsEmpty) &&
-          !assignmentWithRubricDataArrIsEmpty && (
-            <>
-              <b>
-                {selectedCourse !== ""
-                  ? "Your Canvas Course Entries"
-                  : "Select a course from the drop-down (above) to proceed!"}
-              </b>
-            </>
-          )} */}
         {courseSelectMUISelected || selectedCourse.length > 0 ? (
           <>
             <b>Your Canvas Course Entries</b>
