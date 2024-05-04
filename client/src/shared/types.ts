@@ -8,6 +8,7 @@ type Prettify<T> = {
 type numberLike = number | null;
 type booleanLike = boolean | null;
 type numberArrLike = number[] | null;
+type dateLike = Date | null;
 
 // Using built-in Vite properties to determine frontend & backend URLs for the application
 const mode = import.meta.env.MODE;
@@ -165,8 +166,11 @@ type CanvasCourseQuizMongoDBEntry = MongoDBCombined<{
   canvasCourseName: string;
   canvasCourseDept: string;
   canvasCourseNum: number;
+  canvasCourseAcademicSemesterOffered: SeasonEnumValues;
+  canvasCourseAcademicYearOffered: number;
   quizId: number;
   quizName: string;
+  quizDueAt: dateLike;
   canvasMatchedLearningObjectivesArr: string[][];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 }>;
@@ -368,6 +372,9 @@ type CanvasCourseAssignmentRubricObjExtraProperties = {
   canvasCourseNum: number;
   canvasCourseName: string;
   canvasCourseInternalId: number;
+  canvasAssignmentDueAt: dateLike;
+  canvasCourseAcademicSemesterOffered: SeasonEnumValues;
+  canvasCourseAcademicYearOffered: number;
   canvasMatchedLearningObjectivesArr: string[][];
   recentSubmissionData: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
 };
@@ -418,8 +425,26 @@ type RubricRatingSubmissionScore = Prettify<
 
 const PERCENTAGE_CATEGORIES = ["Exceeds", "Meets", "Below", "None"] as const;
 
+type CanvasCourseItemMongoDBEntry = {
+  canvasUserId: number;
+  canvasCourseInternalId: number;
+  canvasCourseName: string;
+  canvasCourseDept: string;
+  canvasCourseNum: number;
+  canvasCourseAcademicSemesterOffered: SeasonEnumValues;
+  canvasCourseAcademicYearOffered: number;
+  canvasItemId: number;
+  canvasAssignmentRubricId?: number;
+  canvasItenName: string;
+  canvasNumberItems: number;
+  canvasCourseItemDueAt: dateLike;
+  canvasMatchedLearningObjectivesArr: string[][];
+  canvasItemType: "Assessment (Quiz/Test)" | "Assignment (with Rubric)";
+};
+
 export {
   backendUrlBase,
+  dateLike,
   SystemColorThemes,
   seasonValues,
   MongoDBWithId,
@@ -441,6 +466,7 @@ export {
   CanvasUserInfoObj,
   CanvasQuizStatistic,
   CanvasQuizStatisticsResultObj,
+  CanvasCourseItemMongoDBEntry,
   CanvasQuizQuestionAnswerFrequencyArrEntry,
   CanvasQuizQuestionAnswerSetFrequencyArrEntry,
   CanvasCourseAssignmentRubricObjMongoDBEntry,
