@@ -93,20 +93,4 @@ server.listen(backendServerPort, async () => {
   log.info(`Server started on ${backendServerUrl}`);
   await ensureConnectionToCanvasApi();
   await ensureConnectionToMongoDatabase();
-
-  //   const res = await axios.get(`${canvasUrl}/v1/courses/185355/discussion_topics?per_page=100`, {
-  //     headers: await getCanvasApiAuthHeaders(171111)
-  //   });
-
-  //   res.data.forEach((topic: any) => {
-  //     // log.info(topic.title);
-
-  //     if (topic.title === "Software Protection") {
-  //       log.info(topic.id);
-  //       log.info(topic.lock_at);
-  //       log.info(typeof topic.lock_at);
-  //       log.info(topic.lock_at as string);
-  //       log.info(topic.lock_at === null);
-  //     }
-  //   });
 });
