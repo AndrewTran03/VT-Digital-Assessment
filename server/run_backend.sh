@@ -48,7 +48,7 @@ while [ "$modeLowercase" != "development" ] && [ "$modeLowercase" != "d" ] && [ 
     modeLowercase=$(echo "$mode" | tr '[:upper:]' '[:lower:]')
 done
 
-# Check if the mode is 'development' or 'production'
+# Check if the mode is 'development' or 'production' or 'staging'
 if [ "$modeLowercase" == "development" ] || [ "$modeLowercase" == "d" ]; then
     echo "Backend: Development mode selected"
     npm_config_color=always npm run start 2>&1 | tee -a "./logs/$file_name"
