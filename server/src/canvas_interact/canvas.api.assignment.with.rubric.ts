@@ -81,6 +81,14 @@ async function fetchCanvasUserAssignmentData(
     });
     log.warn(`Finished Assignment Course Parsing Index ${j}: ---------------------------------`);
   }
+
+  log.info("ALL LISTED ASSIGNMENT NAMES FOR THAT SEMESTER:");
+  assignmentsWithRubricsArr.forEach((assignment) => {
+    log.warn(
+      `Course: ${assignment.canvasCourseName} - ${assignment.canvasCourseAssignmentName} (ID#${assignment.canvasCourseAssignmentId})`
+    );
+  });
+
   return assignmentsWithRubricsArr;
 }
 

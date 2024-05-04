@@ -62,6 +62,10 @@ async function fetchCanvasUserQuizData(
       quizDueAt: item.due_at!,
       quizHtmlUrl: item.html_url!
     }));
+    log.info(`ALL LISTED QUIZ NAMES FOR COURSE ID (${courseName}) THAT SEMESTER:`);
+    quizArr.forEach((quiz) => {
+      log.warn(`${quiz.quizName} (ID#${quiz.quizId})`);
+    });
 
     await fetchCanvasUserQuizQuestionData(
       axiosHeaders,
