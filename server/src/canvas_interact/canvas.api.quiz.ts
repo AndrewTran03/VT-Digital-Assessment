@@ -105,6 +105,11 @@ async function fetchCanvasUserQuizQuestionData(
       }
     );
 
+    if (quizQuestionsRes.data.length === 0) {
+      log.warn(`Quiz ${quizName} (ID#${quizId}) has no questions.`);
+      continue;
+    }
+
     // Assigns each CanvasQuizQuestion object to proper array index, then drops it (keeps object)
     // PREV: JSON - 0: { ...object... } => TS: arr[0] = ...object...
     const canvasQuizQuestionTemp: Record<number, CanvasQuizQuestion> = {};
