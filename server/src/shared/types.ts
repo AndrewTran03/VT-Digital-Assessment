@@ -54,6 +54,7 @@ type CanvasCourseInfo = {
 type CanvasQuizInfo = {
   quizId: number;
   quizName: string;
+  quizDueAt: Date | null;
 };
 
 // Reference: https://canvas.vt.edu/doc/api/live#!/assignments.json/
@@ -167,7 +168,7 @@ type CanvasQuiz = {
   cant_go_back?: boolean;
   access_code?: string;
   ip_filter?: string;
-  due_at?: Date;
+  due_at?: Date | null;
   lock_at?: Date;
   unlock_at?: Date;
   published?: boolean;
@@ -226,6 +227,7 @@ type CanvasQuizAnswer = CanvasCourseMCQAnswerMongoDBEntry;
 type CanvasQuizQuestionGroup = {
   quizId: number;
   quizName: string;
+  quizDueAt: Date | null;
   questions: CanvasQuizQuestion[];
 };
 
@@ -280,6 +282,7 @@ type CanvasCourseQuizMongoDBEntry = {
   canvasCourseAcademicYearOffered: number;
   quizId: number;
   quizName: string;
+  quizDueAt: Date | null;
   canvasMatchedLearningObjectivesArr: string[][];
   canvasQuizEntries: CanvasCourseQuizQuestionMongoDBEntry[];
 };
@@ -451,6 +454,7 @@ type CanvasUserAssignmentWithRubricBase = {
   canvasCourseAssignmentRubricCategoryIds: string[];
   canvasCourseAssignmentRubricObjArr: CanvasCourseAssignmentRubricObjBaseProperties[];
   canvasCourseAssignmentRubricSubmissionArr: CanvasCourseAssignmentRubricSubmissionMongoDBEntry[];
+  canvasCourseAssignmentDueAt: Date | null;
 };
 
 type CanvasCourseAssignmentRubricObjBaseProperties = {
@@ -468,6 +472,7 @@ type CanvasCourseAssignmentRubricObjExtraProperties = {
   canvasCourseNum: number;
   canvasCourseName: string;
   canvasCourseInternalId: number;
+  canvasAssignmentDueAt: Date | null;
   canvasCourseAcademicSemesterOffered: SeasonTypeEnumValues;
   canvasCourseAcademicYearOffered: number;
   canvasMatchedLearningObjectivesArr: string[][];

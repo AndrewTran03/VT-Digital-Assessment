@@ -28,6 +28,7 @@ import {
   fetchCanvasUserAssignmentSubmissionData
 } from "../canvas_interact/canvas.api.assignment.rubric";
 import { CanvasCourseAssignmentRubricObjModel } from "../models/canvas.assignment.rubric.model";
+import { CourseObjectivesModel } from "../models/canvas.objectives.model";
 
 const router = express.Router();
 const userLoginProgressEmitter = new EventEmitter();
@@ -249,7 +250,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
       questionGroups,
       { courseId, courseName, courseDept, courseNum, courseAcademicSemesterOffered, courseAcademicYearOffered }
     ) => {
-      questionGroups.forEach(({ quizId, quizName, questions }) => {
+      questionGroups.forEach(({ quizId, quizName, quizDueAt, questions }) => {
         const quizEntries: CanvasCourseQuizQuestionMongoDBEntry[] = [];
         questions.forEach((question) => {
           const newQuizQuestionEntry: CanvasCourseQuizQuestionMongoDBEntry = {
@@ -279,6 +280,7 @@ function convertCanvasQuizMapToArray(userId: number, inputMap: Map<CanvasCourseI
           canvasCourseNum: courseNum,
           quizId: quizId,
           quizName: quizName,
+          quizDueAt: quizDueAt,
           canvasCourseAcademicSemesterOffered: courseAcademicSemesterOffered,
           canvasCourseAcademicYearOffered: courseAcademicYearOffered,
           // Empty for now: Will be resolved later in front-end React Matching Component
@@ -314,6 +316,7 @@ function convertAssignmentWithRubricArrToBeMongoDBCompliant(
       canvasRubricId: assignmentRubricResult.canvasCourseAssignmentRubricId,
       canvasAssignmentId: assignmentRubricResult.canvasCourseAssignmentId,
       canvasAssignmentName: assignmentRubricResult.canvasCourseAssignmentName,
+      canvasAssignmentDueAt: assignmentRubricResult.canvasCourseAssignmentDueAt,
       title: assignmentRubricObjArrEntry.title,
       maxPoints: assignmentRubricObjArrEntry.maxPoints,
       rubricData: assignmentRubricObjArrEntry.rubricData,
@@ -357,6 +360,27 @@ router.get("/api/canvas/retrieveCanvasId/progress", (req, res) => {
     userLoginProgressEmitter.off("progress", progressHandler);
     clearInterval(keepAliveInterval);
   });
+});
+
+router.get("/api/canvas/retrieveCanvasLearningObjectiveStatus/:canvasCourseInternalId", async (req, res) => {
+  const canvasCourseInternalId = parseInt(req.params.canvasCourseInternalId);
+  try {
+    const listedCourseLearningObjectives = await CourseObjectivesModel.findOne({
+      canvasCourseInternalId: canvasCourseInternalId
+    });
+    if (!listedCourseLearningObjectives) {
+      throw new Error("The specified Canvas learning-objectives for this course do not exist in the MongoDB database");
+    }
+    log.info(listedCourseLearningObjectives.canvasObjectives);
+    return res.status(200).send(JSON.stringify(listedCourseLearningObjectives.canvasObjectives));
+  } catch (err) {
+    log.error("Did not find any Canvas learning objective for that course! Please try again!");
+    const resErrBody: APIErrorResponse = {
+      errorLoc: "GET",
+      errorMsg: "No items found in MongoDB database"
+    };
+    return res.status(400).send(JSON.stringify(resErrBody));
+  }
 });
 
 router.put("/api/canvas/retrieveCanvasId/:canvasAccountId/:canvasUsername", async (req, res) => {

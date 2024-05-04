@@ -57,9 +57,9 @@ async function fetchCanvasUserCourseData(axiosHeaders: AxiosAuthHeaders, academi
   console.log(JSON.stringify(canvasCoursesArr, null, 2));
   log.info(canvasCoursesArr.length);
   canvasCoursesArr.forEach((course) => {
-    log.error(course.term!.name);
-    log.error(course.name);
-    log.error(course.term);
+    log.warn(course.term!.name);
+    log.warn(course.name);
+    log.warn(course.term);
   });
   const canvasCourseArrCurrSemesterFiltered = canvasCoursesArr.filter(
     (entry) => entry.term!.name === academicYearAndSemesterFilterStr

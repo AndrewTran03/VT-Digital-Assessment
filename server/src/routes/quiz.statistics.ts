@@ -2,7 +2,7 @@ import express from "express";
 import log from "../utils/logger";
 import { APIErrorResponse, CanvasQuizStatistic, SeasonTypeEnumValues } from "../shared/types";
 import { fetchCanvasUserCourseData } from "../canvas_interact/canvas.api.course";
-import { fetchCanvasUserQuizReportData } from "../canvas_interact/canvas.api.quiz.stats";
+import { fetchCanvasUserQuizStatisticsData } from "../canvas_interact/canvas.api.quiz.stats";
 import { getCanvasApiAuthHeaders } from "../utils/canvas.connection";
 import { CanvasQuizStats } from "../canvas_stats/canvas.quiz.stats";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
@@ -19,7 +19,7 @@ router.get("/api/statistics/quiz/:canvasUserId/:academicSemesterStr/:academicYea
   const academicYear = parseInt(academicYearStr);
   const academicYearAndSemesterFilterStr = `${academicYear} ${academicSemester}` as const;
   const canvasUserCourseIds = await fetchCanvasUserCourseData(axiosHeaders, academicYearAndSemesterFilterStr);
-  const canvasQuizStatisticArr = await fetchCanvasUserQuizReportData(
+  const canvasQuizStatisticArr = await fetchCanvasUserQuizStatisticsData(
     axiosHeaders,
     canvasUserId,
     canvasUserCourseIds,

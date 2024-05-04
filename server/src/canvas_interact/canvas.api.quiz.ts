@@ -41,6 +41,8 @@ async function fetchCanvasUserQuizData(
       }
       if (typeof quiz.due_at === "string") {
         quiz.due_at = new Date(quiz.due_at);
+      } else if (quiz.due_at === null) {
+        quiz.due_at = null;
       }
       if (typeof quiz.lock_at === "string") {
         quiz.lock_at = new Date(quiz.lock_at);
@@ -54,7 +56,11 @@ async function fetchCanvasUserQuizData(
     canvasQuizzesArr = Object.values(canvasQuizzesTemp);
 
     // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
-    const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
+    const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({
+      quizId: item.id!,
+      quizName: item.title!,
+      quizDueAt: item.due_at!
+    }));
 
     await fetchCanvasUserQuizQuestionData(
       axiosHeaders,
@@ -86,7 +92,7 @@ async function fetchCanvasUserQuizQuestionData(
 ) {
   console.clear();
   // Get every QUESTION for every available quiz of every Canvas course where the user is a TA or Course Instructor
-  for (const { quizId, quizName } of quizArr) {
+  for (const { quizId, quizName, quizDueAt } of quizArr) {
     const quizQuestionsRes = await axios.get(
       `${canvasUrl}/v1/courses/${courseId}/quizzes/${quizId}/questions?per_page=100`,
       {
@@ -104,6 +110,7 @@ async function fetchCanvasUserQuizQuestionData(
     const quizMapEntry: CanvasQuizQuestionGroup = {
       quizId: quizId,
       quizName: quizName,
+      quizDueAt: quizDueAt,
       questions: canvasCurrQuizQuestionsArr
     };
 

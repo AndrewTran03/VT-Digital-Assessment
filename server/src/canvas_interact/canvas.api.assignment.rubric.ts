@@ -39,6 +39,13 @@ async function fetchCanvasUserAssignmentData(
       const use_rubric_for_grading: booleanLike = assignmentData.use_rubric_for_grading ?? null;
 
       if (use_rubric_for_grading !== null) {
+        let canvasCourseAssignmentDueAt: Date | null = null;
+        if (typeof assignmentData.due_at === "string") {
+          canvasCourseAssignmentDueAt = new Date(assignmentData.due_at);
+        } else if (assignmentData.due_at === null) {
+          canvasCourseAssignmentDueAt = null;
+        }
+
         const canvasCourseAssignmentRubricUsedForGrading = use_rubric_for_grading as boolean;
         const assignmentName = assignmentData.name as string;
         const assignmentId = assignmentData.id as number;
@@ -65,7 +72,8 @@ async function fetchCanvasUserAssignmentData(
           canvasCourseAssignmentRubricUsedForGrading: canvasCourseAssignmentRubricUsedForGrading,
           canvasCourseAssignmentRubricCategoryIds: rubricCriteriaIdsForAssignment,
           canvasCourseAssignmentRubricObjArr: [],
-          canvasCourseAssignmentRubricSubmissionArr: []
+          canvasCourseAssignmentRubricSubmissionArr: [],
+          canvasCourseAssignmentDueAt: canvasCourseAssignmentDueAt
         });
       }
     });

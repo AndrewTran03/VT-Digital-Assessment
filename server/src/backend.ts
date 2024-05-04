@@ -28,8 +28,10 @@ import util from "util";
 import { Server } from "socket.io";
 import log from "./utils/logger";
 import router from "./routes";
-import { ensureConnectionToCanvasApi } from "./utils/canvas.connection";
+import { ensureConnectionToCanvasApi, getCanvasApiAuthHeaders } from "./utils/canvas.connection";
 import { ensureConnectionToMongoDatabase } from "./utils/mongo.connection";
+import { canvasUrl } from "./shared/types";
+import axios from "axios";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
@@ -91,4 +93,20 @@ server.listen(backendServerPort, async () => {
   log.info(`Server started on ${backendServerUrl}`);
   await ensureConnectionToCanvasApi();
   await ensureConnectionToMongoDatabase();
+
+  //   const res = await axios.get(`${canvasUrl}/v1/courses/185355/discussion_topics?per_page=100`, {
+  //     headers: await getCanvasApiAuthHeaders(171111)
+  //   });
+
+  //   res.data.forEach((topic: any) => {
+  //     // log.info(topic.title);
+
+  //     if (topic.title === "Software Protection") {
+  //       log.info(topic.id);
+  //       log.info(topic.lock_at);
+  //       log.info(typeof topic.lock_at);
+  //       log.info(topic.lock_at as string);
+  //       log.info(topic.lock_at === null);
+  //     }
+  //   });
 });

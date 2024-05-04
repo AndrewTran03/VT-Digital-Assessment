@@ -15,6 +15,8 @@ const canvasQuizzesMongoCollectionName = config.get<string>("canvasQuizzesMongoC
 // Reference: https://mongoosejs.com/docs/api/schemastring.html
 // Allow empty strings to pass "required" check (needed for initial empty string of "canvasMatchedLearningObjective" property)
 mongoose.Schema.Types.String.checkRequired((v) => v !== null && v !== undefined);
+// Allow null values to pass "required" check (needed for initial null value of "quizDueAt" property)
+mongoose.Schema.Types.Date.checkRequired((v) => v !== undefined);
 
 const CanvasCourseMCQAnswerSchema = new mongoose.Schema<CanvasCourseMCQAnswerMongoDBEntry>({
   weight: {
@@ -89,6 +91,10 @@ const CanvasCourseQuizSchema = new mongoose.Schema<CanvasCourseQuizMongoDBEntry>
     },
     quizName: {
       type: String,
+      required: true
+    },
+    quizDueAt: {
+      type: Date,
       required: true
     },
     canvasMatchedLearningObjectivesArr: {

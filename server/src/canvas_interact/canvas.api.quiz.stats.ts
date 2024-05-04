@@ -23,7 +23,7 @@ import { extractTextFromHTMLHelper } from "../utils/html.extracter";
 import { CanvasCourseQuizModel } from "../models/canvas.quiz.model";
 
 // TODO: Pass semester filters over
-async function fetchCanvasUserQuizReportData(
+async function fetchCanvasUserQuizStatisticsData(
   axiosHeaders: AxiosAuthHeaders,
   canvasUserId: number,
   courseArr: readonly CanvasCourseInfo[],
@@ -51,6 +51,11 @@ async function fetchCanvasUserQuizReportData(
       }
       if (typeof quiz.due_at === "string") {
         quiz.due_at = new Date(quiz.due_at);
+      } else if (quiz.due_at === null) {
+        quiz.due_at = null;
+      }
+      if (typeof quiz.due_at === "string") {
+        quiz.due_at = new Date(quiz.due_at);
       }
       if (typeof quiz.lock_at === "string") {
         quiz.lock_at = new Date(quiz.lock_at);
@@ -64,7 +69,11 @@ async function fetchCanvasUserQuizReportData(
     const canvasQuizzesArr = Object.values(canvasQuizzesTemp) as CanvasQuiz[];
 
     // Extracts only the relevant information from Quiz data: Quiz Ids and Quiz Titles/Names
-    const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({ quizId: item.id!, quizName: item.title! }));
+    const quizArr: CanvasQuizInfo[] = canvasQuizzesArr.map((item) => ({
+      quizId: item.id!,
+      quizName: item.title!,
+      quizDueAt: item.due_at!
+    }));
 
     await fetchCanvasUserQuizAnswerReportData(
       axiosHeaders,
@@ -334,4 +343,4 @@ function parseCanvasQuizQuestionStatResultHelper(quizStatsEntry: any) {
   return newCanvasQuizStatistic;
 }
 
-export { fetchCanvasUserQuizReportData, fetchCanvasUserQuizAnswerReportData };
+export { fetchCanvasUserQuizStatisticsData, fetchCanvasUserQuizAnswerReportData };
