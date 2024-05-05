@@ -34,5 +34,3 @@ Thumbs.db
 
 # Logging files
 logs/
-
-output*.json

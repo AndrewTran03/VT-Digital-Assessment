@@ -1,23 +1,23 @@
-// import path from "path";
-// import dotenv from "dotenv";
+import path from "path";
+import dotenv from "dotenv";
 
-// // Checking for a valid 'NODE_ENV' variable configuration
-// let ENV_FILE_PATH = "";
-// if (process.env["NODE_ENV"] === "development") {
-//   ENV_FILE_PATH = "../.env.development";
-// } else if (process.env["NODE_ENV"] === "production" || process.env["NODE_ENV"] === "staging") {
-//   ENV_FILE_PATH = `../../.env.${process.env["NODE_ENV"]}`;
-// } else {
-//   console.error('Invalid configuration for the "NODE_ENV" variable:');
-//   console.error(process.env["NODE_ENV"]);
-//   process.exit(1);
-// }
-// dotenv.config({
-//   debug: true,
-//   encoding: "utf8",
-//   override: true,
-//   path: path.resolve(__dirname, ENV_FILE_PATH)
-// });
+// Checking for a valid 'NODE_ENV' variable configuration
+let ENV_FILE_PATH = "";
+if (process.env["NODE_ENV"] === "development") {
+  ENV_FILE_PATH = "../.env.development";
+} else if (process.env["NODE_ENV"] === "production" || process.env["NODE_ENV"] === "staging") {
+  ENV_FILE_PATH = `../../.env.${process.env["NODE_ENV"]}`;
+} else {
+  console.error('Invalid configuration for the "NODE_ENV" variable:');
+  console.error(process.env["NODE_ENV"]);
+  process.exit(1);
+}
+dotenv.config({
+  debug: true,
+  encoding: "utf8",
+  override: true,
+  path: path.resolve(__dirname, ENV_FILE_PATH)
+});
 
 process.env["SUPPRESS_NO_CONFIG_WARNING"] = "y";
 
@@ -53,11 +53,11 @@ log.info("'Config' Internal Object Properties:");
 log.trace(util.inspect(config, { depth: null }));
 
 // Fallback in case of invalid '.env.*' file configuration
-// if (Object.values(config).includes("undefined")) {
-//   log.error(".env File did NOT load correctly or improper setting of '.env' file properties");
-//   log.error("Exiting server now before future crash...");
-//   process.exit(1);
-// }
+if (Object.values(config).includes("undefined")) {
+  log.error(".env File did NOT load correctly or improper setting of '.env' file properties");
+  log.error("Exiting server now before future crash...");
+  process.exit(1);
+}
 
 const frontendClientPort = config.get<number>("frontendClientPort");
 const frontendClientUrl = config.get<string>("frontendClientUrl");

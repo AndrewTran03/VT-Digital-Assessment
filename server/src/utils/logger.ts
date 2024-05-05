@@ -1,10 +1,8 @@
 import logger, { Logger } from "pino";
-import pino from "pino";
 import dayjs from "dayjs";
 import config from "config";
 
-// const level = config.get<string>("logLevel") ?? "trace";
-const level = "trace";
+const level = config.get<string>("logLevel");
 
 /*
 From Chat-GPT: 
@@ -19,7 +17,7 @@ increasing order of severity, are:
 - error: Indicates errors that the application can recover from.
 - fatal: Represents critical errors that lead to the termination of the application.
 */
-const log: Logger = pino({
+const log: Logger = logger({
   level: level,
   transport: {
     target: "pino-pretty",
