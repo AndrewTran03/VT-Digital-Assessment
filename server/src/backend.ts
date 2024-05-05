@@ -51,11 +51,11 @@ log.info("'Config' Internal Object Properties:");
 log.trace(util.inspect(config, { depth: null }));
 
 // Fallback in case of invalid '.env.*' file configuration
-if (Object.values(config).includes("undefined")) {
-  log.error(".env File did NOT load correctly or improper setting of '.env' file properties");
-  log.error("Exiting server now before future crash...");
-  process.exit(1);
-}
+// if (Object.values(config).includes("undefined")) {
+//   log.error(".env File did NOT load correctly or improper setting of '.env' file properties");
+//   log.error("Exiting server now before future crash...");
+//   process.exit(1);
+// }
 
 const frontendClientPort = config.get<number>("frontendClientPort");
 const frontendClientUrl = config.get<string>("frontendClientUrl");
