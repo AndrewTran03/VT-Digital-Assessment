@@ -1,4 +1,5 @@
 import logger, { Logger } from "pino";
+import pino from "pino";
 import dayjs from "dayjs";
 import config from "config";
 
@@ -18,7 +19,7 @@ increasing order of severity, are:
 - error: Indicates errors that the application can recover from.
 - fatal: Represents critical errors that lead to the termination of the application.
 */
-const log: Logger = logger({
+const log: Logger = pino({
   level: level,
   transport: {
     target: "pino-pretty",
