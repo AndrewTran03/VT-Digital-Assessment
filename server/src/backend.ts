@@ -19,6 +19,8 @@
 //   path: path.resolve(__dirname, ENV_FILE_PATH)
 // });
 
+process.env["SUPPRESS_NO_CONFIG_WARNING"] = "y";
+
 import express, { NextFunction } from "express";
 import bodyParser from "body-parser";
 import config from "config";
