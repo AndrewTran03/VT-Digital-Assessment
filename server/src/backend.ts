@@ -19,8 +19,6 @@ dotenv.config({
   path: path.resolve(__dirname, ENV_FILE_PATH)
 });
 
-process.env["SUPPRESS_NO_CONFIG_WARNING"] = "y";
-
 import express, { NextFunction } from "express";
 import bodyParser from "body-parser";
 import config from "config";
@@ -30,10 +28,8 @@ import util from "util";
 import { Server } from "socket.io";
 import log from "./utils/logger";
 import router from "./routes";
-import { ensureConnectionToCanvasApi, getCanvasApiAuthHeaders } from "./utils/canvas.connection";
+import { ensureConnectionToCanvasApi } from "./utils/canvas.connection";
 import { ensureConnectionToMongoDatabase } from "./utils/mongo.connection";
-import { canvasUrl } from "./shared/types";
-import axios from "axios";
 
 // Link: https://medium.com/swlh/typescript-with-mongoose-and-node-express-24073d51d2eed
 const app = express();
