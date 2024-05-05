@@ -13,7 +13,7 @@
     "build": "rm -rf dist && tsc --module nodenext --moduleResolution nodenext --target esnext --esModuleInterop true",
     "stage": "NODE_ENV=staging node dist/src/backend.js",
     "production": "NODE_ENV=production node dist/src/backend.js",
-    "vercel-build": "npm run format && npm run build && node dist/src/backend.js"
+    "vercel-build": "npm run format && npm run build"
   },
   "pre-commit": [
     "vercel-build"
