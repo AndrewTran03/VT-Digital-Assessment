@@ -2,17 +2,17 @@
   "version": 2,
   "builds": [
     {
-      "src": "dist/src/backend.js",
+      "src": "server/dist/src/backend.js",
       "use": "@vercel/node",
       "config": {
-        "includeFiles": ["dist/**"]
+        "includeFiles": ["server/dist/**"]
       }
     }
   ],
   "routes": [
     { 
-      "src": "/(.*)", 
-      "dest": "dist/src/backend.js" 
+      "src": "/server/(.*)", 
+      "dest": "server/dist/src/backend.js" 
     }
   ]
 }
