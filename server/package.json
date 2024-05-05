@@ -12,8 +12,12 @@
     "format": "prettier --write \"**/*.ts*\" \"**/*.js*\"",
     "build": "rm -rf dist && tsc --module nodenext --moduleResolution nodenext --target esnext --esModuleInterop true",
     "stage": "NODE_ENV=staging node dist/src/backend.js",
-    "production": "NODE_ENV=production node dist/src/backend.js"
+    "production": "NODE_ENV=production node dist/src/backend.js",
+    "vercel-build": "npm run format && npm run build && node dist/src/backend.js"
   },
+  "pre-commit": [
+    "vercel-build"
+  ],
   "devDependencies": {
     "@typegoose/typegoose": "^12.1.0",
     "@types/bcrypt": "^5.0.2",
