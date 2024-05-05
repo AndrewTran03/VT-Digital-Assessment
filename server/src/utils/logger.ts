@@ -2,7 +2,8 @@ import logger, { Logger } from "pino";
 import dayjs from "dayjs";
 import config from "config";
 
-const level = config.get<string>("logLevel") ?? "trace";
+// const level = config.get<string>("logLevel") ?? "trace";
+const level = "trace";
 
 /*
 From Chat-GPT: 
