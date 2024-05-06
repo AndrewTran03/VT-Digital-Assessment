@@ -74,9 +74,9 @@ sh docker_deployment.sh
 
 ## Useful Development Links (LOCAL ONLY):
 
-- Frontend: https://vt-digital-assessment.discovery.cs.vt.edu/
+- Frontend: https://vt-digital-assessment.localhost.devcom.vt.edu/
 OR http://localhost:5001/
-- Backend: https://vt-digital-assessment-server.discovery.cs.vt.edu/ OR http://localhost:3001/
+- Backend: https://vt-digital-assessment-server.localhost.devcom.vt.edu/ OR http://localhost:3001/
 - Traefik Dashboard: http://localhost:8000/
 
 ## Extra Resources:
