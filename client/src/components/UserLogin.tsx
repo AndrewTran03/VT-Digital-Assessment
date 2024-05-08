@@ -1,4 +1,14 @@
-import { Box, CircularProgress, Table, TableBody, TableCell, TableRow, Typography } from "@mui/material";
+import {
+  Accordion,
+  AccordionSummary,
+  Box,
+  CircularProgress,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography
+} from "@mui/material";
 import axios, { AxiosError } from "axios";
 import { FormEvent, useContext, useEffect, useRef, useState } from "react";
 import { useCookies } from "react-cookie";
@@ -26,6 +36,17 @@ const UserLogin: React.FC = () => {
   const [progressMsg, setProgressMsg] = useState("");
   const systemColorTheme = useSystemColorThemeDetector();
   const navigate = useNavigate();
+  const [canvasApiKeyAccordionOpen, setCanvasApiKeyAccordionOpen] = useState(false);
+  const canvasApiKeySetupInstructions = [
+    "Login to your VT Canvas Account.",
+    "In the top left on your Canvas User Dashboard, click 'Account'.",
+    "Click on 'Settings'.",
+    "Scroll down. Click on the '+ New Access Token' Button.",
+    "Enter a purpose for the token",
+    "If desired, set an expiration date. Otherwise, leave it blank for no expiration.",
+    "Click 'Generate Token'.",
+    "Copy the token and paste it in the 'Canvas User API Key' field."
+  ] as const;
 
   useEffect(() => {
     // Clear local storage for fresh login
@@ -117,7 +138,6 @@ const UserLogin: React.FC = () => {
 
       // Clear countdown and navigate to dashboard after 3 seconds
       setTimeout(() => {
-        setUserSubmitInfoComplete(false);
         navigate("/dashboard");
       }, TRANSITION_LOADING_TIMER_COUNT * 1000);
 
@@ -195,7 +215,7 @@ const UserLogin: React.FC = () => {
 
   return (
     <>
-      <Typography variant="body1" fontSize={20}>
+      <Typography data-cy-testid="login-header" variant="body1" fontSize={20}>
         <b>Welcome to the Virginia Tech Digital Assessment Application!</b>
       </Typography>
       <Table
@@ -247,6 +267,53 @@ const UserLogin: React.FC = () => {
       <button type="submit" onClick={handleApiInputSubmitClick} disabled={loading}>
         Submit User Info
       </button>
+      <Accordion
+        expanded={canvasApiKeyAccordionOpen}
+        onChange={() => setCanvasApiKeyAccordionOpen((prevState) => !prevState)}
+        style={{
+          marginTop: "10px",
+          border: "1px solid lightgray",
+          borderRadius: "5px"
+        }}
+        disabled={loading || userSubmitInfoComplete}
+      >
+        <AccordionSummary
+          style={{
+            marginTop: "10px",
+            border: "1px solid lightgray",
+            borderRadius: "10px"
+          }}
+        >
+          <div style={{ textAlign: "center", width: "100%" }}>
+            <Typography>
+              <b>
+                {!canvasApiKeyAccordionOpen
+                  ? "Instructions on How to Generate a Canvas User API Key"
+                  : "How to Generate a Canvas User API Key"}
+              </b>
+            </Typography>
+          </div>
+        </AccordionSummary>
+        <Table>
+          <TableBody>
+            {canvasApiKeySetupInstructions.map((instruction, idx) => (
+              <TableRow>
+                <TableCell
+                  style={{
+                    border: "2px solid lightgray",
+                    display: "flex",
+                    flexDirection: "column",
+                    flexGrow: 1,
+                    height: "100%"
+                  }}
+                >
+                  {`[${idx + 1}] ${instruction}`}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </Accordion>
       {/* Loading Iconography */}
       {loading && (
         <Box sx={{ display: "flex", justifyContent: "center" }}>
