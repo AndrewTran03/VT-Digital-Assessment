@@ -311,6 +311,29 @@ const UserLogin: React.FC = () => {
                 </TableCell>
               </TableRow>
             ))}
+            <TableRow>
+              <TableCell>
+                <Typography>
+                  <b>NOTES:</b>
+                  <br />
+                  <ol>
+                    <li>
+                      The Canvas User API Key is used to authenticate your user information with the Canvas API. Please
+                      keep this key secure and do <b>NOT</b> share it with anyone.
+                    </li>
+                    <li>
+                      If you need have lost your current Canvas User API Key, please follow the <b>same</b> steps as{" "}
+                      <b>above</b> but before generating a new one, scroll down and <b>DELETE</b> the <b>OLD</b> entry{" "}
+                      <b>first</b>.
+                    </li>
+                    <li>
+                      If you have any questions or concerns, please contact the Virginia Tech Digital Assessment Working
+                      Group.
+                    </li>
+                  </ol>
+                </Typography>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </Accordion>
