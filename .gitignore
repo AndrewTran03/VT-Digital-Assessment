@@ -1,4 +1,6 @@
+# MacOS-Specific file
 .DS_Store
 
+# Hide any extra Makefile-prefixed files
 Makefile*
 !Makefile
