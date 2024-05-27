@@ -1,0 +1,14 @@
+$ lsof -i :PORT_NUMBER
+# kill -9 $(lsof -ti :PORT_NUMBER)
+OR ...
+$ lsof -ti :PORT_NUMBER | xargs kill -9
+
+This will show you the process that is using the port.
+
+However, for MacOS, the common PORT number 5000 is used for AirPlay.
+
+https://www.reddit.com/r/webdev/comments/qg8yt9/apple_took_over_port_5000_in_the_latest_macos/
+https://forums.developer.apple.com/forums/thread/682332
+
+You can disable in System Preferences --> Sharing --> AirPlay Receiver (OR just search AirPlay 
+Receiver in Spotlight and disable it.)
