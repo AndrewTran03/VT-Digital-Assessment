@@ -1,0 +1,4 @@
+References on How to Setup Cypress Code Coverage (Vite + TS + React):
+
+- https://medium.com/@nelfayran/cypress-react-and-vite-collaboration-bed6761808fc
+- https://www.npmjs.com/package/nyc
