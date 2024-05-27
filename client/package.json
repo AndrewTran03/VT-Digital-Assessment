@@ -11,20 +11,29 @@
     "build-prod": "tsc && vite build --debug --mode production --target esNext --clearScreen",
     "format": "prettier --write \"**/*.ts*\" \"**/*.js*\" \"**/*.css\" \"**/*.html\"",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives",
-    "preview": "vite preview --port 5001"
+    "preview": "vite preview --port 5001",
+    "cypress": "cypress open --browser chrome",
+    "cypress:code-cov-report": "nyc report --reporter=text-summary",
+    "test:component": "cypress run --component --browser chrome --headless",
+    "test:e2e": "cypress run --e2e --browser chrome --headless",
+    "test:e2e-script": "./cypress/run_e2e_cypress_tests.sh 5500",
+    "test:e2e-code-cov": "open ./coverage/lcov-report/index.html"
   },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.12.39",
+    "@cypress/react18": "^2.0.0",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@mui/material": "^5.15.7",
     "@mui/x-date-pickers": "^7.3.1",
+    "@types/cypress__code-coverage": "^3.10.2",
     "@types/d3": "^7.4.3",
     "@types/lodash": "^4.17.0",
-    "@types/node": "^20.11.30",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@types/react-vis": "^1.11.15",
@@ -39,6 +48,7 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
     "lodash": "^4.17.21",
+    "nyc": "^15.1.0",
     "prettier": "3.2.4",
     "react-cookie": "^7.0.2",
     "react-drag-drop-files": "^2.3.10",
@@ -48,6 +58,7 @@
     "tslint-config-prettier": "1.18.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
+    "vite-plugin-istanbul": "^6.0.2",
     "zod": "^3.22.4",
     "zod-validation-error": "^3.0.0"
   }
