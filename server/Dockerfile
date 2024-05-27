@@ -20,7 +20,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install all necessary dependencies from Alpine Linux
 RUN apk update && \
-    apk add --no-cache vim bash npm make git openjdk11 build-base python3
+    apk add --no-cache vim bash
 
 # Install NPM dependencies
 COPY package.json .
