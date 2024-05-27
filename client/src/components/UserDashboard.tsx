@@ -94,10 +94,10 @@ const UserDashboard: React.FC = () => {
   ).sort();
   const [selectedCourse, setSelectedCourse] = useState(() => {
     console.log(`IS LENGTH > 0? ${uniqueCanvasCourseArrForTermandYear.length > 0}`);
-    if (uniqueCanvasCourseArrForTermandYear.length > 0) {
-      return (uniqueCanvasCourseArrForTermandYear[0] as string).replaceAll('"', "");
-    } else if (window.localStorage.getItem("selectedCourse")) {
+    if (window.localStorage.getItem("selectedCourse")) {
       return (JSON.parse(window.localStorage.getItem("selectedCourse")!) as string).replaceAll('"', "");
+    } else if (uniqueCanvasCourseArrForTermandYear.length > 0) {
+      return (uniqueCanvasCourseArrForTermandYear[0] as string).replaceAll('"', "");
     } else {
       return "";
     }
@@ -545,6 +545,7 @@ const UserDashboard: React.FC = () => {
     e.preventDefault();
     console.log(e.target.value.toString());
     setSelectedCourse(e.target.value.toString());
+    window.localStorage.setItem("selectedCourse", JSON.stringify(e.target.value.toString()));
     setCourseSelectMUISelected(true);
   }
 
