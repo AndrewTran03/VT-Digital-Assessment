@@ -3,9 +3,16 @@ dist/
 node_modules/
 
 # Git-related files
-.git
+.git/
 .gitignore
 
 # Docker-related files
 Dockerfile
 .dockerignore
+
+# Testing files
+cypress/
+.nyc_output/
+coverage/
+cypress.config.ts
+nyc.config.ts
