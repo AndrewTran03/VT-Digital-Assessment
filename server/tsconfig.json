@@ -9,7 +9,8 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "noPropertyAccessFromIndexSignature": true
+    "noPropertyAccessFromIndexSignature": true,
+    "types": ["node", "jest"]
   },
-  "include": ["src/**/*", "./env.d.ts", "config/**/*", "types/**/*"]
+  "include": ["src/**/*", "./env.d.ts", "config/**/*", "tests/**/*"]
 }
