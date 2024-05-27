@@ -4,7 +4,7 @@ node_modules/
 logs/
 
 # Git-related files
-.git
+.git/
 .gitignore
 
 # Docker-related files
@@ -14,3 +14,8 @@ Dockerfile
 # Enviornment files
 .env*
 !.env.production
+
+# Testing files
+tests/
+jest.config.ts
+vercel.json
